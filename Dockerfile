@@ -3,9 +3,11 @@ FROM mcr.microsoft.com/playwright/python:v1.48.0-jammy
 
 WORKDIR /app
 
-# Asılılıqları quraşdır (requests, bs4, dnspython, flask) + gunicorn
+# Asılılıqları quraşdır + gunicorn + playwright (EYNİ python mühitinə!)
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt gunicorn
+RUN pip install --no-cache-dir -r requirements.txt gunicorn playwright
+# Chromium brauzerini həmin playwright versiyası üçün quraşdır
+RUN playwright install chromium
 
 # Tətbiqi kopyala
 COPY . .
