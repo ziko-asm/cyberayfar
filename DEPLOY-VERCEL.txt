@@ -1,0 +1,43 @@
+==================================================
+ CYBERAYFAR SCANER — VERCEL-ə DEPLOY
+==================================================
+
+Layihə Vercel üçün HAZIRDIR (vercel.json + api/index.py var).
+Deploy etmək üçün İKİ yol var:
+
+--------------------------------------------------
+ YOL A) GitHub -> Vercel  (TÖVSIYƏ — bir daha fayl yazmazsan)
+--------------------------------------------------
+1) github.com-a gir -> "New repository" -> ad ver (məs: cyberayfar)
+2) "uploading an existing file" linkinə bas
+3) skaner qovluğunun İÇİNDƏKİ bütün faylları sürükləyib burax
+   (app.py, motor.py, vercel.json, api/, core/, modullar/, templates/...)
+4) "Commit changes"
+5) vercel.com -> "Add New Project" -> "Import Git Repository"
+   -> yeni repo-nu seç -> "Deploy"
+6) 1-2 dəqiqəyə canlı URL hazır olacaq!
+
+Bundan sonra: dəyişiklik lazım olsa, GitHub-da faylı redaktə et ->
+Vercel avtomatik yenidən deploy edir. Bir daha ZIP endirmək yoxdur.
+
+--------------------------------------------------
+ YOL B) Vercel CLI  (Node lazımdır)
+--------------------------------------------------
+1) npm i -g vercel
+2) cd skaner
+3) vercel         (brauzerdə giriş edəcək)
+4) vercel --prod  (canlı versiya)
+
+==================================================
+ VACİB: Mühit dəyişəni (Environment Variable)
+==================================================
+Vercel-də: Project -> Settings -> Environment Variables:
+
+   Ad:    SAHIB_DOMENLER
+   Dəyər: saytyoxla.vercel.app,saytyoxla.az
+
+(Bura ÖZ domenlərini yaz — yalnız bunlar təsdiqsiz skan olunur.
+ Başqa domenlər sahiblik təsdiqi tələb edəcək = təhlükəsiz.)
+
+Dəyişdikdən sonra "Redeploy" et.
+==================================================

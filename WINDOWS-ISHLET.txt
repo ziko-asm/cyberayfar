@@ -1,0 +1,30 @@
+========================================
+ SaytYoxla Skaner — WINDOWS TƏLİMATI
+========================================
+
+--- A) VEB İNTERFEYS (tövsiyə olunur) ---
+
+1) Qovluğa keç (cmd və ya PowerShell):
+   cd masaustu\skaner       (və ya harda açmısansa)
+
+2) Kitabxanaları quraşdır (bir dəfə):
+   py -m pip install -r requirements.txt
+
+3) Veb serveri işə sal:
+   py app.py
+
+4) Brauzeri aç və bu ünvana get:
+   http://127.0.0.1:5000
+
+   -> URL yaz, "Skan et" düyməsini bas, nəticələri gör!
+
+Serveri dayandırmaq: cmd pəncərəsində Ctrl+C
+
+--- B) TERMİNAL (sürətli test) ---
+
+   py skan.py https://saytyoxla.vercel.app --oz-saytim
+
+========================================
+QEYD: Əgər "py" işləməsə, tam ünvanı yoxla:
+C:\Users\Admin\AppData\Local\Programs\Python\Python312\python.exe app.py
+========================================

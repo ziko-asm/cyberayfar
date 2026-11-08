@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CYBERAYFAR SCANER</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --qara:#05070a; --panel:#0b1016; --panel2:#0e141c; --kenar:#1b2733;
+    --neon:#00ff9c; --cyan:#00e5ff; --metn:#c8e6d8; --solgun:#5f7385;
+    --kritik:#ff2bd6; --yuksek:#ff3b5c; --orta:#ffb020; --asagi:#2f9bff; --info:#5f7385;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Share Tech Mono',monospace;background:var(--qara);color:var(--metn);
+    min-height:100vh;padding:20px;
+    background-image:
+      linear-gradient(rgba(0,255,156,.025) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(0,255,156,.025) 1px,transparent 1px);
+    background-size:34px 34px;
+  }
+  .konteyner{max-width:860px;margin:0 auto}
+
+  /* ---- Dil seçimi ---- */
+  .diller{display:flex;justify-content:flex-end;gap:8px;margin-bottom:6px}
+  .diller button{background:var(--panel);border:1px solid var(--kenar);color:var(--solgun);
+    padding:5px 11px;border-radius:6px;cursor:pointer;font-family:inherit;font-size:12px;letter-spacing:1px}
+  .diller button.aktiv{color:var(--qara);background:var(--neon);border-color:var(--neon);font-weight:bold}
+
+  /* ---- Başlıq ---- */
+  header{text-align:center;padding:14px 0 22px}
+  header h1{font-family:'Orbitron',sans-serif;font-size:34px;font-weight:800;letter-spacing:3px;
+    color:#fff;text-shadow:0 0 10px var(--neon),0 0 24px rgba(0,255,156,.5)}
+  header h1 .c{color:var(--neon)}
+  header p{color:var(--cyan);margin-top:8px;font-size:13px;letter-spacing:2px;text-transform:uppercase}
+
+  /* ---- Axtarış ---- */
+  .axtaris{display:flex;gap:10px;margin:18px 0;flex-wrap:wrap}
+  .axtaris input{flex:1;min-width:220px;padding:15px 16px;border-radius:8px;
+    border:1px solid var(--kenar);background:var(--panel);color:var(--neon);
+    font-family:inherit;font-size:16px;outline:none;letter-spacing:1px}
+  .axtaris input:focus{border-color:var(--neon);box-shadow:0 0 0 2px rgba(0,255,156,.15)}
+  .axtaris button{padding:15px 26px;border:1px solid var(--neon);border-radius:8px;
+    background:transparent;color:var(--neon);font-family:'Orbitron',sans-serif;font-size:14px;
+    font-weight:700;letter-spacing:2px;cursor:pointer;transition:.15s;text-shadow:0 0 8px rgba(0,255,156,.6)}
+  .axtaris button:hover{background:var(--neon);color:var(--qara);box-shadow:0 0 18px rgba(0,255,156,.5)}
+  .axtaris button:disabled{opacity:.4;cursor:not-allowed}
+
+  /* ---- Terminal (canlı irəliləmə) ---- */
+  .terminal{display:none;background:#04120c;border:1px solid var(--kenar);border-radius:10px;
+    padding:16px 18px;margin-bottom:18px;font-size:14px;min-height:60px}
+  .terminal .setir{padding:3px 0;color:var(--solgun);white-space:pre-wrap}
+  .terminal .setir.isliyir{color:var(--cyan)}
+  .terminal .setir.bitdi{color:var(--neon)}
+  .terminal .yan{color:var(--neon)}
+  .kursor{display:inline-block;width:9px;height:15px;background:var(--neon);animation:yan 1s steps(2) infinite;vertical-align:middle}
+  @keyframes yan{50%{opacity:0}}
+
+  /* ---- Nəticə ---- */
+  .netice{display:none}
+  .xulase{display:flex;gap:18px;align-items:center;background:var(--panel);
+    border:1px solid var(--kenar);border-radius:12px;padding:22px;margin-bottom:16px;flex-wrap:wrap}
+  .bal-qutu{position:relative;width:104px;height:104px;flex-shrink:0;display:grid;place-items:center}
+  .bal-dairesi{width:104px;height:104px;border-radius:50%;position:absolute;inset:0;
+    border:4px solid var(--neon);box-shadow:0 0 18px rgba(0,255,156,.35),inset 0 0 18px rgba(0,255,156,.1)}
+  .bal-ici{text-align:center;z-index:1}
+  .bal-ici .rəqəm{font-family:'Orbitron',sans-serif;font-size:30px;font-weight:800;color:#fff;line-height:1}
+  .bal-ici .qiymet{font-size:13px;color:var(--neon);letter-spacing:2px;margin-top:2px}
+  .xulase-metn{flex:1;min-width:180px}
+  .xulase-metn h2{font-size:16px;color:#fff;margin-bottom:6px;word-break:break-all}
+  .xulase-metn .stat{color:var(--solgun);font-size:13px}
+
+  /* ---- Yoxlamalar checklist ---- */
+  .yoxlamalar{background:var(--panel);border:1px solid var(--kenar);border-radius:12px;
+    padding:16px 18px;margin-bottom:18px}
+  .yoxlamalar .bash{font-family:'Orbitron',sans-serif;font-size:13px;letter-spacing:2px;
+    color:var(--cyan);margin-bottom:12px;text-transform:uppercase}
+  .yox-setir{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed var(--kenar);font-size:14px}
+  .yox-setir:last-child{border-bottom:0}
+  .yox-ikon{width:22px;text-align:center;font-weight:bold}
+  .yox-ad{flex:1}
+  .yox-status{font-size:12px;letter-spacing:1px;padding:2px 10px;border-radius:999px}
+  .yox-temiz .yox-ikon{color:var(--neon)} .yox-temiz .yox-status{color:var(--neon);border:1px solid var(--neon)}
+  .yox-zeif .yox-ikon{color:var(--yuksek)} .yox-zeif .yox-status{color:var(--yuksek);border:1px solid var(--yuksek)}
+
+  /* ---- Tapıntılar ---- */
+  .tapinti{background:var(--panel);border:1px solid var(--kenar);border-left-width:4px;
+    border-radius:10px;padding:15px 17px;margin-bottom:11px}
+  .tapinti .bash{display:flex;align-items:center;gap:10px;margin-bottom:7px;flex-wrap:wrap}
+  .nisan{font-size:11px;font-weight:bold;padding:3px 9px;border-radius:5px;color:var(--qara);letter-spacing:1px}
+  .tapinti h3{font-size:15px;color:#fff}
+  .tapinti .s2{font-size:12px;color:var(--cyan);margin:4px 0;word-break:break-all}
+  .tapinti .izah{font-size:13px;margin:6px 0;color:var(--metn)}
+  .tapinti .hell{font-size:12px;color:var(--neon);background:rgba(0,255,156,.07);
+    padding:8px 11px;border-radius:7px;margin-top:8px;border:1px solid rgba(0,255,156,.2)}
+  .kritik{border-left-color:var(--kritik)} .kritik .nisan{background:var(--kritik)}
+  .yuksek{border-left-color:var(--yuksek)} .yuksek .nisan{background:var(--yuksek)}
+  .orta{border-left-color:var(--orta)} .orta .nisan{background:var(--orta)}
+  .asagi{border-left-color:var(--asagi)} .asagi .nisan{background:var(--asagi)}
+  .info{border-left-color:var(--info)} .info .nisan{background:var(--info);color:#fff}
+  .temiz-msg{text-align:center;padding:26px;color:var(--neon);font-size:16px}
+  .xeta{display:none;background:rgba(255,59,92,.08);border:1px solid var(--yuksek);
+    border-radius:10px;padding:15px;color:#ff8ea0;white-space:pre-wrap;margin-bottom:16px}
+  footer{text-align:center;color:var(--solgun);font-size:12px;padding:26px 0;letter-spacing:1px}
+</style>
+</head>
+<body>
+<div class="konteyner">
+  <div class="diller">
+    <button data-dil="az" class="aktiv" onclick="dilDeyis('az')">AZ</button>
+    <button data-dil="en" onclick="dilDeyis('en')">EN</button>
+    <button data-dil="ru" onclick="dilDeyis('ru')">RU</button>
+  </div>
+
+  <header>
+    <h1><span class="c">CYBER</span>AYFAR <span class="c">SCANER</span></h1>
+    <p id="altbashlik">İcazəli Veb Zəiflik Skaneri</p>
+  </header>
+
+  <div class="axtaris">
+    <input id="hedef" type="text" placeholder="domen.com" value="saytyoxla.vercel.app" autocomplete="off">
+    <button id="skanBtn" onclick="skanBasla()">⚡ SKAN ET</button>
+  </div>
+
+  <div class="xeta" id="xeta"></div>
+  <div class="terminal" id="terminal"></div>
+
+  <div class="netice" id="netice">
+    <div class="xulase">
+      <div class="bal-qutu">
+        <div class="bal-dairesi" id="balDairesi"></div>
+        <div class="bal-ici">
+          <div class="rəqəm" id="balReqem">—</div>
+          <div class="qiymet" id="balQiymet"></div>
+        </div>
+      </div>
+      <div class="xulase-metn">
+        <h2 id="xHedef"></h2>
+        <div class="stat" id="xStat"></div>
+      </div>
+    </div>
+
+    <div class="yoxlamalar">
+      <div class="bash" id="yoxBash">Aparılan Yoxlamalar</div>
+      <div id="yoxListe"></div>
+    </div>
+
+    <div id="tapintilar"></div>
+  </div>
+
+  <footer id="footer">⚖️ Yalnız öz saytlarını və ya icazəli saytları skan et.</footer>
+</div>
+
+<script>
+// ============ TƏRCÜMƏLƏR (interfeys) ============
+const UI = {
+  az:{altbashlik:"İcazəli Veb Zəiflik Skaneri",skan:"⚡ SKAN ET",skan_edilir:"SKAN EDİLİR...",
+    footer:"⚖️ Yalnız öz saytlarını və ya icazəli saytları skan et.",
+    qiymet:"QİYMƏT",netice:"nəticə",sehife:"səhifə",forma:"forma",
+    yoxlamalar:"Aparılan Yoxlamalar",temiz:"TƏMİZ",zeif:"ZƏİF",
+    tapildi_yox:"✓ Heç bir açıq zəiflik tapılmadı!",hell:"Həll",
+    xeta_qosulma:"Serverə qoşulma xətası",
+    kat:{fayllar:"Həssas Fayllar",email:"Email / Spoofing",xss:"XSS (Cross-Site Scripting)",sqli:"SQL Injection"},
+    addim:{icaze:"İcazə yoxlanılır",crawl:"Sayt gəzilir (crawl)",hessas:"Həssas fayllar yoxlanılır",
+      spoofing:"Domain spoofing (SPF/DMARC)",xss:"XSS hücumları sınanılır",sqli:"SQL Injection sınanılır",bitdi:"Skan tamamlandı"},
+    nisan:{kritik:"KRİTİK",yuksek:"YÜKSEK",orta:"ORTA",asagi:"AŞAĞI",info:"MƏLUMAT"}},
+  en:{altbashlik:"Authorized Web Vulnerability Scanner",skan:"⚡ SCAN",skan_edilir:"SCANNING...",
+    footer:"⚖️ Only scan sites you own or are authorized to test.",
+    qiymet:"GRADE",netice:"findings",sehife:"pages",forma:"forms",
+    yoxlamalar:"Checks Performed",temiz:"CLEAN",zeif:"WEAK",
+    tapildi_yox:"✓ No open vulnerabilities found!",hell:"Fix",
+    xeta_qosulma:"Server connection error",
+    kat:{fayllar:"Sensitive Files",email:"Email / Spoofing",xss:"XSS (Cross-Site Scripting)",sqli:"SQL Injection"},
+    addim:{icaze:"Checking authorization",crawl:"Crawling site",hessas:"Checking sensitive files",
+      spoofing:"Domain spoofing (SPF/DMARC)",xss:"Testing XSS attacks",sqli:"Testing SQL Injection",bitdi:"Scan complete"},
+    nisan:{kritik:"CRITICAL",yuksek:"HIGH",orta:"MEDIUM",asagi:"LOW",info:"INFO"}},
+  ru:{altbashlik:"Авторизованный сканер уязвимостей",skan:"⚡ СКАН",skan_edilir:"СКАНИРОВАНИЕ...",
+    footer:"⚖️ Сканируйте только свои или авторизованные сайты.",
+    qiymet:"ОЦЕНКА",netice:"результатов",sehife:"страниц",forma:"форм",
+    yoxlamalar:"Выполненные проверки",temiz:"ЧИСТО",zeif:"СЛАБО",
+    tapildi_yox:"✓ Открытых уязвимостей не найдено!",hell:"Решение",
+    xeta_qosulma:"Ошибка подключения к серверу",
+    kat:{fayllar:"Чувствительные файлы",email:"Email / Spoofing",xss:"XSS (Cross-Site Scripting)",sqli:"SQL-инъекция"},
+    addim:{icaze:"Проверка авторизации",crawl:"Обход сайта (crawl)",hessas:"Проверка файлов",
+      spoofing:"Domain spoofing (SPF/DMARC)",xss:"Проверка XSS-атак",sqli:"Проверка SQL-инъекций",bitdi:"Сканирование завершено"},
+    nisan:{kritik:"КРИТИЧНО",yuksek:"ВЫСОКО",orta:"СРЕДНЕ",asagi:"НИЗКО",info:"ИНФО"}}
+};
+
+let dil = 'az';
+let sonNetice = null;      // son skan nəticəsi (dil dəyişəndə yenidən göstərmək üçün)
+
+function dilDeyis(y){
+  dil = y;
+  document.querySelectorAll('.diller button').forEach(b=>
+    b.classList.toggle('aktiv', b.dataset.dil===y));
+  document.documentElement.lang = y;
+  const t = UI[y];
+  document.getElementById('altbashlik').textContent = t.altbashlik;
+  document.getElementById('skanBtn').textContent = t.skan;
+  document.getElementById('footer').textContent = t.footer;
+  document.getElementById('yoxBash').textContent = t.yoxlamalar;
+  if(sonNetice) neticeGoster(sonNetice);   // nəticəni yeni dildə yenilə
+}
+
+// ============ CANLI SKAN (SSE + POST ehtiyat) ============
+let simTimer = null;
+
+function skanBasla(){
+  const hedef = document.getElementById('hedef').value.trim();
+  if(!hedef) return;
+  const btn = document.getElementById('skanBtn');
+  const term = document.getElementById('terminal');
+  const netice = document.getElementById('netice');
+  const xeta = document.getElementById('xeta');
+
+  sonNetice = null;
+  xeta.style.display='none';
+  netice.style.display='none';
+  term.style.display='block';
+  term.innerHTML='';
+  btn.disabled=true;
+  btn.textContent = UI[dil].skan_edilir;
+  if(simTimer){ clearInterval(simTimer); simTimer=null; }
+
+  let addimlar = [];
+  let tamamlandi = false;
+
+  function termRender(){
+    term.innerHTML = addimlar.map((a,i)=>{
+      const son = i===addimlar.length-1;
+      const cls = a.bitdi ? 'bitdi' : (son ? 'isliyir' : 'bitdi');
+      const ikon = a.bitdi ? '✓' : (son ? '▶' : '✓');
+      const kursor = (son && !a.bitdi) ? '<span class="kursor"></span>' : '';
+      return `<div class="setir ${cls}"><span class="yan">[${ikon}]</span> ${UI[dil].addim[a.kod]||a.kod} ${kursor}</div>`;
+    }).join('');
+  }
+  function bitir(){ btn.disabled=false; btn.textContent=UI[dil].skan; if(simTimer){clearInterval(simTimer);simTimer=null;} }
+  function xetaGoster(msg){ tamamlandi=true; bitir(); term.style.display='none'; xeta.textContent=msg; xeta.style.display='block'; }
+  function neticeHazir(data){ tamamlandi=true; bitir(); addimlar.forEach(a=>a.bitdi=true); termRender(); sonNetice=data; neticeGoster(data); }
+
+  // --- POST ehtiyat (Vercel / SSE işləməyəndə): simulyasiya irəliləmə ---
+  function postFallback(){
+    const sim = ['icaze','crawl','hessas','spoofing','xss','sqli'];
+    let i=0; addimlar=[];
+    simTimer = setInterval(()=>{
+      if(i<sim.length){
+        if(addimlar.length) addimlar[addimlar.length-1].bitdi=true;
+        addimlar.push({kod:sim[i], bitdi:false}); termRender(); i++;
+      }
+    }, 850);
+    fetch('/api/skan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({hedef})})
+      .then(r=>r.json())
+      .then(d=>{ if(d.xeta) xetaGoster(d.xeta); else neticeHazir(d); })
+      .catch(e=>xetaGoster(UI[dil].xeta_qosulma+': '+e.message));
+  }
+
+  // --- Əsas: SSE canlı axın ---
+  const es = new EventSource('/api/skan-stream?hedef='+encodeURIComponent(hedef));
+  es.onmessage = (ev)=>{
+    const d = JSON.parse(ev.data);
+    if(d.tip==='ilerleme'){
+      if(d.addim==='bitdi') return;
+      if(addimlar.length) addimlar[addimlar.length-1].bitdi=true;
+      addimlar.push({kod:d.addim, bitdi:false}); termRender();
+    } else if(d.tip==='netice'){ es.close(); neticeHazir(d.data); }
+    else if(d.tip==='xeta'){ es.close(); xetaGoster(d.mesaj); }
+  };
+  es.onerror = ()=>{
+    es.close();
+    if(tamamlandi) return;        // artıq bitib -> heç nə etmə
+    addimlar=[]; termRender();
+    postFallback();               // SSE işləmədi -> POST-a keç
+  };
+}
+
+function balRengi(bal){
+  if(bal>=75) return getComputedStyle(document.documentElement).getPropertyValue('--neon');
+  if(bal>=40) return getComputedStyle(document.documentElement).getPropertyValue('--orta');
+  return getComputedStyle(document.documentElement).getPropertyValue('--yuksek');
+}
+
+function neticeGoster(d){
+  const t = UI[dil];
+  const reng = balRengi(d.bal).trim();
+  document.getElementById('balReqem').textContent = d.bal;
+  document.getElementById('balQiymet').textContent = t.qiymet+' '+d.qiymet;
+  const dairesi = document.getElementById('balDairesi');
+  dairesi.style.borderColor = reng;
+  dairesi.style.boxShadow = `0 0 18px ${reng}55, inset 0 0 18px ${reng}22`;
+  document.getElementById('balReqem').style.color = '#fff';
+  document.getElementById('balQiymet').style.color = reng;
+
+  document.getElementById('xHedef').textContent = d.hedef;
+  document.getElementById('xStat').textContent =
+    `${d.statistika.sehifeler} ${t.sehife} · ${d.statistika.formalar} ${t.forma} · ${d.tapintilar.length} ${t.netice}`;
+
+  // Yoxlamalar checklist (hamısı görünür)
+  const yl = document.getElementById('yoxListe');
+  yl.innerHTML = d.yoxlamalar.map(y=>{
+    const temiz = y.status==='temiz';
+    const ikon = temiz ? '✓' : '⚠';
+    const say = y.say>0 ? ` (${y.say})` : '';
+    return `<div class="yox-setir ${temiz?'yox-temiz':'yox-zeif'}">
+      <span class="yox-ikon">${ikon}</span>
+      <span class="yox-ad">${t.kat[y.kat]}</span>
+      <span class="yox-status">${temiz?t.temiz:t.zeif}${say}</span></div>`;
+  }).join('');
+
+  // Tapıntılar
+  const qab = document.getElementById('tapintilar');
+  if(d.tapintilar.length===0){
+    qab.innerHTML = `<div class="temiz-msg">${t.tapildi_yox}</div>`;
+  } else {
+    qab.innerHTML = d.tapintilar.map(tp=>{
+      const m = tp.metn[dil];
+      return `<div class="tapinti ${tp.ciddilik}">
+        <div class="bash"><span class="nisan">${t.nisan[tp.ciddilik]}</span><h3>${m.ad}</h3></div>
+        <div class="s2">📍 ${tp.yer}</div>
+        <div class="izah">${m.izah}</div>
+        <div class="hell">💡 ${t.hell}: ${m.hell}</div></div>`;
+    }).join('');
+  }
+  document.getElementById('netice').style.display='block';
+}
+
+document.getElementById('hedef').addEventListener('keydown', e=>{
+  if(e.key==='Enter') skanBasla();
+});
+</script>
+</body>
+</html>
