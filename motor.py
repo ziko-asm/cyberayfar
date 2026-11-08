@@ -13,7 +13,7 @@ from modullar import (sensitive_files, email_spoof, xss, sqli, headers, cors,
                       open_redirect, js_libs, command_injection, lfi,
                       csrf, subdomain, http_methods, mixed_content, hidden_paths,
                       secrets_leak, tls_analiz, ssrf, xxe, graphql,
-                      host_header, clickjacking, waf, idor)
+                      host_header, clickjacking, waf, idor, oob_checks)
 
 GIZLI_ACAR = "DEYISDIR-MENI-uzun-tesadufi-acar"
 
@@ -42,6 +42,7 @@ KATEQORIYA = {
     "graphql_introspection": "graphql", "host_header": "host",
     "clickjacking": "clickjacking", "waf_askarlandi": "waf",
     "idor": "idor",
+    "ssrf_oob": "ssrf", "rce_oob": "cmd", "xxe_oob": "xxe",
 }
 KATEQORIYALAR = ("fayllar", "basliqlar", "email", "xss", "sqli", "cmd", "lfi",
                  "redirect", "cors", "kohne_js", "csrf", "yollar", "metodlar",
@@ -50,7 +51,7 @@ KATEQORIYALAR = ("fayllar", "basliqlar", "email", "xss", "sqli", "cmd", "lfi",
 
 
 def skan_et(hedef: str, test_rejimi=True, maks_sehife=30, ilerleme=None,
-            allowlist=(), auth=None):
+            allowlist=(), auth=None, oob_base=None):
     def bildir(addim):
         if ilerleme:
             ilerleme(addim)
@@ -131,7 +132,7 @@ def skan_et(hedef: str, test_rejimi=True, maks_sehife=30, ilerleme=None,
 
     # 4) AKTİV modullar (paralel)
     bildir("xss"); bildir("sqli"); bildir("redirect")
-    bildir("cmd"); bildir("lfi"); bildir("csrf"); bildir("ssrf"); bildir("idor")
+    bildir("cmd"); bildir("lfi"); bildir("csrf"); bildir("ssrf"); bildir("idor"); bildir("oob")
     aktiv = [
         (xss.yoxla, (purl, formalar, hesabat)),
         (sqli.yoxla, (purl, formalar, hesabat)),
@@ -141,6 +142,7 @@ def skan_et(hedef: str, test_rejimi=True, maks_sehife=30, ilerleme=None,
         (csrf.yoxla, (formalar, hesabat)),
         (ssrf.yoxla, (purl, hesabat)),
         (idor.yoxla, (purl, hesabat, auth_edildi)),
+        (oob_checks.yoxla, (purl, hedef, oob_base, hesabat)),
     ]
     http_client.modullari_paralel_islet(aktiv)
 

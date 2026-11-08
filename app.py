@@ -65,10 +65,31 @@ def health():
     return {"status": "ok", "headless": bool(os.environ.get("RENDER"))}, 200
 
 
+@app.route("/oob/<token>", methods=["GET", "POST", "PUT", "HEAD", "OPTIONS"])
+def oob_callback(token):
+    """OOB collaborator: hədəf buraya sorğu edərsə, blind zəiflik təsdiqlənir."""
+    from core import oob as oob_store
+    oob_store.qeyd_et(token, {"ip": request.remote_addr,
+                              "metod": request.method,
+                              "ua": request.headers.get("User-Agent", "")})
+    return "1", 200
+
+
+def _oob_base():
+    # Blind OOB davamlı serverdə (Render/lokal) işləyir; Vercel efemer -> söndür
+    if os.environ.get("VERCEL"):
+        return None
+    try:
+        return request.host_url.rstrip("/")
+    except Exception:
+        return None
+
+
 @app.route("/api/skan-stream")
 def api_skan_stream():
     """Canlı irəliləmə (lokalda işləyir; Vercel-də frontend POST-a keçir)."""
     hedef = (request.args.get("hedef") or "").strip()
+    ob = _oob_base()
 
     def generate():
         if not hedef:
@@ -84,7 +105,7 @@ def api_skan_stream():
             try:
                 qutu["data"] = motor.skan_et(
                     hedef, test_rejimi=TEST_REJIMI, maks_sehife=MAKS_SEHIFE,
-                    ilerleme=ilerleme, allowlist=ALLOWLIST)
+                    ilerleme=ilerleme, allowlist=ALLOWLIST, oob_base=ob)
             except authorization.IcazeXetasi as e:
                 qutu["xeta"] = str(e)
             except Exception as e:
@@ -125,7 +146,7 @@ def api_skan():
     try:
         return jsonify(motor.skan_et(
             hedef, test_rejimi=TEST_REJIMI, maks_sehife=MAKS_SEHIFE,
-            allowlist=ALLOWLIST, auth=auth))
+            allowlist=ALLOWLIST, auth=auth, oob_base=_oob_base()))
     except authorization.IcazeXetasi as e:
         return jsonify({"xeta": str(e)}), 403
     except Exception as e:

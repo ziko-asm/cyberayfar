@@ -376,3 +376,32 @@ METINLER.update({
                "hell": "Проверяйте владельца объекта на каждом запросе (серверная авторизация). Используйте случайные UUID."},
     },
 })
+
+
+# ---- OOB (callback-təsdiqli blind zəifliklər) ----
+METINLER.update({
+    "ssrf_oob": {
+        "az": {"ad": "Blind SSRF (OOB təsdiqli)", "izah": "'{param}' parametri serveri bizim collaborator-a sorğu etməyə məcbur etdi — SSRF 100% təsdiqləndi. Hücumçu daxili sistemlərə/bulud metadata-ya çata bilər.",
+               "hell": "İstifadəçi URL-lərini whitelist ilə yoxla, daxili IP/metadata ünvanlarını blokla."},
+        "en": {"ad": "Blind SSRF (OOB-confirmed)", "izah": "The '{param}' parameter made the server call our collaborator — SSRF 100% confirmed. An attacker can reach internal systems/cloud metadata.",
+               "hell": "Whitelist user URLs; block internal IP/metadata addresses."},
+        "ru": {"ad": "Слепой SSRF (OOB-подтверждён)", "izah": "Параметр '{param}' заставил сервер обратиться к нашему коллаборатору — SSRF подтверждён на 100%. Доступ к внутренним системам/metadata.",
+               "hell": "Проверяйте URL по whitelist; блокируйте внутренние IP/metadata."},
+    },
+    "rce_oob": {
+        "az": {"ad": "Blind RCE (OOB təsdiqli)", "izah": "'{param}' parametri serverdə OS əmri (curl) işlətdi — kor RCE 100% təsdiqləndi. Tam sistem ələ keçirilə bilər.",
+               "hell": "İnputu heç vaxt shell-ə ötürmə; təhlükəsiz API-lər, ciddi validasiya."},
+        "en": {"ad": "Blind RCE (OOB-confirmed)", "izah": "The '{param}' parameter ran an OS command (curl) on the server — blind RCE 100% confirmed. Full system takeover is possible.",
+               "hell": "Never pass input to a shell; use safe APIs and strict validation."},
+        "ru": {"ad": "Слепой RCE (OOB-подтверждён)", "izah": "Параметр '{param}' выполнил команду ОС (curl) на сервере — слепой RCE подтверждён на 100%. Возможен полный захват.",
+               "hell": "Не передавайте ввод в shell; безопасные API и строгая валидация."},
+    },
+    "xxe_oob": {
+        "az": {"ad": "Blind XXE (OOB təsdiqli)", "izah": "Server XML xarici entity vasitəsilə collaborator-a sorğu etdi — kor XXE 100% təsdiqləndi. Server faylları oxuna/SSRF edilə bilər.",
+               "hell": "XML parserdə xarici entity-ləri (DTD) tam söndür."},
+        "en": {"ad": "Blind XXE (OOB-confirmed)", "izah": "The server fetched our collaborator via an XML external entity — blind XXE 100% confirmed. Server files can be read / SSRF performed.",
+               "hell": "Fully disable external entities (DTD) in the XML parser."},
+        "ru": {"ad": "Слепой XXE (OOB-подтверждён)", "izah": "Сервер обратился к коллаборатору через внешнюю XML-сущность — слепой XXE подтверждён на 100%. Чтение файлов / SSRF.",
+               "hell": "Полностью отключите внешние сущности (DTD) в XML-парсере."},
+    },
+})
