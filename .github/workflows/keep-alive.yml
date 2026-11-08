@@ -1,0 +1,25 @@
+name: keep-alive
+
+# Render pulsuz plan 15 dəq boşdan sonra yatır.
+# Bu, hər 10 dəqiqədə /health-ı pingləyib oyaq saxlayır.
+# Render URL-ini repo-da dəyişən kimi qur:
+#   Settings -> Secrets and variables -> Actions -> Variables -> New:
+#   Ad: RENDER_URL   Dəyər: https://cyberayfar.onrender.com
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"   # hər 10 dəqiqə (GitHub bəzən gecikdirir)
+  workflow_dispatch:          # əl ilə də işə sala bilərsən
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping /health
+        run: |
+          URL="${{ vars.RENDER_URL }}"
+          if [ -z "$URL" ]; then
+            echo "RENDER_URL dəyişəni qurulmayıb — atlanır."; exit 0
+          fi
+          echo "Pinging $URL/health ..."
+          curl -fsS --max-time 60 "$URL/health" || echo "Ping alınmadı (server oyanırdı ola bilər)"

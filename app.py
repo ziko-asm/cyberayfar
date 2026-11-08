@@ -59,6 +59,12 @@ def ana_sehife():
     return render_template("index.html")
 
 
+@app.route("/health")
+def health():
+    """Keep-alive / monitorinq üçün ucuz endpoint (serveri oyaq saxlayır)."""
+    return {"status": "ok", "headless": bool(os.environ.get("RENDER"))}, 200
+
+
 @app.route("/api/skan-stream")
 def api_skan_stream():
     """Canlı irəliləmə (lokalda işləyir; Vercel-də frontend POST-a keçir)."""
