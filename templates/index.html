@@ -6,7 +6,7 @@
 <title>CYBERAYFAR SCANER</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
   :root{
     --qara:#05070a; --panel:#0b1016; --panel2:#0e141c; --kenar:#1b2733;
@@ -14,100 +14,113 @@
     --kritik:#ff2bd6; --yuksek:#ff3b5c; --orta:#ffb020; --asagi:#2f9bff; --info:#5f7385;
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{
-    font-family:'Share Tech Mono',monospace;background:var(--qara);color:var(--metn);
-    min-height:100vh;padding:20px;
-    background-image:
-      linear-gradient(rgba(0,255,156,.025) 1px,transparent 1px),
-      linear-gradient(90deg,rgba(0,255,156,.025) 1px,transparent 1px);
-    background-size:34px 34px;
-  }
-  .konteyner{max-width:860px;margin:0 auto}
+  body{font-family:'Share Tech Mono',monospace;background:var(--qara);color:var(--metn);
+    min-height:100vh;padding:20px;overflow-x:hidden}
+  #matrix{position:fixed;inset:0;z-index:-2;opacity:.07;pointer-events:none}
+  body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background-image:linear-gradient(rgba(0,255,156,.03) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(0,255,156,.03) 1px,transparent 1px);background-size:34px 34px}
+  .konteyner{max-width:880px;margin:0 auto}
 
-  /* ---- Dil seçimi ---- */
   .diller{display:flex;justify-content:flex-end;gap:8px;margin-bottom:6px}
   .diller button{background:var(--panel);border:1px solid var(--kenar);color:var(--solgun);
     padding:5px 11px;border-radius:6px;cursor:pointer;font-family:inherit;font-size:12px;letter-spacing:1px}
   .diller button.aktiv{color:var(--qara);background:var(--neon);border-color:var(--neon);font-weight:bold}
 
-  /* ---- Başlıq ---- */
-  header{text-align:center;padding:14px 0 22px}
-  header h1{font-family:'Orbitron',sans-serif;font-size:34px;font-weight:800;letter-spacing:3px;
-    color:#fff;text-shadow:0 0 10px var(--neon),0 0 24px rgba(0,255,156,.5)}
+  header{text-align:center;padding:10px 0 20px}
+  .logo{display:inline-flex;align-items:center;gap:14px;justify-content:center}
+  .logo svg{filter:drop-shadow(0 0 8px var(--neon))}
+  header h1{font-family:'Orbitron',sans-serif;font-size:32px;font-weight:900;letter-spacing:3px;
+    color:#fff;text-shadow:0 0 10px var(--neon),0 0 24px rgba(0,255,156,.5);
+    animation:glitch 4s infinite}
   header h1 .c{color:var(--neon)}
-  header p{color:var(--cyan);margin-top:8px;font-size:13px;letter-spacing:2px;text-transform:uppercase}
+  @keyframes glitch{0%,92%,100%{text-shadow:0 0 10px var(--neon),0 0 24px rgba(0,255,156,.5)}
+    93%{text-shadow:2px 0 var(--cyan),-2px 0 var(--kritik)}95%{text-shadow:-2px 0 var(--cyan),2px 0 var(--kritik)}97%{text-shadow:0 0 10px var(--neon)}}
+  header p{color:var(--cyan);margin-top:10px;font-size:13px;letter-spacing:2px;text-transform:uppercase}
 
-  /* ---- Axtarış ---- */
   .axtaris{display:flex;gap:10px;margin:18px 0;flex-wrap:wrap}
   .axtaris input{flex:1;min-width:220px;padding:15px 16px;border-radius:8px;
     border:1px solid var(--kenar);background:var(--panel);color:var(--neon);
     font-family:inherit;font-size:16px;outline:none;letter-spacing:1px}
   .axtaris input:focus{border-color:var(--neon);box-shadow:0 0 0 2px rgba(0,255,156,.15)}
-  .axtaris button{padding:15px 26px;border:1px solid var(--neon);border-radius:8px;
-    background:transparent;color:var(--neon);font-family:'Orbitron',sans-serif;font-size:14px;
-    font-weight:700;letter-spacing:2px;cursor:pointer;transition:.15s;text-shadow:0 0 8px rgba(0,255,156,.6)}
+  .axtaris button{padding:15px 26px;border:1px solid var(--neon);border-radius:8px;background:transparent;
+    color:var(--neon);font-family:'Orbitron',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;
+    cursor:pointer;transition:.15s;text-shadow:0 0 8px rgba(0,255,156,.6)}
   .axtaris button:hover{background:var(--neon);color:var(--qara);box-shadow:0 0 18px rgba(0,255,156,.5)}
   .axtaris button:disabled{opacity:.4;cursor:not-allowed}
 
-  /* ---- Terminal (canlı irəliləmə) ---- */
   .terminal{display:none;background:#04120c;border:1px solid var(--kenar);border-radius:10px;
-    padding:16px 18px;margin-bottom:18px;font-size:14px;min-height:60px}
-  .terminal .setir{padding:3px 0;color:var(--solgun);white-space:pre-wrap}
-  .terminal .setir.isliyir{color:var(--cyan)}
-  .terminal .setir.bitdi{color:var(--neon)}
+    padding:16px 18px;margin-bottom:18px;font-size:13px;max-height:220px;overflow:auto}
+  .terminal .setir{padding:2px 0;color:var(--solgun);white-space:pre-wrap}
+  .terminal .setir.isliyir{color:var(--cyan)} .terminal .setir.bitdi{color:var(--neon)}
   .terminal .yan{color:var(--neon)}
-  .kursor{display:inline-block;width:9px;height:15px;background:var(--neon);animation:yan 1s steps(2) infinite;vertical-align:middle}
+  .kursor{display:inline-block;width:9px;height:14px;background:var(--neon);animation:yan 1s steps(2) infinite;vertical-align:middle}
   @keyframes yan{50%{opacity:0}}
 
-  /* ---- Nəticə ---- */
   .netice{display:none}
-  .xulase{display:flex;gap:18px;align-items:center;background:var(--panel);
-    border:1px solid var(--kenar);border-radius:12px;padding:22px;margin-bottom:16px;flex-wrap:wrap}
+  .panel{background:var(--panel);border:1px solid var(--kenar);border-radius:12px;padding:20px;margin-bottom:16px}
+  .xulase{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
   .bal-qutu{position:relative;width:104px;height:104px;flex-shrink:0;display:grid;place-items:center}
-  .bal-dairesi{width:104px;height:104px;border-radius:50%;position:absolute;inset:0;
-    border:4px solid var(--neon);box-shadow:0 0 18px rgba(0,255,156,.35),inset 0 0 18px rgba(0,255,156,.1)}
+  .bal-dairesi{width:104px;height:104px;border-radius:50%;position:absolute;inset:0;border:4px solid var(--neon)}
   .bal-ici{text-align:center;z-index:1}
-  .bal-ici .rəqəm{font-family:'Orbitron',sans-serif;font-size:30px;font-weight:800;color:#fff;line-height:1}
+  .bal-ici .reqem{font-family:'Orbitron',sans-serif;font-size:30px;font-weight:800;color:#fff;line-height:1}
   .bal-ici .qiymet{font-size:13px;color:var(--neon);letter-spacing:2px;margin-top:2px}
   .xulase-metn{flex:1;min-width:180px}
   .xulase-metn h2{font-size:16px;color:#fff;margin-bottom:6px;word-break:break-all}
-  .xulase-metn .stat{color:var(--solgun);font-size:13px}
+  .xulase-metn .stat{color:var(--solgun);font-size:13px;margin-bottom:8px}
+  .tech-chip{display:inline-block;font-size:11px;color:var(--cyan);border:1px solid var(--kenar);
+    border-radius:5px;padding:2px 8px;margin:2px 4px 2px 0}
 
-  /* ---- Yoxlamalar checklist ---- */
-  .yoxlamalar{background:var(--panel);border:1px solid var(--kenar);border-radius:12px;
-    padding:16px 18px;margin-bottom:18px}
-  .yoxlamalar .bash{font-family:'Orbitron',sans-serif;font-size:13px;letter-spacing:2px;
-    color:var(--cyan);margin-bottom:12px;text-transform:uppercase}
+  /* İcmal (exec summary) */
+  .icmal-bash{font-family:'Orbitron',sans-serif;font-size:12px;letter-spacing:2px;color:var(--cyan);
+    margin-bottom:12px;text-transform:uppercase}
+  .cip-sira{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+  .cip{font-size:12px;padding:5px 11px;border-radius:7px;color:#fff;font-weight:bold;letter-spacing:.5px}
+  .bar{display:flex;height:14px;border-radius:7px;overflow:hidden;border:1px solid var(--kenar)}
+  .bar span{display:block;height:100%}
+  .eylemler{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .eylemler button{background:transparent;border:1px solid var(--cyan);color:var(--cyan);
+    padding:9px 15px;border-radius:7px;cursor:pointer;font-family:inherit;font-size:13px;transition:.15s}
+  .eylemler button:hover{background:var(--cyan);color:var(--qara)}
+
+  .yox-bash{font-family:'Orbitron',sans-serif;font-size:12px;letter-spacing:2px;color:var(--cyan);margin-bottom:12px;text-transform:uppercase}
   .yox-setir{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed var(--kenar);font-size:14px}
   .yox-setir:last-child{border-bottom:0}
   .yox-ikon{width:22px;text-align:center;font-weight:bold}
   .yox-ad{flex:1}
-  .yox-status{font-size:12px;letter-spacing:1px;padding:2px 10px;border-radius:999px}
+  .yox-status{font-size:11px;letter-spacing:1px;padding:2px 10px;border-radius:999px}
   .yox-temiz .yox-ikon{color:var(--neon)} .yox-temiz .yox-status{color:var(--neon);border:1px solid var(--neon)}
   .yox-zeif .yox-ikon{color:var(--yuksek)} .yox-zeif .yox-status{color:var(--yuksek);border:1px solid var(--yuksek)}
 
-  /* ---- Tapıntılar ---- */
-  .tapinti{background:var(--panel);border:1px solid var(--kenar);border-left-width:4px;
-    border-radius:10px;padding:15px 17px;margin-bottom:11px}
-  .tapinti .bash{display:flex;align-items:center;gap:10px;margin-bottom:7px;flex-wrap:wrap}
+  .tapinti{background:var(--panel);border:1px solid var(--kenar);border-left-width:4px;border-radius:10px;padding:15px 17px;margin-bottom:11px}
+  .tapinti .bash{display:flex;align-items:center;gap:8px;margin-bottom:7px;flex-wrap:wrap}
   .nisan{font-size:11px;font-weight:bold;padding:3px 9px;border-radius:5px;color:var(--qara);letter-spacing:1px}
+  .cvss-rozet{font-size:10px;color:var(--solgun);border:1px solid var(--kenar);border-radius:4px;padding:2px 6px}
   .tapinti h3{font-size:15px;color:#fff}
   .tapinti .s2{font-size:12px;color:var(--cyan);margin:4px 0;word-break:break-all}
   .tapinti .izah{font-size:13px;margin:6px 0;color:var(--metn)}
-  .tapinti .hell{font-size:12px;color:var(--neon);background:rgba(0,255,156,.07);
-    padding:8px 11px;border-radius:7px;margin-top:8px;border:1px solid rgba(0,255,156,.2)}
+  .tapinti .hell{font-size:12px;color:var(--neon);background:rgba(0,255,156,.07);padding:8px 11px;border-radius:7px;margin-top:8px;border:1px solid rgba(0,255,156,.2)}
   .kritik{border-left-color:var(--kritik)} .kritik .nisan{background:var(--kritik)}
   .yuksek{border-left-color:var(--yuksek)} .yuksek .nisan{background:var(--yuksek)}
   .orta{border-left-color:var(--orta)} .orta .nisan{background:var(--orta)}
   .asagi{border-left-color:var(--asagi)} .asagi .nisan{background:var(--asagi)}
   .info{border-left-color:var(--info)} .info .nisan{background:var(--info);color:#fff}
   .temiz-msg{text-align:center;padding:26px;color:var(--neon);font-size:16px}
-  .xeta{display:none;background:rgba(255,59,92,.08);border:1px solid var(--yuksek);
-    border-radius:10px;padding:15px;color:#ff8ea0;white-space:pre-wrap;margin-bottom:16px}
+  .xeta{display:none;background:rgba(255,59,92,.08);border:1px solid var(--yuksek);border-radius:10px;padding:15px;color:#ff8ea0;white-space:pre-wrap;margin-bottom:16px}
   footer{text-align:center;color:var(--solgun);font-size:12px;padding:26px 0;letter-spacing:1px}
+
+  @media print{
+    #matrix,body::before,.diller,.axtaris,.terminal,.eylemler,footer{display:none!important}
+    body{background:#fff;color:#111;padding:0}
+    .panel,.tapinti{background:#fff;border:1px solid #ccc;color:#111}
+    .tapinti h3,.xulase-metn h2,.bal-ici .reqem{color:#111}
+    header h1{color:#111;text-shadow:none;animation:none}
+  }
+  @media(max-width:560px){header h1{font-size:24px}.logo svg{width:34px;height:34px}}
 </style>
 </head>
 <body>
+<canvas id="matrix"></canvas>
 <div class="konteyner">
   <div class="diller">
     <button data-dil="az" class="aktiv" onclick="dilDeyis('az')">AZ</button>
@@ -116,7 +129,14 @@
   </div>
 
   <header>
-    <h1><span class="c">CYBER</span>AYFAR <span class="c">SCANER</span></h1>
+    <div class="logo">
+      <svg width="44" height="44" viewBox="0 0 48 48" fill="none">
+        <path d="M24 3L6 10v12c0 11 7.6 18.9 18 23 10.4-4.1 18-12 18-23V10L24 3z"
+              stroke="#00ff9c" stroke-width="2.5" fill="rgba(0,255,156,.06)"/>
+        <path d="M16 24l6 6 10-12" stroke="#00ff9c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <h1><span class="c">CYBER</span>AYFAR</h1>
+    </div>
     <p id="altbashlik">İcazəli Veb Zəiflik Skaneri</p>
   </header>
 
@@ -129,22 +149,33 @@
   <div class="terminal" id="terminal"></div>
 
   <div class="netice" id="netice">
-    <div class="xulase">
+    <!-- Xülasə -->
+    <div class="panel xulase">
       <div class="bal-qutu">
         <div class="bal-dairesi" id="balDairesi"></div>
-        <div class="bal-ici">
-          <div class="rəqəm" id="balReqem">—</div>
-          <div class="qiymet" id="balQiymet"></div>
-        </div>
+        <div class="bal-ici"><div class="reqem" id="balReqem">—</div><div class="qiymet" id="balQiymet"></div></div>
       </div>
       <div class="xulase-metn">
         <h2 id="xHedef"></h2>
         <div class="stat" id="xStat"></div>
+        <div id="xTech"></div>
       </div>
     </div>
 
-    <div class="yoxlamalar">
-      <div class="bash" id="yoxBash">Aparılan Yoxlamalar</div>
+    <!-- İcmal (exec summary) -->
+    <div class="panel">
+      <div class="icmal-bash" id="icmalBash">İcmal</div>
+      <div class="cip-sira" id="cipSira"></div>
+      <div class="bar" id="icmalBar"></div>
+      <div class="eylemler">
+        <button onclick="jsonYukle()" id="btnJson">⬇ JSON yüklə</button>
+        <button onclick="window.print()" id="btnPdf">🖨 PDF / Çap</button>
+      </div>
+    </div>
+
+    <!-- Yoxlamalar -->
+    <div class="panel">
+      <div class="yox-bash" id="yoxBash">Aparılan Yoxlamalar</div>
       <div id="yoxListe"></div>
     </div>
 
@@ -155,180 +186,142 @@
 </div>
 
 <script>
-// ============ TƏRCÜMƏLƏR (interfeys) ============
+// ============ TƏRCÜMƏLƏR ============
 const UI = {
   az:{altbashlik:"İcazəli Veb Zəiflik Skaneri",skan:"⚡ SKAN ET",skan_edilir:"SKAN EDİLİR...",
-    footer:"⚖️ Yalnız öz saytlarını və ya icazəli saytları skan et.",
-    qiymet:"QİYMƏT",netice:"nəticə",sehife:"səhifə",forma:"forma",
-    yoxlamalar:"Aparılan Yoxlamalar",temiz:"TƏMİZ",zeif:"ZƏİF",
-    tapildi_yox:"✓ Heç bir açıq zəiflik tapılmadı!",hell:"Həll",
-    xeta_qosulma:"Serverə qoşulma xətası",
-    kat:{fayllar:"Həssas Fayllar",email:"Email / Spoofing",xss:"XSS (Cross-Site Scripting)",sqli:"SQL Injection"},
-    addim:{icaze:"İcazə yoxlanılır",crawl:"Sayt gəzilir (crawl)",hessas:"Həssas fayllar yoxlanılır",
-      spoofing:"Domain spoofing (SPF/DMARC)",xss:"XSS hücumları sınanılır",sqli:"SQL Injection sınanılır",bitdi:"Skan tamamlandı"},
+    footer:"⚖️ Yalnız öz saytlarını və ya icazəli saytları skan et.",qiymet:"QİYMƏT",
+    netice:"nəticə",sehife:"səhifə",forma:"forma",icmal:"İcmal",texnologiya:"Texnologiya",
+    yoxlamalar:"Aparılan Yoxlamalar",temiz:"TƏMİZ",zeif:"ZƏİF",tapildi_yox:"✓ Heç bir açıq zəiflik tapılmadı!",
+    hell:"Həll",json:"⬇ JSON yüklə",pdf:"🖨 PDF / Çap",xeta_qosulma:"Serverə qoşulma xətası",
+    kat:{fayllar:"Həssas Fayllar",basliqlar:"Təhlükəsizlik Başlıqları",email:"Email / Spoofing",xss:"XSS",sqli:"SQL Injection",cmd:"Command Injection",lfi:"LFI / Path Traversal",redirect:"Open Redirect",cors:"CORS",kohne_js:"Köhnə JS Kitabxanalar"},
+    addim:{icaze:"İcazə yoxlanılır",crawl:"Sayt gəzilir (crawl)",texnologiya:"Texnologiya aşkarlanır",fayllar:"Həssas fayllar yoxlanılır",basliqlar:"Təhlükəsizlik başlıqları yoxlanılır",cors:"CORS yoxlanılır",kohne_js:"Köhnə JS kitabxanalar yoxlanılır",spoofing:"Domain spoofing yoxlanılır",xss:"XSS sınanılır",sqli:"SQL Injection sınanılır",redirect:"Open Redirect sınanılır",cmd:"Command Injection sınanılır",lfi:"LFI sınanılır",bitdi:"Skan tamamlandı"},
     nisan:{kritik:"KRİTİK",yuksek:"YÜKSEK",orta:"ORTA",asagi:"AŞAĞI",info:"MƏLUMAT"}},
   en:{altbashlik:"Authorized Web Vulnerability Scanner",skan:"⚡ SCAN",skan_edilir:"SCANNING...",
-    footer:"⚖️ Only scan sites you own or are authorized to test.",
-    qiymet:"GRADE",netice:"findings",sehife:"pages",forma:"forms",
-    yoxlamalar:"Checks Performed",temiz:"CLEAN",zeif:"WEAK",
-    tapildi_yox:"✓ No open vulnerabilities found!",hell:"Fix",
-    xeta_qosulma:"Server connection error",
-    kat:{fayllar:"Sensitive Files",email:"Email / Spoofing",xss:"XSS (Cross-Site Scripting)",sqli:"SQL Injection"},
-    addim:{icaze:"Checking authorization",crawl:"Crawling site",hessas:"Checking sensitive files",
-      spoofing:"Domain spoofing (SPF/DMARC)",xss:"Testing XSS attacks",sqli:"Testing SQL Injection",bitdi:"Scan complete"},
+    footer:"⚖️ Only scan sites you own or are authorized to test.",qiymet:"GRADE",
+    netice:"findings",sehife:"pages",forma:"forms",icmal:"Summary",texnologiya:"Technology",
+    yoxlamalar:"Checks Performed",temiz:"CLEAN",zeif:"WEAK",tapildi_yox:"✓ No open vulnerabilities found!",
+    hell:"Fix",json:"⬇ Download JSON",pdf:"🖨 PDF / Print",xeta_qosulma:"Server connection error",
+    kat:{fayllar:"Sensitive Files",basliqlar:"Security Headers",email:"Email / Spoofing",xss:"XSS",sqli:"SQL Injection",cmd:"Command Injection",lfi:"LFI / Path Traversal",redirect:"Open Redirect",cors:"CORS",kohne_js:"Outdated JS Libraries"},
+    addim:{icaze:"Checking authorization",crawl:"Crawling site",texnologiya:"Detecting technology",fayllar:"Checking sensitive files",basliqlar:"Checking security headers",cors:"Checking CORS",kohne_js:"Checking outdated JS",spoofing:"Checking domain spoofing",xss:"Testing XSS",sqli:"Testing SQL Injection",redirect:"Testing Open Redirect",cmd:"Testing Command Injection",lfi:"Testing LFI",bitdi:"Scan complete"},
     nisan:{kritik:"CRITICAL",yuksek:"HIGH",orta:"MEDIUM",asagi:"LOW",info:"INFO"}},
   ru:{altbashlik:"Авторизованный сканер уязвимостей",skan:"⚡ СКАН",skan_edilir:"СКАНИРОВАНИЕ...",
-    footer:"⚖️ Сканируйте только свои или авторизованные сайты.",
-    qiymet:"ОЦЕНКА",netice:"результатов",sehife:"страниц",forma:"форм",
-    yoxlamalar:"Выполненные проверки",temiz:"ЧИСТО",zeif:"СЛАБО",
-    tapildi_yox:"✓ Открытых уязвимостей не найдено!",hell:"Решение",
-    xeta_qosulma:"Ошибка подключения к серверу",
-    kat:{fayllar:"Чувствительные файлы",email:"Email / Spoofing",xss:"XSS (Cross-Site Scripting)",sqli:"SQL-инъекция"},
-    addim:{icaze:"Проверка авторизации",crawl:"Обход сайта (crawl)",hessas:"Проверка файлов",
-      spoofing:"Domain spoofing (SPF/DMARC)",xss:"Проверка XSS-атак",sqli:"Проверка SQL-инъекций",bitdi:"Сканирование завершено"},
+    footer:"⚖️ Сканируйте только свои или авторизованные сайты.",qiymet:"ОЦЕНКА",
+    netice:"результатов",sehife:"страниц",forma:"форм",icmal:"Сводка",texnologiya:"Технологии",
+    yoxlamalar:"Выполненные проверки",temiz:"ЧИСТО",zeif:"СЛАБО",tapildi_yox:"✓ Открытых уязвимостей не найдено!",
+    hell:"Решение",json:"⬇ Скачать JSON",pdf:"🖨 PDF / Печать",xeta_qosulma:"Ошибка подключения к серверу",
+    kat:{fayllar:"Чувствительные файлы",basliqlar:"Заголовки безопасности",email:"Email / Spoofing",xss:"XSS",sqli:"SQL-инъекция",cmd:"Command Injection",lfi:"LFI / Path Traversal",redirect:"Open Redirect",cors:"CORS",kohne_js:"Устаревшие JS-библиотеки"},
+    addim:{icaze:"Проверка авторизации",crawl:"Обход сайта",texnologiya:"Определение технологий",fayllar:"Проверка файлов",basliqlar:"Проверка заголовков",cors:"Проверка CORS",kohne_js:"Проверка устаревших JS",spoofing:"Проверка domain spoofing",xss:"Проверка XSS",sqli:"Проверка SQL-инъекций",redirect:"Проверка Open Redirect",cmd:"Проверка Command Injection",lfi:"Проверка LFI",bitdi:"Сканирование завершено"},
     nisan:{kritik:"КРИТИЧНО",yuksek:"ВЫСОКО",orta:"СРЕДНЕ",asagi:"НИЗКО",info:"ИНФО"}}
 };
-
-let dil = 'az';
-let sonNetice = null;      // son skan nəticəsi (dil dəyişəndə yenidən göstərmək üçün)
+const RENG={kritik:'#ff2bd6',yuksek:'#ff3b5c',orta:'#ffb020',asagi:'#2f9bff',info:'#5f7385'};
+let dil='az', sonNetice=null, simTimer=null;
 
 function dilDeyis(y){
-  dil = y;
-  document.querySelectorAll('.diller button').forEach(b=>
-    b.classList.toggle('aktiv', b.dataset.dil===y));
-  document.documentElement.lang = y;
-  const t = UI[y];
-  document.getElementById('altbashlik').textContent = t.altbashlik;
-  document.getElementById('skanBtn').textContent = t.skan;
-  document.getElementById('footer').textContent = t.footer;
-  document.getElementById('yoxBash').textContent = t.yoxlamalar;
-  if(sonNetice) neticeGoster(sonNetice);   // nəticəni yeni dildə yenilə
+  dil=y;
+  document.querySelectorAll('.diller button').forEach(b=>b.classList.toggle('aktiv',b.dataset.dil===y));
+  document.documentElement.lang=y;
+  const t=UI[y];
+  document.getElementById('altbashlik').textContent=t.altbashlik;
+  document.getElementById('skanBtn').textContent=t.skan;
+  document.getElementById('footer').textContent=t.footer;
+  document.getElementById('yoxBash').textContent=t.yoxlamalar;
+  document.getElementById('icmalBash').textContent=t.icmal;
+  document.getElementById('btnJson').textContent=t.json;
+  document.getElementById('btnPdf').textContent=t.pdf;
+  if(sonNetice) neticeGoster(sonNetice);
 }
 
-// ============ CANLI SKAN (SSE + POST ehtiyat) ============
-let simTimer = null;
-
+// ============ SKAN (SSE + POST ehtiyat) ============
 function skanBasla(){
-  const hedef = document.getElementById('hedef').value.trim();
-  if(!hedef) return;
-  const btn = document.getElementById('skanBtn');
-  const term = document.getElementById('terminal');
-  const netice = document.getElementById('netice');
-  const xeta = document.getElementById('xeta');
-
-  sonNetice = null;
-  xeta.style.display='none';
-  netice.style.display='none';
-  term.style.display='block';
-  term.innerHTML='';
-  btn.disabled=true;
-  btn.textContent = UI[dil].skan_edilir;
-  if(simTimer){ clearInterval(simTimer); simTimer=null; }
-
-  let addimlar = [];
-  let tamamlandi = false;
+  const hedef=document.getElementById('hedef').value.trim(); if(!hedef) return;
+  const btn=document.getElementById('skanBtn'),term=document.getElementById('terminal'),
+    netice=document.getElementById('netice'),xeta=document.getElementById('xeta');
+  sonNetice=null; xeta.style.display='none'; netice.style.display='none';
+  term.style.display='block'; term.innerHTML=''; btn.disabled=true; btn.textContent=UI[dil].skan_edilir;
+  if(simTimer){clearInterval(simTimer);simTimer=null;}
+  let addimlar=[], tamamlandi=false;
 
   function termRender(){
-    term.innerHTML = addimlar.map((a,i)=>{
-      const son = i===addimlar.length-1;
-      const cls = a.bitdi ? 'bitdi' : (son ? 'isliyir' : 'bitdi');
-      const ikon = a.bitdi ? '✓' : (son ? '▶' : '✓');
-      const kursor = (son && !a.bitdi) ? '<span class="kursor"></span>' : '';
-      return `<div class="setir ${cls}"><span class="yan">[${ikon}]</span> ${UI[dil].addim[a.kod]||a.kod} ${kursor}</div>`;
-    }).join('');
+    term.innerHTML=addimlar.map((a,i)=>{const son=i===addimlar.length-1;
+      const cls=a.bitdi?'bitdi':(son?'isliyir':'bitdi'); const ikon=a.bitdi?'✓':(son?'▶':'✓');
+      const k=(son&&!a.bitdi)?'<span class="kursor"></span>':'';
+      return `<div class="setir ${cls}"><span class="yan">[${ikon}]</span> ${UI[dil].addim[a.kod]||a.kod} ${k}</div>`;}).join('');
+    term.scrollTop=term.scrollHeight;
   }
-  function bitir(){ btn.disabled=false; btn.textContent=UI[dil].skan; if(simTimer){clearInterval(simTimer);simTimer=null;} }
-  function xetaGoster(msg){ tamamlandi=true; bitir(); term.style.display='none'; xeta.textContent=msg; xeta.style.display='block'; }
-  function neticeHazir(data){ tamamlandi=true; bitir(); addimlar.forEach(a=>a.bitdi=true); termRender(); sonNetice=data; neticeGoster(data); }
-
-  // --- POST ehtiyat (Vercel / SSE işləməyəndə): simulyasiya irəliləmə ---
+  function bitir(){btn.disabled=false;btn.textContent=UI[dil].skan;if(simTimer){clearInterval(simTimer);simTimer=null;}}
+  function xetaGoster(m){tamamlandi=true;bitir();term.style.display='none';xeta.textContent=m;xeta.style.display='block';}
+  function neticeHazir(d){tamamlandi=true;bitir();addimlar.forEach(a=>a.bitdi=true);termRender();sonNetice=d;neticeGoster(d);}
   function postFallback(){
-    const sim = ['icaze','crawl','hessas','spoofing','xss','sqli'];
-    let i=0; addimlar=[];
-    simTimer = setInterval(()=>{
-      if(i<sim.length){
-        if(addimlar.length) addimlar[addimlar.length-1].bitdi=true;
-        addimlar.push({kod:sim[i], bitdi:false}); termRender(); i++;
-      }
-    }, 850);
+    const sim=['icaze','crawl','texnologiya','fayllar','basliqlar','spoofing','xss','sqli','cmd','lfi'];let i=0;addimlar=[];
+    simTimer=setInterval(()=>{if(i<sim.length){if(addimlar.length)addimlar[addimlar.length-1].bitdi=true;addimlar.push({kod:sim[i],bitdi:false});termRender();i++;}},650);
     fetch('/api/skan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({hedef})})
-      .then(r=>r.json())
-      .then(d=>{ if(d.xeta) xetaGoster(d.xeta); else neticeHazir(d); })
+      .then(r=>r.json()).then(d=>{if(d.xeta)xetaGoster(d.xeta);else neticeHazir(d);})
       .catch(e=>xetaGoster(UI[dil].xeta_qosulma+': '+e.message));
   }
-
-  // --- Əsas: SSE canlı axın ---
-  const es = new EventSource('/api/skan-stream?hedef='+encodeURIComponent(hedef));
-  es.onmessage = (ev)=>{
-    const d = JSON.parse(ev.data);
-    if(d.tip==='ilerleme'){
-      if(d.addim==='bitdi') return;
-      if(addimlar.length) addimlar[addimlar.length-1].bitdi=true;
-      addimlar.push({kod:d.addim, bitdi:false}); termRender();
-    } else if(d.tip==='netice'){ es.close(); neticeHazir(d.data); }
-    else if(d.tip==='xeta'){ es.close(); xetaGoster(d.mesaj); }
-  };
-  es.onerror = ()=>{
-    es.close();
-    if(tamamlandi) return;        // artıq bitib -> heç nə etmə
-    addimlar=[]; termRender();
-    postFallback();               // SSE işləmədi -> POST-a keç
-  };
+  const es=new EventSource('/api/skan-stream?hedef='+encodeURIComponent(hedef));
+  es.onmessage=(ev)=>{const d=JSON.parse(ev.data);
+    if(d.tip==='ilerleme'){if(d.addim==='bitdi')return;if(addimlar.length)addimlar[addimlar.length-1].bitdi=true;addimlar.push({kod:d.addim,bitdi:false});termRender();}
+    else if(d.tip==='netice'){es.close();neticeHazir(d.data);}
+    else if(d.tip==='xeta'){es.close();xetaGoster(d.mesaj);}};
+  es.onerror=()=>{es.close();if(tamamlandi)return;addimlar=[];termRender();postFallback();};
 }
 
-function balRengi(bal){
-  if(bal>=75) return getComputedStyle(document.documentElement).getPropertyValue('--neon');
-  if(bal>=40) return getComputedStyle(document.documentElement).getPropertyValue('--orta');
-  return getComputedStyle(document.documentElement).getPropertyValue('--yuksek');
-}
+function balRengi(b){return b>=75?getComputedStyle(document.documentElement).getPropertyValue('--neon'):b>=40?getComputedStyle(document.documentElement).getPropertyValue('--orta'):getComputedStyle(document.documentElement).getPropertyValue('--yuksek');}
 
 function neticeGoster(d){
-  const t = UI[dil];
-  const reng = balRengi(d.bal).trim();
-  document.getElementById('balReqem').textContent = d.bal;
-  document.getElementById('balQiymet').textContent = t.qiymet+' '+d.qiymet;
-  const dairesi = document.getElementById('balDairesi');
-  dairesi.style.borderColor = reng;
-  dairesi.style.boxShadow = `0 0 18px ${reng}55, inset 0 0 18px ${reng}22`;
-  document.getElementById('balReqem').style.color = '#fff';
-  document.getElementById('balQiymet').style.color = reng;
+  const t=UI[dil], reng=balRengi(d.bal).trim();
+  document.getElementById('balReqem').textContent=d.bal;
+  document.getElementById('balQiymet').textContent=t.qiymet+' '+d.qiymet;
+  const dr=document.getElementById('balDairesi');dr.style.borderColor=reng;dr.style.boxShadow=`0 0 18px ${reng}55,inset 0 0 18px ${reng}22`;
+  document.getElementById('balQiymet').style.color=reng;
+  document.getElementById('xHedef').textContent=d.hedef;
+  document.getElementById('xStat').textContent=`${d.statistika.sehifeler} ${t.sehife} · ${d.statistika.formalar} ${t.forma} · ${d.tapintilar.length} ${t.netice}`;
 
-  document.getElementById('xHedef').textContent = d.hedef;
-  document.getElementById('xStat').textContent =
-    `${d.statistika.sehifeler} ${t.sehife} · ${d.statistika.formalar} ${t.forma} · ${d.tapintilar.length} ${t.netice}`;
+  // Texnologiya chip-ləri
+  const tex=d.texnologiya||{}; let texHtml='';
+  if(tex.server&&tex.server!=='?') texHtml+=`<span class="tech-chip">⚙ ${tex.server}</span>`;
+  (tex.texnologiyalar||[]).forEach(x=>texHtml+=`<span class="tech-chip">${x}</span>`);
+  document.getElementById('xTech').innerHTML=texHtml;
 
-  // Yoxlamalar checklist (hamısı görünür)
-  const yl = document.getElementById('yoxListe');
-  yl.innerHTML = d.yoxlamalar.map(y=>{
-    const temiz = y.status==='temiz';
-    const ikon = temiz ? '✓' : '⚠';
-    const say = y.say>0 ? ` (${y.say})` : '';
-    return `<div class="yox-setir ${temiz?'yox-temiz':'yox-zeif'}">
-      <span class="yox-ikon">${ikon}</span>
-      <span class="yox-ad">${t.kat[y.kat]}</span>
-      <span class="yox-status">${temiz?t.temiz:t.zeif}${say}</span></div>`;
-  }).join('');
+  // İcmal: chip-lər + bar
+  const ic=d.icmal||{}; const sira=['kritik','yuksek','orta','asagi','info'];
+  document.getElementById('cipSira').innerHTML=sira.map(s=>ic[s]?`<span class="cip" style="background:${RENG[s]};color:${s==='info'?'#fff':'#05070a'}">${t.nisan[s]}: ${ic[s]}</span>`:'').join('');
+  const cem=sira.reduce((a,s)=>a+(ic[s]||0),0)||1;
+  document.getElementById('icmalBar').innerHTML=sira.map(s=>ic[s]?`<span style="background:${RENG[s]};width:${ic[s]/cem*100}%"></span>`:'').join('')||`<span style="background:var(--neon);width:100%"></span>`;
+
+  // Yoxlamalar
+  document.getElementById('yoxListe').innerHTML=d.yoxlamalar.map(y=>{const tm=y.status==='temiz';
+    return `<div class="yox-setir ${tm?'yox-temiz':'yox-zeif'}"><span class="yox-ikon">${tm?'✓':'⚠'}</span><span class="yox-ad">${t.kat[y.kat]||y.kat}</span><span class="yox-status">${tm?t.temiz:t.zeif}${y.say>0?' ('+y.say+')':''}</span></div>`;}).join('');
 
   // Tapıntılar
-  const qab = document.getElementById('tapintilar');
-  if(d.tapintilar.length===0){
-    qab.innerHTML = `<div class="temiz-msg">${t.tapildi_yox}</div>`;
-  } else {
-    qab.innerHTML = d.tapintilar.map(tp=>{
-      const m = tp.metn[dil];
-      return `<div class="tapinti ${tp.ciddilik}">
-        <div class="bash"><span class="nisan">${t.nisan[tp.ciddilik]}</span><h3>${m.ad}</h3></div>
-        <div class="s2">📍 ${tp.yer}</div>
-        <div class="izah">${m.izah}</div>
-        <div class="hell">💡 ${t.hell}: ${m.hell}</div></div>`;
-    }).join('');
-  }
+  const qab=document.getElementById('tapintilar');
+  if(!d.tapintilar.length){qab.innerHTML=`<div class="temiz-msg">${t.tapildi_yox}</div>`;}
+  else{qab.innerHTML=d.tapintilar.map(tp=>{const m=tp.metn[dil];
+    return `<div class="tapinti ${tp.ciddilik}"><div class="bash"><span class="nisan">${t.nisan[tp.ciddilik]}</span>${tp.cvss?`<span class="cvss-rozet">CVSS ${tp.cvss.toFixed(1)}</span>`:''}<h3>${m.ad}</h3></div><div class="s2">📍 ${tp.yer}</div><div class="izah">${m.izah}</div><div class="hell">💡 ${t.hell}: ${m.hell}</div></div>`;}).join('');}
   document.getElementById('netice').style.display='block';
 }
 
-document.getElementById('hedef').addEventListener('keydown', e=>{
-  if(e.key==='Enter') skanBasla();
-});
+function jsonYukle(){
+  if(!sonNetice)return;
+  const blob=new Blob([JSON.stringify(sonNetice,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='cyberayfar-'+(sonNetice.domen||'report').replace(/[^a-z0-9]/gi,'_')+'.json';a.click();
+}
+
+document.getElementById('hedef').addEventListener('keydown',e=>{if(e.key==='Enter')skanBasla();});
+
+// ============ MATRIX arxa fon animasiyası ============
+(function(){
+  const c=document.getElementById('matrix'),x=c.getContext('2d');
+  let w,h,sutun,damla;
+  function olcu(){w=c.width=innerWidth;h=c.height=innerHeight;sutun=Math.floor(w/14);damla=Array(sutun).fill(1);}
+  olcu();addEventListener('resize',olcu);
+  const herf="01</>{}#$aycberfkiber010110".split('');
+  setInterval(()=>{x.fillStyle='rgba(5,7,10,.08)';x.fillRect(0,0,w,h);
+    x.fillStyle='#00ff9c';x.font='13px monospace';
+    for(let i=0;i<damla.length;i++){const t=herf[Math.floor(Math.random()*herf.length)];
+      x.fillText(t,i*14,damla[i]*14);if(damla[i]*14>h&&Math.random()>.975)damla[i]=0;damla[i]++;}},60);
+})();
 </script>
 </body>
 </html>

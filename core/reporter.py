@@ -54,3 +54,19 @@ def qiymet(bal: int) -> str:
     if bal >= 60: return "C"
     if bal >= 40: return "D"
     return "F"
+
+
+# Təxmini CVSS bal aralığı (standart sənaye göstəricisi)
+CVSS = {"kritik": 9.5, "yuksek": 7.5, "orta": 5.0, "asagi": 3.0, "info": 0.0}
+
+
+def cvss(ciddilik: str) -> float:
+    return CVSS.get(ciddilik, 0.0)
+
+
+def icmal(tapintilar) -> dict:
+    """Exec summary: hər ciddilikdən neçə ədəd (Mərhələ 4)."""
+    say = {"kritik": 0, "yuksek": 0, "orta": 0, "asagi": 0, "info": 0}
+    for t in tapintilar:
+        say[t["ciddilik"]] = say.get(t["ciddilik"], 0) + 1
+    return say

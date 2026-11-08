@@ -1,83 +1,81 @@
 """
-MODUL: SQL INJECTION (Error-based) DETEKTORU
-============================================
-SQL injection = saytın istifadəçi inputunu birbaşa SQL sorğusuna
-qoşması. Hücumçu verilənlər bazasını oxuya/poza bilər.
-
-NECƏ AŞKARLAYIRIQ (zərərsiz üsul):
-  1. İnputa tək dırnaq (') kimi "sorğunu pozan" simvol göndəririk.
-  2. Əgər cavabda SQL XƏTA MESAJI görünürsə (məs: "SQL syntax",
-     "mysql_fetch", "ORA-01756"), deməli input birbaşa SQL-ə düşür
-     = sayt SQLi-yə açıqdır.
-
-Biz DATA ÇIXARMIRIQ, heç nə SİLMİRİK (DROP/DELETE yoxdur). Yalnız
-xəta mesajının görünüb-görünmədiyini yoxlayırıq. Bu "error-based
-detection" standart və təhlükəsiz metoddur.
+MODUL: SQL INJECTION — error-based + time-based (blind)
+=======================================================
+1) Error-based: ' göndərib SQL xəta mesajı axtarır.
+2) Time-based (blind): xəta görünməsə belə, "gözlə" payload-u ilə
+   cavab gecikməsini ölçür (kor zəiflikləri tapır).
+Hər ikisi zərərsizdir — data çıxarmır, heç nə silmir.
 """
 
 import re
-import requests
+import time
 from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
+from core import http_client
 
-# Müxtəlif verilənlər bazalarının xəta imzaları
-SQL_XETA_IMZALARI = [
-    r"SQL syntax.*MySQL", r"Warning.*mysqli?", r"MySQLSyntaxErrorException",
-    r"valid MySQL result", r"PostgreSQL.*ERROR", r"pg_query\(\)",
-    r"ORA-\d{5}", r"Oracle error", r"Microsoft SQL Server",
-    r"ODBC SQL Server Driver", r"SQLite/JDBCDriver", r"sqlite3.OperationalError",
-    r"Unclosed quotation mark", r"quoted string not properly terminated",
-]
-IMZA_REGEX = re.compile("|".join(SQL_XETA_IMZALARI), re.IGNORECASE)
+SQL_XETA = re.compile(
+    r"SQL syntax.*MySQL|Warning.*mysqli?|MySQLSyntaxErrorException|"
+    r"valid MySQL result|PostgreSQL.*ERROR|pg_query\(\)|ORA-\d{5}|"
+    r"Oracle error|Microsoft SQL Server|ODBC SQL Server Driver|"
+    r"SQLite/JDBCDriver|sqlite3.OperationalError|Unclosed quotation mark|"
+    r"quoted string not properly terminated", re.IGNORECASE)
 
-# Sorğunu pozmaq üçün zərərsiz test inputları
-TEST_INPUTLARI = ["'", '"', "')", "' --", "`"]
+ERROR_PAYLOAD = ["'", '"', "')", "' --", "`"]
+GOZLEME = 5
+TIME_PAYLOAD = [f"' AND SLEEP({GOZLEME})-- -", f"'; WAITFOR DELAY '0:0:{GOZLEME}'-- -",
+                f"' OR SLEEP({GOZLEME})-- -"]
 
 
 def _xeta_var(metn):
-    return bool(IMZA_REGEX.search(metn))
+    return bool(SQL_XETA.search(metn or ""))
 
 
-def _get_parametrleri_yoxla(url, hesabat, sessiya, timeout):
+def _get_yoxla(url, hesabat, timeout):
     parcalar = urlparse(url)
     parametrler = parse_qs(parcalar.query)
-    if not parametrler:
-        return
     for param in parametrler:
-        for test in TEST_INPUTLARI:
+        tapildi = False
+        # 1) Error-based
+        for p in ERROR_PAYLOAD:
             yeni = {k: v[0] for k, v in parametrler.items()}
-            yeni[param] = yeni[param] + test
+            yeni[param] = yeni[param] + p
             test_url = urlunparse(parcalar._replace(query=urlencode(yeni)))
-            try:
-                cavab = sessiya.get(test_url, timeout=timeout)
-            except requests.RequestException:
-                continue
-            if _xeta_var(cavab.text):
+            cavab = http_client.al(test_url, timeout=timeout)
+            if cavab and _xeta_var(cavab.text):
                 hesabat.elave_et("kritik", "sqli_url", test_url, param=param)
-                return  # bu parametr üçün tapdıq, davam etmə
-
-
-def _formalari_yoxla(formalar, hesabat, sessiya, timeout):
-    for form in formalar:
-        for test in TEST_INPUTLARI:
-            data = {inp["ad"]: f"test{test}" for inp in form["inputlar"]}
-            if not data:
+                tapildi = True
                 break
-            try:
-                if form["metod"] == "post":
-                    cavab = sessiya.post(form["hereket"], data=data, timeout=timeout)
-                else:
-                    cavab = sessiya.get(form["hereket"], params=data, timeout=timeout)
-            except requests.RequestException:
-                continue
-            if _xeta_var(cavab.text):
-                hesabat.elave_et("kritik", "sqli_forma", form["hereket"],
-                                 menbe=form["menbe_sehife"])
+        if tapildi:
+            continue
+        # 2) Time-based (blind) — baza vaxtını ölç
+        t0 = time.time(); http_client.al(url, timeout=timeout)
+        baza = time.time() - t0
+        for p in TIME_PAYLOAD:
+            yeni = {k: v[0] for k, v in parametrler.items()}
+            yeni[param] = yeni[param] + p
+            test_url = urlunparse(parcalar._replace(query=urlencode(yeni)))
+            t0 = time.time()
+            http_client.al(test_url, timeout=GOZLEME + timeout + 4)
+            if time.time() - t0 >= GOZLEME + max(baza, 0) - 1.5:
+                hesabat.elave_et("kritik", "sqli_blind", test_url, param=param)
                 break
 
 
-def yoxla(parametrli_url, formalar, hesabat, timeout=10):
-    sessiya = requests.Session()
-    sessiya.headers.update({"User-Agent": "SaytYoxla-Skaner/1.0"})
+def _forma_yoxla(form, hesabat, timeout):
+    metod = form["metod"]
+    for p in ERROR_PAYLOAD:
+        data = {inp["ad"]: f"test{p}" for inp in form["inputlar"]}
+        if not data:
+            return
+        kw = {"data": data} if metod == "post" else {"params": data}
+        cavab = http_client.al(form["hereket"], metod=metod.upper(), timeout=timeout, **kw)
+        if cavab and _xeta_var(cavab.text):
+            hesabat.elave_et("kritik", "sqli_forma", form["hereket"],
+                             menbe=form["menbe_sehife"])
+            return
+
+
+def yoxla(parametrli_url, formalar, hesabat, timeout=8):
     for url in parametrli_url:
-        _get_parametrleri_yoxla(url, hesabat, sessiya, timeout)
-    _formalari_yoxla(formalar, hesabat, sessiya, timeout)
+        _get_yoxla(url, hesabat, timeout)
+    for form in formalar:
+        _forma_yoxla(form, hesabat, timeout)

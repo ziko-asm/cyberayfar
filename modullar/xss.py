@@ -1,76 +1,76 @@
 """
-MODUL: ƏKS OLUNAN XSS (Reflected XSS) DETEKTORU
-===============================================
-XSS = saytın istifadəçi inputunu təmizləmədən səhifəyə qaytarması.
-Bu zaman hücumçu zərərli JavaScript yeridə bilər.
-
-NECƏ AŞKARLAYIRIQ (zərərsiz üsul):
-  1. Hər input/parametrə unikal "canary" (nişan) göndəririk, məs: zXy123
-     ətrafında HTML üçün təhlükəli simvollarla: <>"'
-  2. Əgər bu simvollar cavabda OLDUĞU KİMİ (təmizlənmədən) görünürsə,
-     deməli sayt XSS-ə açıqdır.
-  Biz real zərərli skript İŞLƏTMİRİK — yalnız simvolların filtrlənib-
-  filtrlənmədiyini yoxlayırıq. Bu, standart və təhlükəsiz metoddur.
+MODUL: ƏKS OLUNAN XSS (Reflected) — doğrulama ilə
+=================================================
+Canary (nişan) + HTML təhlükəli simvolları göndərir. Təmizlənmədən
+qayıdarsa = XSS. Mərhələ 2: tapılanı 2-ci canary ilə TƏSDİQLƏYİR
+(yalançı müsbəti azaldır).
 """
 
 import secrets
-import requests
 from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
+from core import http_client
 
-# Canary: cavabda tapması asan, təsadüfi nişan
+TEHLUKELI = "<>\"'"
+
+
 def _canary():
     n = secrets.token_hex(4)
-    # HTML-də təhlükəli simvollar — filtrlənməlidirlər
     return f"xss{n}<>\"'", n
 
 
-def _reflektə_olunur(cavab_metni, nishan, token):
-    """Təhlükəli simvollar təmizlənmədən qayıdıbsa True."""
-    tehlukeli = f"<>\"'"
-    # Nişanla birlikdə təhlükəli simvollar varsa = filtrlənməyib
-    return (f"xss{token}" in cavab_metni and
-            any(s in cavab_metni.split(f"xss{token}")[-1][:6] for s in tehlukeli))
+def _reflekte(metn, token):
+    if f"xss{token}" not in metn:
+        return False
+    sonra = metn.split(f"xss{token}")[-1][:6]
+    return any(s in sonra for s in TEHLUKELI)
 
 
-def _get_parametrleri_yoxla(url, hesabat, sessiya, timeout):
+def _tesdiqle_get(test_url_sablonu, param, parametrler, parcalar):
+    """İkinci canary ilə təkrar yoxla."""
+    canary, token = _canary()
+    yeni = {k: v[0] for k, v in parametrler.items()}
+    yeni[param] = canary
+    url = urlunparse(parcalar._replace(query=urlencode(yeni)))
+    cavab = http_client.al(url)
+    return cavab and _reflekte(cavab.text, token)
+
+
+def _get_yoxla(url, hesabat, timeout):
     parcalar = urlparse(url)
     parametrler = parse_qs(parcalar.query)
-    if not parametrler:
-        return
     for param in parametrler:
         canary, token = _canary()
         yeni = {k: v[0] for k, v in parametrler.items()}
         yeni[param] = canary
         test_url = urlunparse(parcalar._replace(query=urlencode(yeni)))
-        try:
-            cavab = sessiya.get(test_url, timeout=timeout)
-        except requests.RequestException:
-            continue
-        if _reflektə_olunur(cavab.text, canary, token):
-            hesabat.elave_et("yuksek", "xss_url", test_url, param=param)
+        cavab = http_client.al(test_url, timeout=timeout)
+        if cavab and _reflekte(cavab.text, token):
+            # DOĞRULAMA: ikinci dəfə təsdiqlə
+            if _tesdiqle_get(test_url, param, parametrler, parcalar):
+                hesabat.elave_et("yuksek", "xss_url", test_url, param=param)
 
 
-def _formalari_yoxla(formalar, hesabat, sessiya, timeout):
-    for form in formalar:
-        canary, token = _canary()
-        data = {inp["ad"]: canary for inp in form["inputlar"]}
-        if not data:
-            continue
-        try:
-            if form["metod"] == "post":
-                cavab = sessiya.post(form["hereket"], data=data, timeout=timeout)
-            else:
-                cavab = sessiya.get(form["hereket"], params=data, timeout=timeout)
-        except requests.RequestException:
-            continue
-        if _reflektə_olunur(cavab.text, canary, token):
+def _forma_yoxla(form, hesabat, timeout):
+    canary, token = _canary()
+    data = {inp["ad"]: canary for inp in form["inputlar"]}
+    if not data:
+        return
+    metod = form["metod"]
+    kw = {"data": data} if metod == "post" else {"params": data}
+    cavab = http_client.al(form["hereket"], metod=metod.upper(), timeout=timeout, **kw)
+    if cavab and _reflekte(cavab.text, token):
+        # Doğrulama
+        c2, t2 = _canary()
+        d2 = {inp["ad"]: c2 for inp in form["inputlar"]}
+        kw2 = {"data": d2} if metod == "post" else {"params": d2}
+        cavab2 = http_client.al(form["hereket"], metod=metod.upper(), timeout=timeout, **kw2)
+        if cavab2 and _reflekte(cavab2.text, t2):
             hesabat.elave_et("yuksek", "xss_forma", form["hereket"],
                              menbe=form["menbe_sehife"])
 
 
-def yoxla(parametrli_url, formalar, hesabat, timeout=10):
-    sessiya = requests.Session()
-    sessiya.headers.update({"User-Agent": "SaytYoxla-Skaner/1.0"})
+def yoxla(parametrli_url, formalar, hesabat, timeout=8):
     for url in parametrli_url:
-        _get_parametrleri_yoxla(url, hesabat, sessiya, timeout)
-    _formalari_yoxla(formalar, hesabat, sessiya, timeout)
+        _get_yoxla(url, hesabat, timeout)
+    for form in formalar:
+        _forma_yoxla(form, hesabat, timeout)
