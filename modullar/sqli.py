@@ -29,9 +29,22 @@ def _xeta_var(metn):
     return bool(SQL_XETA.search(metn or ""))
 
 
+def _vaxt(url, timeout):
+    t0 = time.time()
+    http_client.al(url, timeout=timeout)
+    return time.time() - t0
+
+
 def _get_yoxla(url, hesabat, timeout):
     parcalar = urlparse(url)
     parametrler = parse_qs(parcalar.query)
+
+    # YALANÇI MÜSBƏT QORUMASI: normal səhifə onsuz da SQL xətası göstərirsə,
+    # bu modul etibarsızdır (sayt həmişə o mətni göstərir) -> atla.
+    normal = http_client.al(url, timeout=timeout)
+    if normal and _xeta_var(normal.text):
+        return
+
     for param in parametrler:
         tapildi = False
         # 1) Error-based
@@ -46,26 +59,33 @@ def _get_yoxla(url, hesabat, timeout):
                 break
         if tapildi:
             continue
-        # 2) Time-based (blind) — baza vaxtını ölç
-        t0 = time.time(); http_client.al(url, timeout=timeout)
-        baza = time.time() - t0
+        # 2) Time-based (blind) — davamlı baza + TƏSDİQ
+        baza = max(_vaxt(url, timeout), _vaxt(url, timeout))
+        astana = baza + GOZLEME * 0.8
         for p in TIME_PAYLOAD:
             yeni = {k: v[0] for k, v in parametrler.items()}
             yeni[param] = yeni[param] + p
             test_url = urlunparse(parcalar._replace(query=urlencode(yeni)))
-            t0 = time.time()
-            http_client.al(test_url, timeout=GOZLEME + timeout + 4)
-            if time.time() - t0 >= GOZLEME + max(baza, 0) - 1.5:
+            if _vaxt(test_url, GOZLEME + timeout + 4) < astana:
+                continue
+            # İkinci dəfə də gecikməlidir (bir anlıq sıçrayış deyil)
+            if _vaxt(test_url, GOZLEME + timeout + 4) >= astana:
                 hesabat.elave_et("kritik", "sqli_blind", test_url, param=param)
                 break
 
 
 def _forma_yoxla(form, hesabat, timeout):
     metod = form["metod"]
+    if not form["inputlar"]:
+        return
+    kw_normal = {"data": {i["ad"]: "test123" for i in form["inputlar"]}} if metod == "post" \
+        else {"params": {i["ad"]: "test123" for i in form["inputlar"]}}
+    # Yalançı müsbət qoruması: normal göndəriş onsuz da xəta göstərirsə -> atla
+    normal = http_client.al(form["hereket"], metod=metod.upper(), timeout=timeout, **kw_normal)
+    if normal and _xeta_var(normal.text):
+        return
     for p in ERROR_PAYLOAD:
         data = {inp["ad"]: f"test{p}" for inp in form["inputlar"]}
-        if not data:
-            return
         kw = {"data": data} if metod == "post" else {"params": data}
         cavab = http_client.al(form["hereket"], metod=metod.upper(), timeout=timeout, **kw)
         if cavab and _xeta_var(cavab.text):
