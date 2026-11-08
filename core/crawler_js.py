@@ -87,3 +87,14 @@ def gez(bas_url, maks_sehife=20, timeout=15000):
 
     return {"sehifeler": len(gorulmus), "formalar": formalar,
             "parametrli_url": list(parametrli)}
+
+
+# Ayrıca proses kimi işlədiləndə (motor subprocess ilə çağırır) —
+# bu, Playwright-in web-server thread problemini həll edir.
+if __name__ == "__main__":
+    import sys
+    import json as _json
+    _url = sys.argv[1]
+    _maks = int(sys.argv[2]) if len(sys.argv) > 2 else 20
+    netice = gez(_url, maks_sehife=_maks)
+    sys.stdout.write(_json.dumps(netice))

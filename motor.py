@@ -3,6 +3,8 @@ MOTOR (Engine) v3 — 15 kateqoriya, paralel
 ==========================================
 """
 
+import os
+import sys
 from urllib.parse import urlparse
 
 from core import (authorization, crawler as crawler_modulu, reporter, diller,
@@ -64,14 +66,24 @@ def skan_et(hedef: str, test_rejimi=True, maks_sehife=30, ilerleme=None,
 
     # 2) Crawl + texnologiya
     bildir("crawl")
-    # Əvvəlcə HEADLESS (əsl Chrome) cəhd et; alınmasa köhnə crawler-ə keç
-    netice, headless = None, False
+    # HEADLESS (əsl Chrome) ayrıca prosesdə — Playwright-in thread problemini
+    # həll edir. Alınmasa köhnə (requests) crawler-ə avtomatik keçir.
+    netice, headless, headless_xeta = None, False, None
     try:
-        from core import crawler_js
-        netice = crawler_js.gez(hedef, maks_sehife=min(maks_sehife, 20))
-        headless = True
-    except Exception:
-        netice = None
+        import subprocess
+        kok = os.path.dirname(os.path.abspath(__file__))
+        skript = os.path.join(kok, "core", "crawler_js.py")
+        cp = subprocess.run(
+            [sys.executable, skript, hedef, str(min(maks_sehife, 15))],
+            capture_output=True, text=True, timeout=120)
+        if cp.returncode == 0 and cp.stdout.strip():
+            import json as _json
+            netice = _json.loads(cp.stdout)
+            headless = True
+        else:
+            headless_xeta = (cp.stderr or cp.stdout or f"rc={cp.returncode}").strip()[-400:]
+    except Exception as e:
+        headless_xeta = f"{type(e).__name__}: {e}"[-400:]
     if not netice:
         netice = crawler_modulu.Crawler(hedef, maks_sehife=maks_sehife).gez()
     purl, formalar = netice["parametrli_url"], netice["formalar"]
@@ -144,7 +156,7 @@ def skan_et(hedef: str, test_rejimi=True, maks_sehife=30, ilerleme=None,
         "hedef": hedef, "domen": domen,
         "bal": bal, "qiymet": reporter.qiymet(bal),
         "platforma_domeni": platforma, "texnologiya": tech,
-        "headless": headless,
+        "headless": headless, "headless_xeta": headless_xeta,
         "icmal": reporter.icmal(hesabat.tapintilar),
         "statistika": {"sehifeler": netice["sehifeler"],
                        "formalar": len(formalar), "parametrli_url": len(purl)},
