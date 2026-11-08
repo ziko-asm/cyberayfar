@@ -160,6 +160,7 @@
   .tapinti .bash{display:flex;align-items:center;gap:8px;margin-bottom:7px;flex-wrap:wrap}
   .nisan{font-size:11px;font-weight:bold;padding:3px 9px;border-radius:5px;color:var(--qara);letter-spacing:1px}
   .cvss-rozet{font-size:10px;color:var(--solgun);border:1px solid var(--kenar);border-radius:4px;padding:2px 6px}
+  .owasp-chip{font-size:10px;color:var(--cyan);border:1px solid var(--cyan);border-radius:4px;padding:2px 6px;font-weight:bold}
   .tapinti h3{font-size:15px;color:#fff}
   .tapinti .s2{font-size:12px;color:var(--cyan);margin:4px 0;word-break:break-all}
   .tapinti .izah{font-size:13px;margin:6px 0;color:var(--metn)}
@@ -294,6 +295,11 @@
         <button onclick="jsonYukle()" id="btnJson">⬇ JSON yüklə</button>
         <button onclick="window.print()" id="btnPdf">🖨 PDF / Çap</button>
       </div>
+    </div>
+
+    <div class="panel" id="owaspPanel" style="display:none">
+      <div class="yox-bash">⚠ OWASP TOP 10 (2021)</div>
+      <div id="owaspListe"></div>
     </div>
 
     <div class="panel">
@@ -433,6 +439,14 @@ function neticeGoster(d){
   document.getElementById('yoxListe').innerHTML=d.yoxlamalar.map(y=>{const tm=y.status==='temiz';
     return `<div class="yox-setir ${tm?'yox-temiz':'yox-zeif'}"><span class="yox-ikon">${tm?'✓':'⚠'}</span><span class="yox-ad">${t.kat[y.kat]||y.kat}</span><span class="yox-status">${tm?t.temiz:t.zeif}${y.say>0?' ('+y.say+')':''}</span></div>`;}).join('');
 
+  // OWASP Top 10
+  const ow=d.owasp_icmal||{}, owAd=d.owasp_adlar||{}, owK=Object.keys(ow).sort();
+  const owP=document.getElementById('owaspPanel');
+  if(owK.length){
+    document.getElementById('owaspListe').innerHTML=owK.map(k=>`<div class="yox-setir yox-zeif"><span class="yox-ikon">⚠</span><span class="yox-ad"><b>${k}</b> — ${(owAd[k]&&owAd[k][dil])||''}</span><span class="yox-status">${ow[k]}</span></div>`).join('');
+    owP.style.display='block';
+  } else owP.style.display='none';
+
   tapintilariGoster();
   document.getElementById('netice').style.display='block';
 }
@@ -462,7 +476,7 @@ function tapintilariGoster(){
   if(aktivFiltr){finfo.style.display='block';finfo.textContent=`⊗ ${t.nisan[aktivFiltr]} (${list.length}) — ${t.filtr_temizle}`;}
   else finfo.style.display='none';
   qab.innerHTML=list.map((tp,i)=>{const m=tp.metn[dil];
-    return `<div class="tapinti ${tp.ciddilik}" style="animation-delay:${Math.min(i*35,350)}ms"><div class="bash"><span class="nisan">${t.nisan[tp.ciddilik]}</span>${tp.cvss?`<span class="cvss-rozet">CVSS ${tp.cvss.toFixed(1)}</span>`:''}<h3>${m.ad}</h3></div><div class="s2">📍 ${tp.yer}</div><div class="izah">${m.izah}</div><div class="hell">💡 ${t.hell}: ${m.hell}</div></div>`;}).join('');
+    return `<div class="tapinti ${tp.ciddilik}" style="animation-delay:${Math.min(i*35,350)}ms"><div class="bash"><span class="nisan">${t.nisan[tp.ciddilik]}</span>${tp.cvss?`<span class="cvss-rozet">CVSS ${tp.cvss.toFixed(1)}</span>`:''}${tp.owasp?`<span class="owasp-chip">${tp.owasp}</span>`:''}<h3>${m.ad}</h3></div><div class="s2">📍 ${tp.yer}</div><div class="izah">${m.izah}</div><div class="hell">💡 ${t.hell}: ${m.hell}</div></div>`;}).join('');
 }
 
 function jsonYukle(){

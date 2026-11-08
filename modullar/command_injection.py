@@ -13,9 +13,11 @@ from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 from core import http_client
 
 GOZLEME = 5   # saniyə
-PAYLOADLAR = [f";sleep {GOZLEME}", f"| sleep {GOZLEME}",
-              f"& sleep {GOZLEME}", f"`sleep {GOZLEME}`",
-              f"$(sleep {GOZLEME})"]
+PAYLOADLAR = [f";sleep {GOZLEME}", f"| sleep {GOZLEME}", f"& sleep {GOZLEME}",
+              f"`sleep {GOZLEME}`", f"$(sleep {GOZLEME})", f"&& sleep {GOZLEME}",
+              f"|| sleep {GOZLEME}", f"%0asleep {GOZLEME}", f"';sleep {GOZLEME};'",
+              f"\";sleep {GOZLEME};\"", f"| ping -c {GOZLEME} 127.0.0.1",
+              f"& timeout {GOZLEME}"]
 
 
 def _vaxt_olc(url, timeout):

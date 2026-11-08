@@ -8,7 +8,7 @@ import sys
 from urllib.parse import urlparse
 
 from core import (authorization, crawler as crawler_modulu, reporter, diller,
-                  tech_detect, http_client)
+                  tech_detect, http_client, owasp)
 from modullar import (sensitive_files, email_spoof, xss, sqli, headers, cors,
                       open_redirect, js_libs, command_injection, lfi,
                       csrf, subdomain, http_methods, mixed_content, hidden_paths,
@@ -152,6 +152,7 @@ def skan_et(hedef: str, test_rejimi=True, maks_sehife=30, ilerleme=None,
     tapintilar = [{
         "ciddilik": t["ciddilik"], "kod": t["kod"], "yer": t["yer"],
         "cvss": reporter.cvss(t["ciddilik"]),
+        "owasp": owasp.kateqoriya(t["kod"]),
         "metn": diller.render_hamisi(t["kod"], t["deyishken"]),
     } for t in hesabat.tapintilar]
 
@@ -171,6 +172,8 @@ def skan_et(hedef: str, test_rejimi=True, maks_sehife=30, ilerleme=None,
         "headless": headless, "headless_xeta": headless_xeta,
         "auth_edildi": auth_edildi,
         "icmal": reporter.icmal(hesabat.tapintilar),
+        "owasp_icmal": owasp.icmal(hesabat.tapintilar),
+        "owasp_adlar": owasp.ADLAR,
         "statistika": {"sehifeler": netice["sehifeler"],
                        "formalar": len(formalar), "parametrli_url": len(purl)},
         "yoxlamalar": yoxlamalar, "tapintilar": tapintilar,

