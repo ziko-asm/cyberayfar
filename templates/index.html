@@ -6,51 +6,95 @@
 <title>CYBERAYFAR SCANER</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Share+Tech+Mono&family=VT323&display=swap" rel="stylesheet">
 <style>
   :root{
-    --qara:#05070a; --panel:#0b1016; --panel2:#0e141c; --kenar:#1b2733;
+    --qara:#03050a; --panel:#0a0f17; --panel2:#0e141c; --kenar:#182534;
     --neon:#00ff9c; --cyan:#00e5ff; --metn:#c8e6d8; --solgun:#5f7385;
     --kritik:#ff2bd6; --yuksek:#ff3b5c; --orta:#ffb020; --asagi:#2f9bff; --info:#5f7385;
   }
   *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
   body{font-family:'Share Tech Mono',monospace;background:var(--qara);color:var(--metn);
-    min-height:100vh;padding:20px;overflow-x:hidden}
-  #matrix{position:fixed;inset:0;z-index:-2;opacity:.07;pointer-events:none}
-  body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
-    background-image:linear-gradient(rgba(0,255,156,.03) 1px,transparent 1px),
-      linear-gradient(90deg,rgba(0,255,156,.03) 1px,transparent 1px);background-size:34px 34px}
-  .konteyner{max-width:880px;margin:0 auto}
+    min-height:100vh;padding:20px;overflow-x:hidden;position:relative}
+
+  /* ---- Fon qatları ---- */
+  #matrix{position:fixed;inset:0;z-index:-3;opacity:.10;pointer-events:none}
+  body::before{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;
+    background:radial-gradient(circle at 50% 0%,rgba(0,255,156,.08),transparent 60%),
+      linear-gradient(rgba(0,255,156,.025) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(0,255,156,.025) 1px,transparent 1px);
+    background-size:100% 100%,36px 36px,36px 36px}
+  /* CRT scanline + flicker */
+  .crt{position:fixed;inset:0;z-index:999;pointer-events:none;
+    background:repeating-linear-gradient(0deg,rgba(0,0,0,0) 0,rgba(0,0,0,0) 2px,rgba(0,0,0,.14) 3px,rgba(0,0,0,0) 4px);
+    mix-blend-mode:overlay;animation:flicker 5s infinite}
+  .crt::after{content:"";position:absolute;left:0;right:0;height:120px;
+    background:linear-gradient(rgba(0,255,156,0),rgba(0,255,156,.07),rgba(0,255,156,0));
+    animation:sweep 6s linear infinite}
+  @keyframes sweep{0%{top:-120px}100%{top:100%}}
+  @keyframes flicker{0%,100%{opacity:.5}48%{opacity:.5}49%{opacity:.75}50%{opacity:.4}51%{opacity:.7}52%{opacity:.5}}
+
+  /* ---- Boot overlay ---- */
+  #boot{position:fixed;inset:0;z-index:2000;background:#03050a;display:flex;align-items:center;justify-content:center;
+    font-family:'VT323',monospace;transition:opacity .6s}
+  #boot.gizle{opacity:0;pointer-events:none}
+  #bootMetn{color:var(--neon);font-size:22px;line-height:1.6;white-space:pre;text-shadow:0 0 8px rgba(0,255,156,.6);
+    max-width:90vw}
+  #bootMetn .ok{color:var(--cyan)}
+  .boot-kursor{display:inline-block;width:11px;height:20px;background:var(--neon);animation:yan .8s steps(2) infinite;vertical-align:-3px}
+
+  .konteyner{max-width:900px;margin:0 auto;position:relative;z-index:1}
 
   .diller{display:flex;justify-content:flex-end;gap:8px;margin-bottom:6px}
   .diller button{background:var(--panel);border:1px solid var(--kenar);color:var(--solgun);
-    padding:5px 11px;border-radius:6px;cursor:pointer;font-family:inherit;font-size:12px;letter-spacing:1px}
-  .diller button.aktiv{color:var(--qara);background:var(--neon);border-color:var(--neon);font-weight:bold}
+    padding:5px 11px;border-radius:6px;cursor:pointer;font-family:inherit;font-size:12px;letter-spacing:1px;transition:.15s}
+  .diller button.aktiv{color:var(--qara);background:var(--neon);border-color:var(--neon);font-weight:bold;box-shadow:0 0 14px rgba(0,255,156,.5)}
 
-  header{text-align:center;padding:10px 0 20px}
-  .logo{display:inline-flex;align-items:center;gap:14px;justify-content:center}
-  .logo svg{filter:drop-shadow(0 0 8px var(--neon))}
-  header h1{font-family:'Orbitron',sans-serif;font-size:32px;font-weight:900;letter-spacing:3px;
-    color:#fff;text-shadow:0 0 10px var(--neon),0 0 24px rgba(0,255,156,.5);
-    animation:glitch 4s infinite}
-  header h1 .c{color:var(--neon)}
-  @keyframes glitch{0%,92%,100%{text-shadow:0 0 10px var(--neon),0 0 24px rgba(0,255,156,.5)}
-    93%{text-shadow:2px 0 var(--cyan),-2px 0 var(--kritik)}95%{text-shadow:-2px 0 var(--cyan),2px 0 var(--kritik)}97%{text-shadow:0 0 10px var(--neon)}}
-  header p{color:var(--cyan);margin-top:10px;font-size:13px;letter-spacing:2px;text-transform:uppercase}
+  /* ---- Hero ---- */
+  header{text-align:center;padding:14px 0 10px}
+  .logo{display:inline-flex;align-items:center;gap:16px;justify-content:center}
+  .logo svg{filter:drop-shadow(0 0 10px var(--neon));animation:nabz 3s ease-in-out infinite}
+  @keyframes nabz{50%{filter:drop-shadow(0 0 20px var(--neon))}}
+  h1.glitch{position:relative;font-family:'Orbitron',sans-serif;font-size:46px;font-weight:900;letter-spacing:4px;color:#fff;
+    text-shadow:0 0 12px var(--neon),0 0 30px rgba(0,255,156,.5)}
+  h1.glitch .c{color:var(--neon)}
+  h1.glitch::before,h1.glitch::after{content:attr(data-text);position:absolute;top:0;left:0;width:100%;
+    background:var(--qara);overflow:hidden;opacity:.85}
+  h1.glitch::before{color:var(--cyan);animation:gl1 2.6s infinite linear alternate-reverse;clip-path:polygon(0 0,100% 0,100% 44%,0 44%)}
+  h1.glitch::after{color:var(--kritik);animation:gl2 2s infinite linear alternate-reverse;clip-path:polygon(0 56%,100% 56%,100% 100%,0 100%)}
+  @keyframes gl1{0%,88%,100%{transform:translateX(0)}90%{transform:translate(-3px,-1px)}94%{transform:translate(3px,1px)}}
+  @keyframes gl2{0%,86%,100%{transform:translateX(0)}92%{transform:translate(3px,1px)}96%{transform:translate(-3px,-1px)}}
+  .tagline{min-height:22px;margin-top:12px;color:var(--cyan);font-size:15px;letter-spacing:1px}
+  .tagline .tw-kursor{display:inline-block;width:8px;height:15px;background:var(--cyan);vertical-align:-2px;animation:yan .8s steps(2) infinite}
 
-  .axtaris{display:flex;gap:10px;margin:18px 0;flex-wrap:wrap}
-  .axtaris input{flex:1;min-width:220px;padding:15px 16px;border-radius:8px;
-    border:1px solid var(--kenar);background:var(--panel);color:var(--neon);
+  /* ---- Stats ---- */
+  .stats{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:18px 0 6px}
+  .stat{flex:1;min-width:120px;max-width:200px;background:var(--panel);border:1px solid var(--kenar);
+    border-radius:10px;padding:14px;text-align:center;position:relative;overflow:hidden}
+  .stat .num{font-family:'Orbitron',sans-serif;font-size:28px;font-weight:800;color:var(--neon);text-shadow:0 0 12px rgba(0,255,156,.5)}
+  .stat .lab{font-size:12px;color:var(--solgun);letter-spacing:1px;margin-top:4px;text-transform:uppercase}
+
+  /* ---- Terminal input ---- */
+  .axtaris{display:flex;gap:10px;margin:18px 0;flex-wrap:wrap;align-items:stretch}
+  .input-sarma{flex:1;min-width:240px;display:flex;align-items:center;gap:10px;background:var(--panel);
+    border:1px solid var(--kenar);border-radius:8px;padding:0 14px;transition:.15s}
+  .input-sarma:focus-within{border-color:var(--neon);box-shadow:0 0 0 2px rgba(0,255,156,.15),0 0 18px rgba(0,255,156,.12)}
+  .prompt{color:var(--neon);font-size:15px;white-space:nowrap;user-select:none;opacity:.9}
+  .axtaris input{flex:1;padding:15px 0;border:0;background:transparent;color:var(--neon);
     font-family:inherit;font-size:16px;outline:none;letter-spacing:1px}
-  .axtaris input:focus{border-color:var(--neon);box-shadow:0 0 0 2px rgba(0,255,156,.15)}
   .axtaris button{padding:15px 26px;border:1px solid var(--neon);border-radius:8px;background:transparent;
     color:var(--neon);font-family:'Orbitron',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;
-    cursor:pointer;transition:.15s;text-shadow:0 0 8px rgba(0,255,156,.6)}
-  .axtaris button:hover{background:var(--neon);color:var(--qara);box-shadow:0 0 18px rgba(0,255,156,.5)}
+    cursor:pointer;transition:.15s;text-shadow:0 0 8px rgba(0,255,156,.6);white-space:nowrap}
+  .axtaris button:hover{background:var(--neon);color:var(--qara);box-shadow:0 0 22px rgba(0,255,156,.6)}
   .axtaris button:disabled{opacity:.4;cursor:not-allowed}
 
-  .terminal{display:none;background:#04120c;border:1px solid var(--kenar);border-radius:10px;
-    padding:16px 18px;margin-bottom:18px;font-size:13px;max-height:220px;overflow:auto}
+  /* ---- Terminal (canlı irəliləmə) ---- */
+  .terminal{display:none;position:relative;background:#030f0a;border:1px solid var(--kenar);border-radius:10px;
+    padding:18px;margin-bottom:18px;font-size:13px;max-height:240px;overflow:auto}
+  .terminal::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;
+    background:linear-gradient(90deg,transparent,var(--neon),transparent);animation:tscan 1.6s linear infinite}
+  @keyframes tscan{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
   .terminal .setir{padding:2px 0;color:var(--solgun);white-space:pre-wrap}
   .terminal .setir.isliyir{color:var(--cyan)} .terminal .setir.bitdi{color:var(--neon)}
   .terminal .yan{color:var(--neon)}
@@ -58,32 +102,39 @@
   @keyframes yan{50%{opacity:0}}
 
   .netice{display:none}
-  .panel{background:var(--panel);border:1px solid var(--kenar);border-radius:12px;padding:20px;margin-bottom:16px}
+  .panel{background:var(--panel);border:1px solid var(--kenar);border-radius:12px;padding:20px;margin-bottom:16px;position:relative}
+  /* animasiyalı neon kənar */
+  .panel.isiq::after{content:"";position:absolute;inset:-1px;border-radius:12px;padding:1px;pointer-events:none;
+    background:linear-gradient(120deg,transparent,rgba(0,255,156,.5),transparent,rgba(0,229,255,.4),transparent);
+    background-size:300% 300%;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor;mask-composite:exclude;animation:kenar 4s linear infinite}
+  @keyframes kenar{0%{background-position:0% 50%}100%{background-position:300% 50%}}
   .xulase{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
-  .bal-qutu{position:relative;width:104px;height:104px;flex-shrink:0;display:grid;place-items:center}
-  .bal-dairesi{width:104px;height:104px;border-radius:50%;position:absolute;inset:0;border:4px solid var(--neon)}
+  .bal-qutu{position:relative;width:108px;height:108px;flex-shrink:0;display:grid;place-items:center}
+  .bal-dairesi{width:108px;height:108px;border-radius:50%;position:absolute;inset:0;border:4px solid var(--neon)}
   .bal-ici{text-align:center;z-index:1}
-  .bal-ici .reqem{font-family:'Orbitron',sans-serif;font-size:30px;font-weight:800;color:#fff;line-height:1}
+  .bal-ici .reqem{font-family:'Orbitron',sans-serif;font-size:32px;font-weight:800;color:#fff;line-height:1}
   .bal-ici .qiymet{font-size:13px;color:var(--neon);letter-spacing:2px;margin-top:2px}
   .xulase-metn{flex:1;min-width:180px}
   .xulase-metn h2{font-size:16px;color:#fff;margin-bottom:6px;word-break:break-all}
-  .xulase-metn .stat{color:var(--solgun);font-size:13px;margin-bottom:8px}
-  .tech-chip{display:inline-block;font-size:11px;color:var(--cyan);border:1px solid var(--kenar);
-    border-radius:5px;padding:2px 8px;margin:2px 4px 2px 0}
+  .xulase-metn .stat-x{color:var(--solgun);font-size:13px;margin-bottom:8px}
+  .tech-chip{display:inline-block;font-size:11px;color:var(--cyan);border:1px solid var(--kenar);border-radius:5px;padding:2px 8px;margin:2px 4px 2px 0}
 
-  /* İcmal (exec summary) */
-  .icmal-bash{font-family:'Orbitron',sans-serif;font-size:12px;letter-spacing:2px;color:var(--cyan);
-    margin-bottom:12px;text-transform:uppercase}
+  .icmal-bash,.yox-bash{font-family:'Orbitron',sans-serif;font-size:12px;letter-spacing:2px;color:var(--cyan);margin-bottom:14px;text-transform:uppercase}
+  .icmal-ust{display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin-bottom:4px}
+  .icmal-sag{flex:1;min-width:220px}
+  #donut{flex-shrink:0}
+  .donut-merkez{font-family:'Orbitron',sans-serif;font-weight:800}
   .cip-sira{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-  .cip{font-size:12px;padding:5px 11px;border-radius:7px;color:#fff;font-weight:bold;letter-spacing:.5px}
+  .cip{font-size:12px;padding:5px 11px;border-radius:7px;color:#fff;font-weight:bold;letter-spacing:.5px;cursor:pointer;transition:.15s;user-select:none}
+  .cip:hover{transform:translateY(-2px);filter:brightness(1.1)}
+  .cip.sol{opacity:.28}
   .bar{display:flex;height:14px;border-radius:7px;overflow:hidden;border:1px solid var(--kenar)}
   .bar span{display:block;height:100%}
-  .eylemler{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
-  .eylemler button{background:transparent;border:1px solid var(--cyan);color:var(--cyan);
-    padding:9px 15px;border-radius:7px;cursor:pointer;font-family:inherit;font-size:13px;transition:.15s}
-  .eylemler button:hover{background:var(--cyan);color:var(--qara)}
+  .eylemler{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+  .eylemler button{background:transparent;border:1px solid var(--cyan);color:var(--cyan);padding:9px 15px;border-radius:7px;cursor:pointer;font-family:inherit;font-size:13px;transition:.15s}
+  .eylemler button:hover{background:var(--cyan);color:var(--qara);box-shadow:0 0 16px rgba(0,229,255,.4)}
 
-  .yox-bash{font-family:'Orbitron',sans-serif;font-size:12px;letter-spacing:2px;color:var(--cyan);margin-bottom:12px;text-transform:uppercase}
   .yox-setir{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed var(--kenar);font-size:14px}
   .yox-setir:last-child{border-bottom:0}
   .yox-ikon{width:22px;text-align:center;font-weight:bold}
@@ -92,7 +143,9 @@
   .yox-temiz .yox-ikon{color:var(--neon)} .yox-temiz .yox-status{color:var(--neon);border:1px solid var(--neon)}
   .yox-zeif .yox-ikon{color:var(--yuksek)} .yox-zeif .yox-status{color:var(--yuksek);border:1px solid var(--yuksek)}
 
-  .tapinti{background:var(--panel);border:1px solid var(--kenar);border-left-width:4px;border-radius:10px;padding:15px 17px;margin-bottom:11px}
+  .filtr-info{font-size:12px;color:var(--cyan);margin-bottom:10px;display:none;cursor:pointer}
+  .tapinti{background:var(--panel);border:1px solid var(--kenar);border-left-width:4px;border-radius:10px;padding:15px 17px;margin-bottom:11px;animation:ac .45s ease both}
+  @keyframes ac{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
   .tapinti .bash{display:flex;align-items:center;gap:8px;margin-bottom:7px;flex-wrap:wrap}
   .nisan{font-size:11px;font-weight:bold;padding:3px 9px;border-radius:5px;color:var(--qara);letter-spacing:1px}
   .cvss-rozet{font-size:10px;color:var(--solgun);border:1px solid var(--kenar);border-radius:4px;padding:2px 6px}
@@ -105,32 +158,26 @@
   .orta{border-left-color:var(--orta)} .orta .nisan{background:var(--orta)}
   .asagi{border-left-color:var(--asagi)} .asagi .nisan{background:var(--asagi)}
   .info{border-left-color:var(--info)} .info .nisan{background:var(--info);color:#fff}
-  .temiz-msg{text-align:center;padding:26px;color:var(--neon);font-size:16px}
+  .temiz-msg{text-align:center;padding:30px;color:var(--neon);font-size:16px;text-shadow:0 0 12px rgba(0,255,156,.4)}
   .xeta{display:none;background:rgba(255,59,92,.08);border:1px solid var(--yuksek);border-radius:10px;padding:15px;color:#ff8ea0;white-space:pre-wrap;margin-bottom:16px}
-  footer{text-align:center;color:var(--solgun);font-size:12px;padding:26px 0;letter-spacing:1px}
+  footer{text-align:center;color:var(--solgun);font-size:12px;padding:30px 0;letter-spacing:1px}
 
-  .icmal-ust{display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin-bottom:4px}
-  .icmal-sag{flex:1;min-width:220px}
-  #donut{flex-shrink:0}
-  .donut-merkez{font-family:'Orbitron',sans-serif;font-weight:800}
-  .cip{cursor:pointer;transition:.15s;user-select:none}
-  .cip:hover{transform:translateY(-1px)}
-  .cip.sol{opacity:.28}
-  .tapinti{animation:ac .4s ease both}
-  @keyframes ac{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-  .filtr-info{font-size:12px;color:var(--cyan);margin-bottom:10px;display:none;cursor:pointer}
   @media print{
-    #matrix,body::before,.diller,.axtaris,.terminal,.eylemler,footer{display:none!important}
+    #matrix,.crt,body::before,#boot,.diller,.axtaris,.stats,.tagline,.terminal,.eylemler,footer{display:none!important}
     body{background:#fff;color:#111;padding:0}
     .panel,.tapinti{background:#fff;border:1px solid #ccc;color:#111}
+    .panel.isiq::after{display:none}
     .tapinti h3,.xulase-metn h2,.bal-ici .reqem{color:#111}
-    header h1{color:#111;text-shadow:none;animation:none}
+    h1.glitch{color:#111;text-shadow:none}h1.glitch::before,h1.glitch::after{display:none}
   }
-  @media(max-width:560px){header h1{font-size:24px}.logo svg{width:34px;height:34px}}
+  @media(max-width:560px){h1.glitch{font-size:30px}.logo svg{width:36px;height:36px}.stat .num{font-size:22px}}
 </style>
 </head>
 <body>
+<div id="boot"><div id="bootMetn"></div></div>
+<div class="crt"></div>
 <canvas id="matrix"></canvas>
+
 <div class="konteyner">
   <div class="diller">
     <button data-dil="az" class="aktiv" onclick="dilDeyis('az')">AZ</button>
@@ -140,18 +187,26 @@
 
   <header>
     <div class="logo">
-      <svg width="44" height="44" viewBox="0 0 48 48" fill="none">
-        <path d="M24 3L6 10v12c0 11 7.6 18.9 18 23 10.4-4.1 18-12 18-23V10L24 3z"
-              stroke="#00ff9c" stroke-width="2.5" fill="rgba(0,255,156,.06)"/>
+      <svg width="54" height="54" viewBox="0 0 48 48" fill="none">
+        <path d="M24 3L6 10v12c0 11 7.6 18.9 18 23 10.4-4.1 18-12 18-23V10L24 3z" stroke="#00ff9c" stroke-width="2.5" fill="rgba(0,255,156,.06)"/>
         <path d="M16 24l6 6 10-12" stroke="#00ff9c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
-      <h1><span class="c">CYBER</span>AYFAR</h1>
+      <h1 class="glitch" data-text="CYBERAYFAR"><span class="c">CYBER</span>AYFAR</h1>
     </div>
-    <p id="altbashlik">İcazəli Veb Zəiflik Skaneri</p>
+    <div class="tagline"><span id="twMetn"></span><span class="tw-kursor"></span></div>
   </header>
 
+  <div class="stats">
+    <div class="stat"><div class="num" data-hedef="15" id="st1">0</div><div class="lab" id="stLab1">Yoxlama növü</div></div>
+    <div class="stat"><div class="num" data-hedef="3" id="st2">0</div><div class="lab" id="stLab2">Dil</div></div>
+    <div class="stat"><div class="num" data-hedef="100" data-son="%" id="st3">0</div><div class="lab" id="stLab3">Pulsuz</div></div>
+  </div>
+
   <div class="axtaris">
-    <input id="hedef" type="text" placeholder="domen.com" value="saytyoxla.vercel.app" autocomplete="off">
+    <div class="input-sarma">
+      <span class="prompt">root@cyberayfar:~#</span>
+      <input id="hedef" type="text" placeholder="domen.com" value="saytyoxla.vercel.app" autocomplete="off">
+    </div>
     <button id="skanBtn" onclick="skanBasla()">⚡ SKAN ET</button>
   </div>
 
@@ -159,28 +214,19 @@
   <div class="terminal" id="terminal"></div>
 
   <div class="netice" id="netice">
-    <!-- Xülasə -->
-    <div class="panel xulase">
+    <div class="panel isiq xulase">
       <div class="bal-qutu">
         <div class="bal-dairesi" id="balDairesi"></div>
         <div class="bal-ici"><div class="reqem" id="balReqem">—</div><div class="qiymet" id="balQiymet"></div></div>
       </div>
-      <div class="xulase-metn">
-        <h2 id="xHedef"></h2>
-        <div class="stat" id="xStat"></div>
-        <div id="xTech"></div>
-      </div>
+      <div class="xulase-metn"><h2 id="xHedef"></h2><div class="stat-x" id="xStat"></div><div id="xTech"></div></div>
     </div>
 
-    <!-- İcmal (exec summary) -->
     <div class="panel">
       <div class="icmal-bash" id="icmalBash">İcmal</div>
       <div class="icmal-ust">
         <svg id="donut" width="116" height="116" viewBox="0 0 116 116"></svg>
-        <div class="icmal-sag">
-          <div class="cip-sira" id="cipSira"></div>
-          <div class="bar" id="icmalBar"></div>
-        </div>
+        <div class="icmal-sag"><div class="cip-sira" id="cipSira"></div><div class="bar" id="icmalBar"></div></div>
       </div>
       <div class="eylemler">
         <button onclick="jsonYukle()" id="btnJson">⬇ JSON yüklə</button>
@@ -188,7 +234,6 @@
       </div>
     </div>
 
-    <!-- Yoxlamalar -->
     <div class="panel">
       <div class="yox-bash" id="yoxBash">Aparılan Yoxlamalar</div>
       <div id="yoxListe"></div>
@@ -202,48 +247,56 @@
 </div>
 
 <script>
-// ============ TƏRCÜMƏLƏR ============
 const UI = {
   az:{altbashlik:"İcazəli Veb Zəiflik Skaneri",skan:"⚡ SKAN ET",skan_edilir:"SKAN EDİLİR...",
     footer:"⚖️ Yalnız öz saytlarını və ya icazəli saytları skan et.",qiymet:"QİYMƏT",
-    netice:"nəticə",sehife:"səhifə",forma:"forma",icmal:"İcmal",texnologiya:"Texnologiya",
+    netice:"nəticə",sehife:"səhifə",forma:"forma",icmal:"İcmal",
     yoxlamalar:"Aparılan Yoxlamalar",temiz:"TƏMİZ",zeif:"ZƏİF",tapildi_yox:"✓ Heç bir açıq zəiflik tapılmadı!",
     hell:"Həll",json:"⬇ JSON yüklə",pdf:"🖨 PDF / Çap",xeta_qosulma:"Serverə qoşulma xətası",filtr_temizle:"filtri təmizlə",
+    st:["Yoxlama növü","Dil","Pulsuz"],
+    tag:["SQL Injection aşkarlanır...","XSS ovlanır...","15 hücum vektoru yoxlanılır...","Tap. Düzəlt. Qoru."],
     kat:{fayllar:"Həssas Fayllar",basliqlar:"Təhlükəsizlik Başlıqları",email:"Email / Spoofing",xss:"XSS",sqli:"SQL Injection",cmd:"Command Injection",lfi:"LFI / Path Traversal",redirect:"Open Redirect",cors:"CORS",kohne_js:"Köhnə JS Kitabxanalar",csrf:"CSRF",yollar:"Gizli Yollar",metodlar:"HTTP Metodları",mixed:"Mixed Content",subdomain:"Subdomenlər"},
     addim:{icaze:"İcazə yoxlanılır",crawl:"Sayt gəzilir (crawl)",texnologiya:"Texnologiya aşkarlanır",fayllar:"Həssas fayllar yoxlanılır",basliqlar:"Təhlükəsizlik başlıqları yoxlanılır",cors:"CORS yoxlanılır",kohne_js:"Köhnə JS kitabxanalar yoxlanılır",spoofing:"Domain spoofing yoxlanılır",xss:"XSS sınanılır",sqli:"SQL Injection sınanılır",redirect:"Open Redirect sınanılır",cmd:"Command Injection sınanılır",lfi:"LFI sınanılır",csrf:"CSRF yoxlanılır",metodlar:"HTTP metodları yoxlanılır",mixed:"Mixed content yoxlanılır",yollar:"Gizli yollar yoxlanılır",subdomain:"Subdomenlər axtarılır",bitdi:"Skan tamamlandı"},
     nisan:{kritik:"KRİTİK",yuksek:"YÜKSEK",orta:"ORTA",asagi:"AŞAĞI",info:"MƏLUMAT"}},
   en:{altbashlik:"Authorized Web Vulnerability Scanner",skan:"⚡ SCAN",skan_edilir:"SCANNING...",
     footer:"⚖️ Only scan sites you own or are authorized to test.",qiymet:"GRADE",
-    netice:"findings",sehife:"pages",forma:"forms",icmal:"Summary",texnologiya:"Technology",
+    netice:"findings",sehife:"pages",forma:"forms",icmal:"Summary",
     yoxlamalar:"Checks Performed",temiz:"CLEAN",zeif:"WEAK",tapildi_yox:"✓ No open vulnerabilities found!",
     hell:"Fix",json:"⬇ Download JSON",pdf:"🖨 PDF / Print",xeta_qosulma:"Server connection error",filtr_temizle:"clear filter",
+    st:["Scan types","Languages","Free"],
+    tag:["Detecting SQL Injection...","Hunting XSS...","15 attack vectors scanned...","Find. Fix. Secure."],
     kat:{fayllar:"Sensitive Files",basliqlar:"Security Headers",email:"Email / Spoofing",xss:"XSS",sqli:"SQL Injection",cmd:"Command Injection",lfi:"LFI / Path Traversal",redirect:"Open Redirect",cors:"CORS",kohne_js:"Outdated JS Libraries",csrf:"CSRF",yollar:"Hidden Paths",metodlar:"HTTP Methods",mixed:"Mixed Content",subdomain:"Subdomains"},
     addim:{icaze:"Checking authorization",crawl:"Crawling site",texnologiya:"Detecting technology",fayllar:"Checking sensitive files",basliqlar:"Checking security headers",cors:"Checking CORS",kohne_js:"Checking outdated JS",spoofing:"Checking domain spoofing",xss:"Testing XSS",sqli:"Testing SQL Injection",redirect:"Testing Open Redirect",cmd:"Testing Command Injection",lfi:"Testing LFI",csrf:"Checking CSRF",metodlar:"Checking HTTP methods",mixed:"Checking mixed content",yollar:"Checking hidden paths",subdomain:"Enumerating subdomains",bitdi:"Scan complete"},
     nisan:{kritik:"CRITICAL",yuksek:"HIGH",orta:"MEDIUM",asagi:"LOW",info:"INFO"}},
   ru:{altbashlik:"Авторизованный сканер уязвимостей",skan:"⚡ СКАН",skan_edilir:"СКАНИРОВАНИЕ...",
     footer:"⚖️ Сканируйте только свои или авторизованные сайты.",qiymet:"ОЦЕНКА",
-    netice:"результатов",sehife:"страниц",forma:"форм",icmal:"Сводка",texnologiya:"Технологии",
+    netice:"результатов",sehife:"страниц",forma:"форм",icmal:"Сводка",
     yoxlamalar:"Выполненные проверки",temiz:"ЧИСТО",zeif:"СЛАБО",tapildi_yox:"✓ Открытых уязвимостей не найдено!",
     hell:"Решение",json:"⬇ Скачать JSON",pdf:"🖨 PDF / Печать",xeta_qosulma:"Ошибка подключения к серверу",filtr_temizle:"сбросить фильтр",
+    st:["Проверок","Языков","Бесплатно"],
+    tag:["Обнаружение SQL-инъекций...","Охота на XSS...","15 векторов атак...","Найти. Исправить. Защитить."],
     kat:{fayllar:"Чувствительные файлы",basliqlar:"Заголовки безопасности",email:"Email / Spoofing",xss:"XSS",sqli:"SQL-инъекция",cmd:"Command Injection",lfi:"LFI / Path Traversal",redirect:"Open Redirect",cors:"CORS",kohne_js:"Устаревшие JS-библиотеки",csrf:"CSRF",yollar:"Скрытые пути",metodlar:"HTTP-методы",mixed:"Mixed Content",subdomain:"Поддомены"},
     addim:{icaze:"Проверка авторизации",crawl:"Обход сайта",texnologiya:"Определение технологий",fayllar:"Проверка файлов",basliqlar:"Проверка заголовков",cors:"Проверка CORS",kohne_js:"Проверка устаревших JS",spoofing:"Проверка domain spoofing",xss:"Проверка XSS",sqli:"Проверка SQL-инъекций",redirect:"Проверка Open Redirect",cmd:"Проверка Command Injection",lfi:"Проверка LFI",csrf:"Проверка CSRF",metodlar:"Проверка HTTP-методов",mixed:"Проверка mixed content",yollar:"Проверка скрытых путей",subdomain:"Поиск поддоменов",bitdi:"Сканирование завершено"},
     nisan:{kritik:"КРИТИЧНО",yuksek:"ВЫСОКО",orta:"СРЕДНЕ",asagi:"НИЗКО",info:"ИНФО"}}
 };
 const RENG={kritik:'#ff2bd6',yuksek:'#ff3b5c',orta:'#ffb020',asagi:'#2f9bff',info:'#5f7385'};
-let dil='az', sonNetice=null, simTimer=null, aktivFiltr=null;
+let dil='az', sonNetice=null, simTimer=null, aktivFiltr=null, twTimer=null;
 
 function dilDeyis(y){
   dil=y;
   document.querySelectorAll('.diller button').forEach(b=>b.classList.toggle('aktiv',b.dataset.dil===y));
   document.documentElement.lang=y;
   const t=UI[y];
-  document.getElementById('altbashlik').textContent=t.altbashlik;
   document.getElementById('skanBtn').textContent=t.skan;
   document.getElementById('footer').textContent=t.footer;
   document.getElementById('yoxBash').textContent=t.yoxlamalar;
   document.getElementById('icmalBash').textContent=t.icmal;
   document.getElementById('btnJson').textContent=t.json;
   document.getElementById('btnPdf').textContent=t.pdf;
+  document.getElementById('stLab1').textContent=t.st[0];
+  document.getElementById('stLab2').textContent=t.st[1];
+  document.getElementById('stLab3').textContent=t.st[2];
+  typewriterBasla();
   if(sonNetice) neticeGoster(sonNetice);
 }
 
@@ -256,7 +309,6 @@ function skanBasla(){
   term.style.display='block'; term.innerHTML=''; btn.disabled=true; btn.textContent=UI[dil].skan_edilir;
   if(simTimer){clearInterval(simTimer);simTimer=null;}
   let addimlar=[], tamamlandi=false;
-
   function termRender(){
     term.innerHTML=addimlar.map((a,i)=>{const son=i===addimlar.length-1;
       const cls=a.bitdi?'bitdi':(son?'isliyir':'bitdi'); const ikon=a.bitdi?'✓':(son?'▶':'✓');
@@ -269,7 +321,7 @@ function skanBasla(){
   function neticeHazir(d){tamamlandi=true;bitir();addimlar.forEach(a=>a.bitdi=true);termRender();sonNetice=d;neticeGoster(d);}
   function postFallback(){
     const sim=['icaze','crawl','texnologiya','fayllar','basliqlar','spoofing','xss','sqli','cmd','lfi'];let i=0;addimlar=[];
-    simTimer=setInterval(()=>{if(i<sim.length){if(addimlar.length)addimlar[addimlar.length-1].bitdi=true;addimlar.push({kod:sim[i],bitdi:false});termRender();i++;}},650);
+    simTimer=setInterval(()=>{if(i<sim.length){if(addimlar.length)addimlar[addimlar.length-1].bitdi=true;addimlar.push({kod:sim[i],bitdi:false});termRender();i++;}},600);
     fetch('/api/skan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({hedef})})
       .then(r=>r.json()).then(d=>{if(d.xeta)xetaGoster(d.xeta);else neticeHazir(d);})
       .catch(e=>xetaGoster(UI[dil].xeta_qosulma+': '+e.message));
@@ -288,26 +340,22 @@ function neticeGoster(d){
   const t=UI[dil], reng=balRengi(d.bal).trim();
   document.getElementById('balReqem').textContent=d.bal;
   document.getElementById('balQiymet').textContent=t.qiymet+' '+d.qiymet;
-  const dr=document.getElementById('balDairesi');dr.style.borderColor=reng;dr.style.boxShadow=`0 0 18px ${reng}55,inset 0 0 18px ${reng}22`;
+  const dr=document.getElementById('balDairesi');dr.style.borderColor=reng;dr.style.boxShadow=`0 0 20px ${reng}66,inset 0 0 20px ${reng}22`;
   document.getElementById('balQiymet').style.color=reng;
   document.getElementById('xHedef').textContent=d.hedef;
   document.getElementById('xStat').textContent=`${d.statistika.sehifeler} ${t.sehife} · ${d.statistika.formalar} ${t.forma} · ${d.tapintilar.length} ${t.netice}`;
-
-  // Texnologiya chip-ləri
   const tex=d.texnologiya||{}; let texHtml='';
   if(tex.server&&tex.server!=='?') texHtml+=`<span class="tech-chip">⚙ ${tex.server}</span>`;
   (tex.texnologiyalar||[]).forEach(x=>texHtml+=`<span class="tech-chip">${x}</span>`);
   document.getElementById('xTech').innerHTML=texHtml;
 
-  // İcmal: kliklənən chip-lər + donut + bar
   aktivFiltr=null;
   const ic=d.icmal||{}; const sira=['kritik','yuksek','orta','asagi','info'];
-  document.getElementById('cipSira').innerHTML=sira.map(s=>ic[s]?`<span class="cip" data-sev="${s}" onclick="filterEt('${s}')" style="background:${RENG[s]};color:${s==='info'?'#fff':'#05070a'}">${t.nisan[s]}: ${ic[s]}</span>`:'').join('');
+  document.getElementById('cipSira').innerHTML=sira.map(s=>ic[s]?`<span class="cip" data-sev="${s}" onclick="filterEt('${s}')" style="background:${RENG[s]};color:${s==='info'?'#fff':'#03050a'}">${t.nisan[s]}: ${ic[s]}</span>`:'').join('');
   const cem=sira.reduce((a,s)=>a+(ic[s]||0),0)||1;
   document.getElementById('icmalBar').innerHTML=sira.map(s=>ic[s]?`<span style="background:${RENG[s]};width:${ic[s]/cem*100}%"></span>`:'').join('')||`<span style="background:var(--neon);width:100%"></span>`;
   donutGoster(ic,sira);
 
-  // Yoxlamalar
   document.getElementById('yoxListe').innerHTML=d.yoxlamalar.map(y=>{const tm=y.status==='temiz';
     return `<div class="yox-setir ${tm?'yox-temiz':'yox-zeif'}"><span class="yox-ikon">${tm?'✓':'⚠'}</span><span class="yox-ad">${t.kat[y.kat]||y.kat}</span><span class="yox-status">${tm?t.temiz:t.zeif}${y.say>0?' ('+y.say+')':''}</span></div>`;}).join('');
 
@@ -320,7 +368,7 @@ function donutGoster(ic,sira){
   const R=46,C=2*Math.PI*R; let off=0,halq='';
   if(cem===0){halq=`<circle cx="58" cy="58" r="${R}" fill="none" stroke="#00ff9c" stroke-width="12"/>`;}
   else sira.forEach(s=>{if(!ic[s])return;const f=ic[s]/cem;
-    halq+=`<circle cx="58" cy="58" r="${R}" fill="none" stroke="${RENG[s]}" stroke-width="12" stroke-linecap="butt" stroke-dasharray="${f*C} ${C}" stroke-dashoffset="${-off*C}" transform="rotate(-90 58 58)"/>`;off+=f;});
+    halq+=`<circle cx="58" cy="58" r="${R}" fill="none" stroke="${RENG[s]}" stroke-width="12" stroke-dasharray="${f*C} ${C}" stroke-dashoffset="${-off*C}" transform="rotate(-90 58 58)"/>`;off+=f;});
   document.getElementById('donut').innerHTML=halq+
     `<text x="58" y="55" text-anchor="middle" class="donut-merkez" fill="#fff" font-size="24">${cem}</text>`+
     `<text x="58" y="73" text-anchor="middle" fill="#5f7385" font-size="10">${UI[dil].netice}</text>`;
@@ -349,21 +397,74 @@ function jsonYukle(){
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);
   a.download='cyberayfar-'+(sonNetice.domen||'report').replace(/[^a-z0-9]/gi,'_')+'.json';a.click();
 }
-
 document.getElementById('hedef').addEventListener('keydown',e=>{if(e.key==='Enter')skanBasla();});
 
-// ============ MATRIX arxa fon animasiyası ============
+// ============ TYPEWRITER tagline ============
+function typewriterBasla(){
+  if(twTimer){clearTimeout(twTimer);}
+  const el=document.getElementById('twMetn'); let frazalar=UI[dil].tag, fi=0, ci=0, silir=false;
+  function tik(){
+    const soz=frazalar[fi];
+    ci += silir?-1:1;
+    el.textContent=soz.slice(0,ci);
+    let gecikme=silir?35:65;
+    if(!silir&&ci===soz.length){gecikme=1600;silir=true;}
+    else if(silir&&ci===0){silir=false;fi=(fi+1)%frazalar.length;gecikme=250;}
+    twTimer=setTimeout(tik,gecikme);
+  }
+  tik();
+}
+
+// ============ STATS count-up ============
+function countUp(){
+  document.querySelectorAll('.stat .num').forEach(el=>{
+    const hedef=+el.dataset.hedef, son=el.dataset.son||''; let n=0;
+    const addim=Math.max(1,Math.round(hedef/40));
+    const t=setInterval(()=>{n+=addim;if(n>=hedef){n=hedef;clearInterval(t);}el.textContent=n+son;},30);
+  });
+}
+
+// ============ BOOT sekvensiyası ============
+function bootBasla(){
+  const boot=document.getElementById('boot'), el=document.getElementById('bootMetn');
+  let gorundu=false;
+  try{gorundu=sessionStorage.getItem('cyb_boot')==='1';}catch(e){}
+  if(gorundu){boot.classList.add('gizle');countUp();typewriterBasla();return;}
+  const setirler=[
+    "> INITIALIZING CYBERAYFAR CORE",
+    "> LOADING 15 ATTACK MODULES ... <span class='ok'>[OK]</span>",
+    "> ESTABLISHING SECURE CHANNEL ... <span class='ok'>[OK]</span>",
+    "> AUTHORIZATION GATE ... <span class='ok'>[ARMED]</span>",
+    "> <span class='ok'>ACCESS GRANTED</span>",
+  ];
+  let i=0, buf="";
+  function yaz(){
+    if(i<setirler.length){
+      buf+=setirler[i]+"\n"; el.innerHTML=buf+'<span class="boot-kursor"></span>'; i++;
+      setTimeout(yaz, 360);
+    } else {
+      setTimeout(()=>{boot.classList.add('gizle');try{sessionStorage.setItem('cyb_boot','1');}catch(e){}
+        countUp();typewriterBasla();}, 650);
+    }
+  }
+  yaz();
+  boot.addEventListener('click',()=>{boot.classList.add('gizle');try{sessionStorage.setItem('cyb_boot','1');}catch(e){}countUp();typewriterBasla();});
+}
+
+// ============ MATRIX fon ============
 (function(){
   const c=document.getElementById('matrix'),x=c.getContext('2d');
   let w,h,sutun,damla;
   function olcu(){w=c.width=innerWidth;h=c.height=innerHeight;sutun=Math.floor(w/14);damla=Array(sutun).fill(1);}
   olcu();addEventListener('resize',olcu);
-  const herf="01</>{}#$aycberfkiber010110".split('');
-  setInterval(()=>{x.fillStyle='rgba(5,7,10,.08)';x.fillRect(0,0,w,h);
-    x.fillStyle='#00ff9c';x.font='13px monospace';
+  const herf="01</>{}#$аяＣＹＢＥＲ01ｱｲｳｴ10アイウエオカ".split('');
+  setInterval(()=>{x.fillStyle='rgba(3,5,10,.07)';x.fillRect(0,0,w,h);
+    x.fillStyle='#00ff9c';x.font='14px monospace';
     for(let i=0;i<damla.length;i++){const t=herf[Math.floor(Math.random()*herf.length)];
-      x.fillText(t,i*14,damla[i]*14);if(damla[i]*14>h&&Math.random()>.975)damla[i]=0;damla[i]++;}},60);
+      x.fillText(t,i*14,damla[i]*14);if(damla[i]*14>h&&Math.random()>.975)damla[i]=0;damla[i]++;}},55);
 })();
+
+bootBasla();
 </script>
 </body>
 </html>
