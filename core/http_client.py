@@ -52,4 +52,7 @@ def modullari_paralel_islet(ishler):
     with ThreadPoolExecutor(max_workers=12) as ex:
         gelecek = [ex.submit(f, *args) for f, args in ishler]
         for g in gelecek:
-            g.result()   # xətaları aşkar et
+            try:
+                g.result()
+            except Exception:
+                pass   # bir modulun xətası bütün skanı dayandırmasın
