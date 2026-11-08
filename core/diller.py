@@ -363,3 +363,16 @@ METINLER.update({
         "ru": {"ad": "Обнаружен WAF: {ad}", "izah": "Сайт защищён фаерволом ({ad}) — это хорошо. Примечание: WAF может скрывать часть результатов.",
                "hell": "Действий не требуется — это признак защиты."}},
 })
+
+
+# ---- IDOR ----
+METINLER.update({
+    "idor": {
+        "az": {"ad": "IDOR (icazə pozuntusu)", "izah": "'{param}' parametrini {id1} -> {id2} dəyişəndə BAŞQA obyektin məlumatı açıldı — hücumçu başqa istifadəçilərin məlumatına baxa/dəyişə bilər.",
+               "hell": "Hər sorğuda obyektin SAHİBİNİ yoxla (server tərəfdə icazə nəzarəti). Təsadüfi UUID işlət, ardıcıl id yox."},
+        "en": {"ad": "IDOR (Broken Access Control)", "izah": "Changing '{param}' from {id1} to {id2} exposed ANOTHER object's data — an attacker can read/modify other users' data.",
+               "hell": "Check object OWNERSHIP on every request (server-side authorization). Use random UUIDs, not sequential ids."},
+        "ru": {"ad": "IDOR (нарушение контроля доступа)", "izah": "Изменение '{param}' с {id1} на {id2} открыло данные ДРУГОГО объекта — атакующий может читать/изменять данные других.",
+               "hell": "Проверяйте владельца объекта на каждом запросе (серверная авторизация). Используйте случайные UUID."},
+    },
+})
