@@ -21,8 +21,10 @@ from core import authorization
 BASE = os.path.dirname(os.path.abspath(__file__))
 app = Flask(__name__, template_folder=os.path.join(BASE, "templates"))
 
-# Vercel-də "VERCEL" dəyişəni avtomatik var -> PROD rejimi
-PROD = bool(os.environ.get("VERCEL"))
+# Vercel "VERCEL", Render "RENDER" dəyişənini avtomatik qoyur -> PROD rejimi
+# (PROD-da təhlükəsizlik qapısı AKTİV: yalnız allowlist/təsdiqli domenlər)
+PROD = bool(os.environ.get("VERCEL") or os.environ.get("RENDER")
+            or os.environ.get("PROD"))
 TEST_REJIMI = not PROD                       # lokalda rahat, canlıda təhlükəsiz
 MAKS_SEHIFE = 15 if PROD else 30             # serverless timeout üçün az
 # Operatorun öz domenləri (ayfar.dev-dəki layihələr) — həmişə icazəli.

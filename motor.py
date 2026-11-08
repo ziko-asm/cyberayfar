@@ -64,8 +64,16 @@ def skan_et(hedef: str, test_rejimi=True, maks_sehife=30, ilerleme=None,
 
     # 2) Crawl + texnologiya
     bildir("crawl")
-    crawler = crawler_modulu.Crawler(hedef, maks_sehife=maks_sehife)
-    netice = crawler.gez()
+    # Əvvəlcə HEADLESS (əsl Chrome) cəhd et; alınmasa köhnə crawler-ə keç
+    netice, headless = None, False
+    try:
+        from core import crawler_js
+        netice = crawler_js.gez(hedef, maks_sehife=min(maks_sehife, 20))
+        headless = True
+    except Exception:
+        netice = None
+    if not netice:
+        netice = crawler_modulu.Crawler(hedef, maks_sehife=maks_sehife).gez()
     purl, formalar = netice["parametrli_url"], netice["formalar"]
 
     bildir("texnologiya")
@@ -136,6 +144,7 @@ def skan_et(hedef: str, test_rejimi=True, maks_sehife=30, ilerleme=None,
         "hedef": hedef, "domen": domen,
         "bal": bal, "qiymet": reporter.qiymet(bal),
         "platforma_domeni": platforma, "texnologiya": tech,
+        "headless": headless,
         "icmal": reporter.icmal(hesabat.tapintilar),
         "statistika": {"sehifeler": netice["sehifeler"],
                        "formalar": len(formalar), "parametrli_url": len(purl)},

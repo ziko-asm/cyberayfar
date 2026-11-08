@@ -1,0 +1,8 @@
+services:
+  - type: web
+    name: cyberayfar
+    runtime: docker
+    plan: free
+    envVars:
+      - key: SAHIB_DOMENLER
+        value: saytyoxla.vercel.app,graphguard-iot.vercel.app,ayfar.dev

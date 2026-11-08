@@ -1,0 +1,9 @@
+.git
+__pycache__
+*.pyc
+.vercel
+.env
+venv
+*.md
+BASLAT.bat
+WINDOWS-ISHLET.txt
