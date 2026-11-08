@@ -288,3 +288,78 @@ METINLER.update({
         "ru": {"ad": "Скрытый путь: /{yol} ({status})", "izah": "Найден путь '{yol}' ({status}) — возможно админ-панель/важный раздел.",
                "hell": "Защитите или скройте этот путь от публичного доступа."}},
 })
+
+
+# ---- A paketi: 8 yeni yoxlama ----
+METINLER.update({
+    "sirr_sizma": {
+        "az": {"ad": "Sirr sızması: {tip}", "izah": "Saytın kodunda açıq qalıb: {tip}. Hücumçu bunu oğurlayıb sistemlərinə girə bilər.",
+               "hell": "Açarı DƏRHAL ləğv et (rotate), koddan çıxar, mühit dəyişəni/server tərəfdə saxla."},
+        "en": {"ad": "Secret leak: {tip}", "izah": "Exposed in the site code: {tip}. An attacker can steal it and access your systems.",
+               "hell": "Revoke (rotate) the key NOW, remove it from code, store server-side/in env vars."},
+        "ru": {"ad": "Утечка секрета: {tip}", "izah": "В коде сайта открыто: {tip}. Атакующий может украсть его и получить доступ.",
+               "hell": "Немедленно отзовите (ротация) ключ, уберите из кода, храните на сервере/в env."}},
+    "tls_self": {
+        "az": {"ad": "Sertifikat doğrulanmadı / self-signed", "izah": "TLS sertifikatı etibarlı deyil — istifadəçi brauzeri xəbərdarlıq verir, MITM riski var.",
+               "hell": "Etibarlı sertifikat ver (məs: Let's Encrypt, pulsuz)."},
+        "en": {"ad": "Certificate not trusted / self-signed", "izah": "The TLS certificate is invalid — browsers warn users, MITM risk exists.",
+               "hell": "Install a trusted certificate (e.g. Let's Encrypt, free)."},
+        "ru": {"ad": "Сертификат не доверенный / self-signed", "izah": "TLS-сертификат недействителен — браузеры предупреждают, риск MITM.",
+               "hell": "Установите доверенный сертификат (напр. Let's Encrypt, бесплатно)."}},
+    "tls_sertifikat": {
+        "az": {"ad": "TLS sertifikatı bitir ({gun} gün)", "izah": "Sertifikatın müddəti bitmək üzrədir ({gun} gün). Bitsə, sayt açılmayacaq.",
+               "hell": "Sertifikatı yenilə (avtomatik yeniləmə qur — Let's Encrypt)."},
+        "en": {"ad": "TLS certificate expiring ({gun} days)", "izah": "The certificate expires soon ({gun} days). When it does, the site breaks.",
+               "hell": "Renew the certificate (set up auto-renewal — Let's Encrypt)."},
+        "ru": {"ad": "Сертификат TLS истекает ({gun} дн.)", "izah": "Срок сертификата скоро истекает ({gun} дн.). После — сайт не откроется.",
+               "hell": "Обновите сертификат (настройте авто-обновление — Let's Encrypt)."}},
+    "tls_kohne": {
+        "az": {"ad": "Köhnə TLS protokolu ({versiyalar})", "izah": "Zəif/köhnə protokol dəstəklənir: {versiyalar}. Bunlar sındırıla bilər.",
+               "hell": "Serverdə TLS 1.0/1.1-i söndür, yalnız TLS 1.2+ saxla."},
+        "en": {"ad": "Outdated TLS protocol ({versiyalar})", "izah": "Weak/old protocols supported: {versiyalar}. These are breakable.",
+               "hell": "Disable TLS 1.0/1.1 on the server; keep only TLS 1.2+."},
+        "ru": {"ad": "Устаревший TLS ({versiyalar})", "izah": "Поддерживаются слабые протоколы: {versiyalar}. Их можно взломать.",
+               "hell": "Отключите TLS 1.0/1.1 на сервере; оставьте только TLS 1.2+."}},
+    "ssrf": {
+        "az": {"ad": "SSRF (Server-Side Request Forgery)", "izah": "'{param}' parametri serveri daxili sistemlərə sorğu göndərməyə məcbur edir — bulud metadata/sirrləri oğurlana bilər.",
+               "hell": "İstifadəçi URL-lərini whitelist ilə yoxla, daxili IP-lərə girişi blokla."},
+        "en": {"ad": "SSRF (Server-Side Request Forgery)", "izah": "The '{param}' parameter makes the server request internal systems — cloud metadata/secrets can be stolen.",
+               "hell": "Whitelist user URLs; block access to internal IPs."},
+        "ru": {"ad": "SSRF (Server-Side Request Forgery)", "izah": "Параметр '{param}' заставляет сервер обращаться к внутренним системам — можно украсть metadata/секреты.",
+               "hell": "Проверяйте URL по whitelist; блокируйте доступ к внутренним IP."}},
+    "xxe": {
+        "az": {"ad": "XXE (XML External Entity)", "izah": "Server XML-i təhlükəli emal edir — hücumçu server fayllarını (/etc/passwd) oxuya bilər.",
+               "hell": "XML parserdə xarici entity-ləri (DTD) söndür."},
+        "en": {"ad": "XXE (XML External Entity)", "izah": "The server parses XML unsafely — an attacker can read server files (/etc/passwd).",
+               "hell": "Disable external entities (DTD) in the XML parser."},
+        "ru": {"ad": "XXE (XML External Entity)", "izah": "Сервер небезопасно обрабатывает XML — можно читать файлы сервера (/etc/passwd).",
+               "hell": "Отключите внешние сущности (DTD) в XML-парсере."}},
+    "graphql_introspection": {
+        "az": {"ad": "GraphQL introspection açıqdır", "izah": "Bütün API sxemi (sorğular, mutasiyalar, tiplər) kənara görünür — hücum səthini açır.",
+               "hell": "Produksiyada GraphQL introspection-u söndür."},
+        "en": {"ad": "GraphQL introspection enabled", "izah": "The full API schema (queries, mutations, types) is exposed — widens the attack surface.",
+               "hell": "Disable GraphQL introspection in production."},
+        "ru": {"ad": "GraphQL introspection включён", "izah": "Вся схема API (запросы, мутации, типы) доступна — расширяет поверхность атаки.",
+               "hell": "Отключите introspection GraphQL в продакшене."}},
+    "host_header": {
+        "az": {"ad": "Host Header Injection", "izah": "Server 'Host' başlığını yoxlamadan əks etdirir — parol-sıfırlama linkləri saxtalaşdırıla, keş zəhərlənə bilər.",
+               "hell": "Host başlığını whitelist ilə yoxla, mütləq (absolute) URL-lər üçün sabit domen işlət."},
+        "en": {"ad": "Host Header Injection", "izah": "The server reflects the 'Host' header unchecked — password-reset links can be forged, cache poisoned.",
+               "hell": "Validate Host against a whitelist; use a fixed domain for absolute URLs."},
+        "ru": {"ad": "Host Header Injection", "izah": "Сервер отражает заголовок 'Host' без проверки — можно подделать ссылки сброса пароля, отравить кэш.",
+               "hell": "Проверяйте Host по whitelist; используйте фиксированный домен для абсолютных URL."}},
+    "clickjacking": {
+        "az": {"ad": "Clickjacking mümkündür", "izah": "Sayt iframe-ə salına bilər (nə X-Frame-Options, nə də CSP frame-ancestors var) — istifadəçi aldadıla bilər.",
+               "hell": "X-Frame-Options: DENY və ya CSP frame-ancestors 'none' əlavə et."},
+        "en": {"ad": "Clickjacking possible", "izah": "The site can be framed (no X-Frame-Options nor CSP frame-ancestors) — users can be tricked.",
+               "hell": "Add X-Frame-Options: DENY or CSP frame-ancestors 'none'."},
+        "ru": {"ad": "Возможен clickjacking", "izah": "Сайт можно встроить в iframe (нет ни X-Frame-Options, ни CSP frame-ancestors) — пользователя можно обмануть.",
+               "hell": "Добавьте X-Frame-Options: DENY или CSP frame-ancestors 'none'."}},
+    "waf_askarlandi": {
+        "az": {"ad": "WAF aşkarlandı: {ad}", "izah": "Saytın qarşısında firewall var ({ad}) — bu müsbətdir. Qeyd: WAF bəzi skan nəticələrini gizlədə bilər.",
+               "hell": "Əlavə tədbir lazım deyil — bu, müdafiə əlamətidir."},
+        "en": {"ad": "WAF detected: {ad}", "izah": "A firewall protects the site ({ad}) — this is good. Note: a WAF may mask some scan results.",
+               "hell": "No action needed — this is a sign of protection."},
+        "ru": {"ad": "Обнаружен WAF: {ad}", "izah": "Сайт защищён фаерволом ({ad}) — это хорошо. Примечание: WAF может скрывать часть результатов.",
+               "hell": "Действий не требуется — это признак защиты."}},
+})

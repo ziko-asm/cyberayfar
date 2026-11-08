@@ -49,7 +49,7 @@ def modullari_paralel_islet(ishler):
     Modulları paralel işlət. `ishler` = [(funksiya, (arqumentlər...)), ...]
     Hər modul öz işini görür, hesabata yazır (append thread-safe-dir).
     """
-    with ThreadPoolExecutor(max_workers=6) as ex:
+    with ThreadPoolExecutor(max_workers=12) as ex:
         gelecek = [ex.submit(f, *args) for f, args in ishler]
         for g in gelecek:
             g.result()   # xətaları aşkar et

@@ -9,7 +9,6 @@ from core import http_client
 BASLIQLAR = [
     ("content-security-policy", "yuksek", "csp_yox"),
     ("strict-transport-security", "orta", "hsts_yox"),
-    ("x-frame-options", "orta", "xfo_yox"),
     ("x-content-type-options", "asagi", "xcto_yox"),
     ("referrer-policy", "asagi", "refpol_yox"),
     ("permissions-policy", "asagi", "permpol_yox"),

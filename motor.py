@@ -9,7 +9,9 @@ from core import (authorization, crawler as crawler_modulu, reporter, diller,
                   tech_detect, http_client)
 from modullar import (sensitive_files, email_spoof, xss, sqli, headers, cors,
                       open_redirect, js_libs, command_injection, lfi,
-                      csrf, subdomain, http_methods, mixed_content, hidden_paths)
+                      csrf, subdomain, http_methods, mixed_content, hidden_paths,
+                      secrets_leak, tls_analiz, ssrf, xxe, graphql,
+                      host_header, clickjacking, waf)
 
 GIZLI_ACAR = "DEYISDIR-MENI-uzun-tesadufi-acar"
 
@@ -23,7 +25,7 @@ KATEQORIYA = {
     "dmarc_passiv": "email", "dkim_yox": "email", "platforma": "email",
     "xss_url": "xss", "xss_forma": "xss",
     "sqli_url": "sqli", "sqli_forma": "sqli", "sqli_blind": "sqli",
-    "csp_yox": "basliqlar", "hsts_yox": "basliqlar", "xfo_yox": "basliqlar",
+    "csp_yox": "basliqlar", "hsts_yox": "basliqlar",
     "xcto_yox": "basliqlar", "refpol_yox": "basliqlar", "permpol_yox": "basliqlar",
     "server_versiya": "basliqlar", "cookie_zeif": "basliqlar",
     "cors_acar": "cors", "cors_reflect": "cors",
@@ -32,10 +34,16 @@ KATEQORIYA = {
     "csrf_yox": "csrf", "gizli_yol": "yollar",
     "tehlukeli_metod": "metodlar", "mixed_content": "mixed",
     "subdomainler": "subdomain",
+    "sirr_sizma": "sirr",
+    "tls_self": "tls", "tls_sertifikat": "tls", "tls_kohne": "tls",
+    "ssrf": "ssrf", "xxe": "xxe",
+    "graphql_introspection": "graphql", "host_header": "host",
+    "clickjacking": "clickjacking", "waf_askarlandi": "waf",
 }
 KATEQORIYALAR = ("fayllar", "basliqlar", "email", "xss", "sqli", "cmd", "lfi",
                  "redirect", "cors", "kohne_js", "csrf", "yollar", "metodlar",
-                 "mixed", "subdomain")
+                 "mixed", "subdomain", "sirr", "tls", "clickjacking",
+                 "graphql", "host", "ssrf", "xxe", "waf")
 
 
 def skan_et(hedef: str, test_rejimi=True, maks_sehife=30, ilerleme=None,
@@ -65,7 +73,8 @@ def skan_et(hedef: str, test_rejimi=True, maks_sehife=30, ilerleme=None,
 
     # 3) PASSİV modullar (paralel)
     bildir("fayllar"); bildir("basliqlar"); bildir("cors"); bildir("kohne_js")
-    bildir("metodlar"); bildir("mixed"); bildir("yollar")
+    bildir("metodlar"); bildir("mixed"); bildir("yollar"); bildir("sirr")
+    bildir("tls"); bildir("clickjacking"); bildir("graphql"); bildir("host"); bildir("waf")
     passiv = [
         (sensitive_files.yoxla, (hedef, hesabat)),
         (headers.yoxla, (hedef, hesabat)),
@@ -74,6 +83,13 @@ def skan_et(hedef: str, test_rejimi=True, maks_sehife=30, ilerleme=None,
         (http_methods.yoxla, (hedef, hesabat)),
         (mixed_content.yoxla, (hedef, hesabat)),
         (hidden_paths.yoxla, (hedef, hesabat)),
+        (secrets_leak.yoxla, (hedef, hesabat)),
+        (tls_analiz.yoxla, (hedef, hesabat)),
+        (clickjacking.yoxla, (hedef, hesabat)),
+        (graphql.yoxla, (hedef, hesabat)),
+        (host_header.yoxla, (hedef, hesabat)),
+        (waf.yoxla, (hedef, hesabat)),
+        (xxe.yoxla, (hedef, hesabat)),
     ]
     bildir("spoofing")
     if platforma:
@@ -86,7 +102,7 @@ def skan_et(hedef: str, test_rejimi=True, maks_sehife=30, ilerleme=None,
 
     # 4) AKTİV modullar (paralel)
     bildir("xss"); bildir("sqli"); bildir("redirect")
-    bildir("cmd"); bildir("lfi"); bildir("csrf")
+    bildir("cmd"); bildir("lfi"); bildir("csrf"); bildir("ssrf")
     aktiv = [
         (xss.yoxla, (purl, formalar, hesabat)),
         (sqli.yoxla, (purl, formalar, hesabat)),
@@ -94,6 +110,7 @@ def skan_et(hedef: str, test_rejimi=True, maks_sehife=30, ilerleme=None,
         (command_injection.yoxla, (purl, hesabat)),
         (lfi.yoxla, (purl, hesabat)),
         (csrf.yoxla, (formalar, hesabat)),
+        (ssrf.yoxla, (purl, hesabat)),
     ]
     http_client.modullari_paralel_islet(aktiv)
 

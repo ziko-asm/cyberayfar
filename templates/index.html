@@ -240,7 +240,7 @@
   </header>
 
   <div class="stats">
-    <div class="stat"><div class="num" data-hedef="15" id="st1">0</div><div class="lab" id="stLab1">Yoxlama növü</div></div>
+    <div class="stat"><div class="num" data-hedef="23" id="st1">0</div><div class="lab" id="stLab1">Yoxlama növü</div></div>
     <div class="stat"><div class="num" data-hedef="3" id="st2">0</div><div class="lab" id="stLab2">Dil</div></div>
     <div class="stat"><div class="num" data-hedef="100" data-son="%" id="st3">0</div><div class="lab" id="stLab3">Pulsuz</div></div>
   </div>
@@ -298,8 +298,8 @@ const UI = {
     hell:"Həll",json:"⬇ JSON yüklə",pdf:"🖨 PDF / Çap",xeta_qosulma:"Serverə qoşulma xətası",filtr_temizle:"filtri təmizlə",
     st:["Yoxlama növü","Dil","Pulsuz"],
     tag:["SQL Injection aşkarlanır...","XSS ovlanır...","15 hücum vektoru yoxlanılır...","Tap. Düzəlt. Qoru."],
-    kat:{fayllar:"Həssas Fayllar",basliqlar:"Təhlükəsizlik Başlıqları",email:"Email / Spoofing",xss:"XSS",sqli:"SQL Injection",cmd:"Command Injection",lfi:"LFI / Path Traversal",redirect:"Open Redirect",cors:"CORS",kohne_js:"Köhnə JS Kitabxanalar",csrf:"CSRF",yollar:"Gizli Yollar",metodlar:"HTTP Metodları",mixed:"Mixed Content",subdomain:"Subdomenlər"},
-    addim:{icaze:"İcazə yoxlanılır",crawl:"Sayt gəzilir (crawl)",texnologiya:"Texnologiya aşkarlanır",fayllar:"Həssas fayllar yoxlanılır",basliqlar:"Təhlükəsizlik başlıqları yoxlanılır",cors:"CORS yoxlanılır",kohne_js:"Köhnə JS kitabxanalar yoxlanılır",spoofing:"Domain spoofing yoxlanılır",xss:"XSS sınanılır",sqli:"SQL Injection sınanılır",redirect:"Open Redirect sınanılır",cmd:"Command Injection sınanılır",lfi:"LFI sınanılır",csrf:"CSRF yoxlanılır",metodlar:"HTTP metodları yoxlanılır",mixed:"Mixed content yoxlanılır",yollar:"Gizli yollar yoxlanılır",subdomain:"Subdomenlər axtarılır",bitdi:"Skan tamamlandı"},
+    kat:{fayllar:"Həssas Fayllar",basliqlar:"Təhlükəsizlik Başlıqları",email:"Email / Spoofing",xss:"XSS",sqli:"SQL Injection",cmd:"Command Injection",lfi:"LFI / Path Traversal",redirect:"Open Redirect",cors:"CORS",kohne_js:"Köhnə JS Kitabxanalar",csrf:"CSRF",yollar:"Gizli Yollar",metodlar:"HTTP Metodları",mixed:"Mixed Content",subdomain:"Subdomenlər",sirr:"Sirr Sızması",tls:"TLS/SSL",clickjacking:"Clickjacking",graphql:"GraphQL",host:"Host Header",ssrf:"SSRF",xxe:"XXE",waf:"WAF"},
+    addim:{icaze:"İcazə yoxlanılır",crawl:"Sayt gəzilir (crawl)",texnologiya:"Texnologiya aşkarlanır",fayllar:"Həssas fayllar yoxlanılır",basliqlar:"Təhlükəsizlik başlıqları yoxlanılır",cors:"CORS yoxlanılır",kohne_js:"Köhnə JS kitabxanalar yoxlanılır",spoofing:"Domain spoofing yoxlanılır",xss:"XSS sınanılır",sqli:"SQL Injection sınanılır",redirect:"Open Redirect sınanılır",cmd:"Command Injection sınanılır",lfi:"LFI sınanılır",csrf:"CSRF yoxlanılır",metodlar:"HTTP metodları yoxlanılır",mixed:"Mixed content yoxlanılır",yollar:"Gizli yollar yoxlanılır",subdomain:"Subdomenlər axtarılır",sirr:"Sirr/API-açar sızması yoxlanılır",tls:"TLS/SSL analiz edilir",clickjacking:"Clickjacking yoxlanılır",graphql:"GraphQL introspection yoxlanılır",host:"Host Header yoxlanılır",ssrf:"SSRF sınanılır",xxe:"XXE sınanılır",waf:"WAF aşkarlanır",bitdi:"Skan tamamlandı"},
     nisan:{kritik:"KRİTİK",yuksek:"YÜKSEK",orta:"ORTA",asagi:"AŞAĞI",info:"MƏLUMAT"}},
   en:{altbashlik:"Authorized Web Vulnerability Scanner",skan:"⚡ SCAN",skan_edilir:"SCANNING...",
     footer:"⚖️ Only scan sites you own or are authorized to test.",qiymet:"GRADE",
@@ -308,8 +308,8 @@ const UI = {
     hell:"Fix",json:"⬇ Download JSON",pdf:"🖨 PDF / Print",xeta_qosulma:"Server connection error",filtr_temizle:"clear filter",
     st:["Scan types","Languages","Free"],
     tag:["Detecting SQL Injection...","Hunting XSS...","15 attack vectors scanned...","Find. Fix. Secure."],
-    kat:{fayllar:"Sensitive Files",basliqlar:"Security Headers",email:"Email / Spoofing",xss:"XSS",sqli:"SQL Injection",cmd:"Command Injection",lfi:"LFI / Path Traversal",redirect:"Open Redirect",cors:"CORS",kohne_js:"Outdated JS Libraries",csrf:"CSRF",yollar:"Hidden Paths",metodlar:"HTTP Methods",mixed:"Mixed Content",subdomain:"Subdomains"},
-    addim:{icaze:"Checking authorization",crawl:"Crawling site",texnologiya:"Detecting technology",fayllar:"Checking sensitive files",basliqlar:"Checking security headers",cors:"Checking CORS",kohne_js:"Checking outdated JS",spoofing:"Checking domain spoofing",xss:"Testing XSS",sqli:"Testing SQL Injection",redirect:"Testing Open Redirect",cmd:"Testing Command Injection",lfi:"Testing LFI",csrf:"Checking CSRF",metodlar:"Checking HTTP methods",mixed:"Checking mixed content",yollar:"Checking hidden paths",subdomain:"Enumerating subdomains",bitdi:"Scan complete"},
+    kat:{fayllar:"Sensitive Files",basliqlar:"Security Headers",email:"Email / Spoofing",xss:"XSS",sqli:"SQL Injection",cmd:"Command Injection",lfi:"LFI / Path Traversal",redirect:"Open Redirect",cors:"CORS",kohne_js:"Outdated JS Libraries",csrf:"CSRF",yollar:"Hidden Paths",metodlar:"HTTP Methods",mixed:"Mixed Content",subdomain:"Subdomains",sirr:"Secret Leaks",tls:"TLS/SSL",clickjacking:"Clickjacking",graphql:"GraphQL",host:"Host Header",ssrf:"SSRF",xxe:"XXE",waf:"WAF"},
+    addim:{icaze:"Checking authorization",crawl:"Crawling site",texnologiya:"Detecting technology",fayllar:"Checking sensitive files",basliqlar:"Checking security headers",cors:"Checking CORS",kohne_js:"Checking outdated JS",spoofing:"Checking domain spoofing",xss:"Testing XSS",sqli:"Testing SQL Injection",redirect:"Testing Open Redirect",cmd:"Testing Command Injection",lfi:"Testing LFI",csrf:"Checking CSRF",metodlar:"Checking HTTP methods",mixed:"Checking mixed content",yollar:"Checking hidden paths",subdomain:"Enumerating subdomains",sirr:"Checking secret leaks",tls:"Analyzing TLS/SSL",clickjacking:"Checking clickjacking",graphql:"Checking GraphQL introspection",host:"Testing Host Header Injection",ssrf:"Testing SSRF",xxe:"Testing XXE",waf:"Detecting WAF",bitdi:"Scan complete"},
     nisan:{kritik:"CRITICAL",yuksek:"HIGH",orta:"MEDIUM",asagi:"LOW",info:"INFO"}},
   ru:{altbashlik:"Авторизованный сканер уязвимостей",skan:"⚡ СКАН",skan_edilir:"СКАНИРОВАНИЕ...",
     footer:"⚖️ Сканируйте только свои или авторизованные сайты.",qiymet:"ОЦЕНКА",
@@ -318,8 +318,8 @@ const UI = {
     hell:"Решение",json:"⬇ Скачать JSON",pdf:"🖨 PDF / Печать",xeta_qosulma:"Ошибка подключения к серверу",filtr_temizle:"сбросить фильтр",
     st:["Проверок","Языков","Бесплатно"],
     tag:["Обнаружение SQL-инъекций...","Охота на XSS...","15 векторов атак...","Найти. Исправить. Защитить."],
-    kat:{fayllar:"Чувствительные файлы",basliqlar:"Заголовки безопасности",email:"Email / Spoofing",xss:"XSS",sqli:"SQL-инъекция",cmd:"Command Injection",lfi:"LFI / Path Traversal",redirect:"Open Redirect",cors:"CORS",kohne_js:"Устаревшие JS-библиотеки",csrf:"CSRF",yollar:"Скрытые пути",metodlar:"HTTP-методы",mixed:"Mixed Content",subdomain:"Поддомены"},
-    addim:{icaze:"Проверка авторизации",crawl:"Обход сайта",texnologiya:"Определение технологий",fayllar:"Проверка файлов",basliqlar:"Проверка заголовков",cors:"Проверка CORS",kohne_js:"Проверка устаревших JS",spoofing:"Проверка domain spoofing",xss:"Проверка XSS",sqli:"Проверка SQL-инъекций",redirect:"Проверка Open Redirect",cmd:"Проверка Command Injection",lfi:"Проверка LFI",csrf:"Проверка CSRF",metodlar:"Проверка HTTP-методов",mixed:"Проверка mixed content",yollar:"Проверка скрытых путей",subdomain:"Поиск поддоменов",bitdi:"Сканирование завершено"},
+    kat:{fayllar:"Чувствительные файлы",basliqlar:"Заголовки безопасности",email:"Email / Spoofing",xss:"XSS",sqli:"SQL-инъекция",cmd:"Command Injection",lfi:"LFI / Path Traversal",redirect:"Open Redirect",cors:"CORS",kohne_js:"Устаревшие JS-библиотеки",csrf:"CSRF",yollar:"Скрытые пути",metodlar:"HTTP-методы",mixed:"Mixed Content",subdomain:"Поддомены",sirr:"Утечки секретов",tls:"TLS/SSL",clickjacking:"Clickjacking",graphql:"GraphQL",host:"Host Header",ssrf:"SSRF",xxe:"XXE",waf:"WAF"},
+    addim:{icaze:"Проверка авторизации",crawl:"Обход сайта",texnologiya:"Определение технологий",fayllar:"Проверка файлов",basliqlar:"Проверка заголовков",cors:"Проверка CORS",kohne_js:"Проверка устаревших JS",spoofing:"Проверка domain spoofing",xss:"Проверка XSS",sqli:"Проверка SQL-инъекций",redirect:"Проверка Open Redirect",cmd:"Проверка Command Injection",lfi:"Проверка LFI",csrf:"Проверка CSRF",metodlar:"Проверка HTTP-методов",mixed:"Проверка mixed content",yollar:"Проверка скрытых путей",subdomain:"Поиск поддоменов",sirr:"Проверка утечек секретов",tls:"Анализ TLS/SSL",clickjacking:"Проверка clickjacking",graphql:"Проверка GraphQL introspection",host:"Проверка Host Header Injection",ssrf:"Проверка SSRF",xxe:"Проверка XXE",waf:"Обнаружение WAF",bitdi:"Сканирование завершено"},
     nisan:{kritik:"КРИТИЧНО",yuksek:"ВЫСОКО",orta:"СРЕДНЕ",asagi:"НИЗКО",info:"ИНФО"}}
 };
 const RENG={kritik:'#ff2bd6',yuksek:'#ff3b5c',orta:'#ffb020',asagi:'#2f9bff',info:'#5f7385'};
@@ -475,7 +475,7 @@ function bootBasla(){
   if(gorundu){boot.classList.add('gizle');countUp();typewriterBasla();return;}
   const setirler=[
     "> INITIALIZING CYBERAYFAR CORE",
-    "> LOADING 15 ATTACK MODULES ... <span class='ok'>[OK]</span>",
+    "> LOADING 23 ATTACK MODULES ... <span class='ok'>[OK]</span>",
     "> ESTABLISHING SECURE CHANNEL ... <span class='ok'>[OK]</span>",
     "> AUTHORIZATION GATE ... <span class='ok'>[ARMED]</span>",
     "> <span class='ok'>ACCESS GRANTED</span>",
