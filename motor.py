@@ -49,7 +49,7 @@ KATEQORIYALAR = ("fayllar", "basliqlar", "email", "xss", "sqli", "cmd", "lfi",
 
 
 def skan_et(hedef: str, test_rejimi=True, maks_sehife=30, ilerleme=None,
-            allowlist=()):
+            allowlist=(), auth=None):
     def bildir(addim):
         if ilerleme:
             ilerleme(addim)
@@ -68,18 +68,26 @@ def skan_et(hedef: str, test_rejimi=True, maks_sehife=30, ilerleme=None,
     bildir("crawl")
     # HEADLESS (əsl Chrome) ayrıca prosesdə — Playwright-in thread problemini
     # həll edir. Alınmasa köhnə (requests) crawler-ə avtomatik keçir.
-    netice, headless, headless_xeta = None, False, None
+    netice, headless, headless_xeta, auth_edildi = None, False, None, False
     try:
         import subprocess
         kok = os.path.dirname(os.path.abspath(__file__))
         skript = os.path.join(kok, "core", "crawler_js.py")
+        env = dict(os.environ)
+        if auth and auth.get("user") and auth.get("parol"):
+            env["CYB_USER"] = str(auth["user"])
+            env["CYB_PASS"] = str(auth["parol"])
+            env["CYB_LOGIN_URL"] = str(auth.get("login_url") or hedef)
         cp = subprocess.run(
             [sys.executable, skript, hedef, str(min(maks_sehife, 15))],
-            capture_output=True, text=True, timeout=120)
+            capture_output=True, text=True, timeout=140, env=env)
         if cp.returncode == 0 and cp.stdout.strip():
             import json as _json
             netice = _json.loads(cp.stdout)
             headless = True
+            auth_edildi = bool(netice.get("auth_ok"))
+            if netice.get("cookies"):   # giriş sessiyasını bütün modullara ver
+                http_client.cookie_qur(netice["cookies"])
         else:
             headless_xeta = (cp.stderr or cp.stdout or f"rc={cp.returncode}").strip()[-400:]
     except Exception as e:
@@ -157,6 +165,7 @@ def skan_et(hedef: str, test_rejimi=True, maks_sehife=30, ilerleme=None,
         "bal": bal, "qiymet": reporter.qiymet(bal),
         "platforma_domeni": platforma, "texnologiya": tech,
         "headless": headless, "headless_xeta": headless_xeta,
+        "auth_edildi": auth_edildi,
         "icmal": reporter.icmal(hesabat.tapintilar),
         "statistika": {"sehifeler": netice["sehifeler"],
                        "formalar": len(formalar), "parametrli_url": len(purl)},

@@ -115,10 +115,17 @@ def api_skan():
     hedef = (data.get("hedef") or "").strip()
     if not hedef:
         return jsonify({"xeta": "Sayt ünvanı boşdur"}), 400
+    # Autentifikasiyalı skan (ixtiyari giriş məlumatı)
+    auth = None
+    user = (data.get("istifadeci") or "").strip()
+    parol = data.get("parol") or ""
+    if user and parol:
+        auth = {"user": user, "parol": parol,
+                "login_url": (data.get("login_url") or "").strip() or None}
     try:
         return jsonify(motor.skan_et(
             hedef, test_rejimi=TEST_REJIMI, maks_sehife=MAKS_SEHIFE,
-            allowlist=ALLOWLIST))
+            allowlist=ALLOWLIST, auth=auth))
     except authorization.IcazeXetasi as e:
         return jsonify({"xeta": str(e)}), 403
     except Exception as e:

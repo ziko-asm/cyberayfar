@@ -33,18 +33,63 @@ def _form_cixar(form, sehife_url):
             "menbe_sehife": sehife_url}
 
 
+def _login(page, login_url, user, pw, timeout):
+    """Headless login: forma tapır, doldurur, göndərir. True = forma tapıldı."""
+    try:
+        page.goto(login_url, wait_until="networkidle", timeout=timeout)
+    except Exception:
+        try:
+            page.goto(login_url, wait_until="domcontentloaded", timeout=timeout)
+        except Exception:
+            return False
+    page.wait_for_timeout(500)
+    if page.locator('input[type="password"]').count() == 0:
+        return False
+    user_sel = None
+    for sel in ('input[type="email"]', 'input[name*="user" i]',
+                'input[name*="email" i]', 'input[name*="login" i]',
+                'input[id*="user" i]', 'input[type="text"]'):
+        if page.locator(sel).count() > 0:
+            user_sel = sel
+            break
+    if not user_sel:
+        return False
+    try:
+        page.fill(user_sel, user)
+        page.fill('input[type="password"]', pw)
+        btn = page.locator('button[type="submit"], input[type="submit"], '
+                           'button:has-text("Login"), button:has-text("Sign in"), '
+                           'button:has-text("Log in"), button:has-text("Giriş")')
+        if btn.count() > 0:
+            btn.first.click()
+        else:
+            page.locator('input[type="password"]').press("Enter")
+        page.wait_for_load_state("networkidle", timeout=timeout)
+        page.wait_for_timeout(800)
+        return True
+    except Exception:
+        return False
+
+
 def gez(bas_url, maks_sehife=20, timeout=15000):
+    import os as _os
     bas_url = bas_url.rstrip("/")
     domen = urlparse(bas_url).netloc
     gorulmus, formalar, parametrli = set(), [], set()
     novbe = [bas_url]
+    kukiler, auth_ok = [], False
+
+    # Giriş məlumatı (motor env ilə ötürür)
+    login_url = _os.environ.get("CYB_LOGIN_URL")
+    user = _os.environ.get("CYB_USER")
+    pw = _os.environ.get("CYB_PASS")
 
     launch_kw = {"args": ["--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu"]}
     if EXEC:
         launch_kw["executable_path"] = EXEC
 
-    with sync_playwright() as pw:
-        browser = pw.chromium.launch(**launch_kw)
+    with sync_playwright() as pw_api:
+        browser = pw_api.chromium.launch(**launch_kw)
         ctx = browser.new_context(
             user_agent="CyberAyfar-Scanner/3.0 (+authorized-security-test)",
             ignore_https_errors=True)
@@ -55,6 +100,17 @@ def gez(bas_url, maks_sehife=20, timeout=15000):
             if urlparse(u).netloc == domen and parse_qs(urlparse(u).query):
                 parametrli.add(u)
         page.on("request", on_request)
+
+        # AUTENTİFİKASİYA (əgər məlumat verilibsə)
+        if user and pw:
+            auth_ok = _login(page, login_url or bas_url, user, pw, timeout)
+            if auth_ok:
+                try:
+                    cur = page.url.split("#")[0]
+                    if urlparse(cur).netloc == domen and cur not in novbe:
+                        novbe.insert(0, cur)   # giriş sonrası səhifədən başla
+                except Exception:
+                    pass
 
         while novbe and len(gorulmus) < maks_sehife:
             url = novbe.pop(0)
@@ -83,10 +139,17 @@ def gez(bas_url, maks_sehife=20, timeout=15000):
                     novbe.append(tam)
                     if parse_qs(urlparse(tam).query):
                         parametrli.add(tam)
+        try:
+            kukiler = [{"name": c["name"], "value": c["value"],
+                        "domain": c.get("domain", ""), "path": c.get("path", "/")}
+                       for c in ctx.cookies()]
+        except Exception:
+            kukiler = []
         browser.close()
 
     return {"sehifeler": len(gorulmus), "formalar": formalar,
-            "parametrli_url": list(parametrli)}
+            "parametrli_url": list(parametrli),
+            "cookies": kukiler, "auth_ok": auth_ok}
 
 
 # Ayrıca proses kimi işlədiləndə (motor subprocess ilə çağırır) —

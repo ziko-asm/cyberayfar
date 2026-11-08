@@ -24,6 +24,18 @@ PARALEL = 8
 _semafor = threading.Semaphore(PARALEL)
 
 
+def cookie_qur(kukiler):
+    """Headless login-dən gələn sessiya cookie-lərini paylaşılan sessiyaya qoyur
+    ki, bütün modullar (requests) də GİRİŞ ETMİŞ vəziyyətdə işləsin."""
+    for c in kukiler or []:
+        try:
+            _sessiya.cookies.set(c.get("name"), c.get("value"),
+                                 domain=(c.get("domain") or "").lstrip("."),
+                                 path=c.get("path", "/"))
+        except Exception:
+            pass
+
+
 def al(url, metod="GET", timeout=8, **kw):
     """Tək sorğu (rate-limit ilə). Xəta olsa None qaytarır."""
     with _semafor:
