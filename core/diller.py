@@ -248,3 +248,43 @@ def render_hamisi(kod, deyishken):
         except (KeyError, IndexError):
             netice[dil] = dict(d)
     return netice
+
+
+# ---- Mərhələ 1 davamı: əlavə yoxlamalar ----
+METINLER.update({
+    "csrf_yox": {
+        "az": {"ad": "CSRF qoruması yoxdur", "izah": "POST forması (mənbə: {menbe}) CSRF token olmadan göndərilir — hücumçu istifadəçi adından saxta sorğu edə bilər.",
+               "hell": "Hər forma üçün CSRF token əlavə et və serverdə yoxla."},
+        "en": {"ad": "Missing CSRF protection", "izah": "A POST form (source: {menbe}) has no CSRF token — an attacker can forge requests as the user.",
+               "hell": "Add a CSRF token to each form and validate it server-side."},
+        "ru": {"ad": "Нет защиты CSRF", "izah": "POST-форма (источник: {menbe}) без CSRF-токена — атакующий может подделать запрос от имени пользователя.",
+               "hell": "Добавьте CSRF-токен в каждую форму и проверяйте на сервере."}},
+    "subdomainler": {
+        "az": {"ad": "{say} subdomen aşkarlandı", "izah": "Hücum səthi: {siyahi}. Hər subdomen ayrıca yoxlanılmalıdır.",
+               "hell": "İstifadə olunmayan subdomenləri bağla; hər birini ayrıca qoru."},
+        "en": {"ad": "{say} subdomains discovered", "izah": "Attack surface: {siyahi}. Each subdomain should be checked separately.",
+               "hell": "Disable unused subdomains; secure each one individually."},
+        "ru": {"ad": "Обнаружено {say} поддоменов", "izah": "Поверхность атаки: {siyahi}. Каждый поддомен нужно проверять отдельно.",
+               "hell": "Отключите неиспользуемые поддомены; защитите каждый."}},
+    "tehlukeli_metod": {
+        "az": {"ad": "Təhlükəli HTTP metodları", "izah": "Server bu metodlara icazə verir: {metodlar}. Bu, fayl dəyişmə/silmə riski yaradır.",
+               "hell": "İstifadə olunmayan metodları (PUT/DELETE/TRACE) serverdə bağla."},
+        "en": {"ad": "Dangerous HTTP methods", "izah": "The server allows: {metodlar}. This risks file modification/deletion.",
+               "hell": "Disable unused methods (PUT/DELETE/TRACE) on the server."},
+        "ru": {"ad": "Опасные HTTP-методы", "izah": "Сервер разрешает: {metodlar}. Это риск изменения/удаления файлов.",
+               "hell": "Отключите неиспользуемые методы (PUT/DELETE/TRACE)."}},
+    "mixed_content": {
+        "az": {"ad": "Mixed Content ({say} resurs)", "izah": "HTTPS səhifə {say} şifrəsiz (HTTP) resurs yükləyir — bu, təhlükəsizliyi pozur.",
+               "hell": "Bütün resursları HTTPS-ə keçir (// və ya https://)."},
+        "en": {"ad": "Mixed Content ({say} resources)", "izah": "The HTTPS page loads {say} insecure (HTTP) resources — this breaks security.",
+               "hell": "Switch all resources to HTTPS (// or https://)."},
+        "ru": {"ad": "Mixed Content ({say} ресурсов)", "izah": "HTTPS-страница загружает {say} незащищённых (HTTP) ресурсов.",
+               "hell": "Переведите все ресурсы на HTTPS (// или https://)."}},
+    "gizli_yol": {
+        "az": {"ad": "Gizli yol: /{yol} ({status})", "izah": "'{yol}' yolu tapıldı ({status}) — admin panel/həssas bölmə ola bilər.",
+               "hell": "Bu yolu kənar girişdən qoru və ya gizlət."},
+        "en": {"ad": "Hidden path: /{yol} ({status})", "izah": "The path '{yol}' was found ({status}) — may be an admin panel/sensitive area.",
+               "hell": "Protect or hide this path from public access."},
+        "ru": {"ad": "Скрытый путь: /{yol} ({status})", "izah": "Найден путь '{yol}' ({status}) — возможно админ-панель/важный раздел.",
+               "hell": "Защитите или скройте этот путь от публичного доступа."}},
+})

@@ -1,8 +1,6 @@
 """
-MOTOR (Engine) v2 — paralel, çox modullu
-========================================
-Mərhələ 1-3: 10 kateqoriya yoxlama, paralel işləmə, texnologiya aşkarlama,
-CVSS, exec summary.
+MOTOR (Engine) v3 — 15 kateqoriya, paralel
+==========================================
 """
 
 from urllib.parse import urlparse
@@ -10,13 +8,14 @@ from urllib.parse import urlparse
 from core import (authorization, crawler as crawler_modulu, reporter, diller,
                   tech_detect, http_client)
 from modullar import (sensitive_files, email_spoof, xss, sqli, headers, cors,
-                      open_redirect, js_libs, command_injection, lfi)
+                      open_redirect, js_libs, command_injection, lfi,
+                      csrf, subdomain, http_methods, mixed_content, hidden_paths)
 
 GIZLI_ACAR = "DEYISDIR-MENI-uzun-tesadufi-acar"
 
 PLATFORMA_DOMENLERI = (".vercel.app", ".netlify.app", ".github.io",
                        ".pages.dev", ".herokuapp.com", ".web.app",
-                       ".firebaseapp.com", ".onrender.com")
+                       ".firebaseapp.com", ".onrender.com", ".streamlit.app")
 
 KATEQORIYA = {
     "hessas_fayl": "fayllar", "robots": "fayllar",
@@ -30,9 +29,13 @@ KATEQORIYA = {
     "cors_acar": "cors", "cors_reflect": "cors",
     "open_redirect": "redirect", "kohne_js": "kohne_js",
     "cmd_injection": "cmd", "lfi": "lfi",
+    "csrf_yox": "csrf", "gizli_yol": "yollar",
+    "tehlukeli_metod": "metodlar", "mixed_content": "mixed",
+    "subdomainler": "subdomain",
 }
-KATEQORIYALAR = ("fayllar", "basliqlar", "email", "xss", "sqli",
-                 "cmd", "lfi", "redirect", "cors", "kohne_js")
+KATEQORIYALAR = ("fayllar", "basliqlar", "email", "xss", "sqli", "cmd", "lfi",
+                 "redirect", "cors", "kohne_js", "csrf", "yollar", "metodlar",
+                 "mixed", "subdomain")
 
 
 def skan_et(hedef: str, test_rejimi=True, maks_sehife=30, ilerleme=None,
@@ -61,46 +64,48 @@ def skan_et(hedef: str, test_rejimi=True, maks_sehife=30, ilerleme=None,
     tech = tech_detect.askarla(hedef)
 
     # 3) PASSİV modullar (paralel)
+    bildir("fayllar"); bildir("basliqlar"); bildir("cors"); bildir("kohne_js")
+    bildir("metodlar"); bildir("mixed"); bildir("yollar")
     passiv = [
         (sensitive_files.yoxla, (hedef, hesabat)),
         (headers.yoxla, (hedef, hesabat)),
         (cors.yoxla, (hedef, hesabat)),
         (js_libs.yoxla, (hedef, hesabat)),
+        (http_methods.yoxla, (hedef, hesabat)),
+        (mixed_content.yoxla, (hedef, hesabat)),
+        (hidden_paths.yoxla, (hedef, hesabat)),
     ]
-    bildir("fayllar"); bildir("basliqlar"); bildir("cors"); bildir("kohne_js")
     bildir("spoofing")
     if platforma:
         hesabat.elave_et("info", "platforma", domen, domen=domen)
     else:
         passiv.append((email_spoof.yoxla, (domen, hesabat)))
+        bildir("subdomain")
+        passiv.append((subdomain.yoxla, (domen, hesabat)))
     http_client.modullari_paralel_islet(passiv)
 
     # 4) AKTİV modullar (paralel)
-    bildir("xss"); bildir("sqli"); bildir("redirect"); bildir("cmd"); bildir("lfi")
+    bildir("xss"); bildir("sqli"); bildir("redirect")
+    bildir("cmd"); bildir("lfi"); bildir("csrf")
     aktiv = [
         (xss.yoxla, (purl, formalar, hesabat)),
         (sqli.yoxla, (purl, formalar, hesabat)),
         (open_redirect.yoxla, (purl, hesabat)),
         (command_injection.yoxla, (purl, hesabat)),
         (lfi.yoxla, (purl, hesabat)),
+        (csrf.yoxla, (formalar, hesabat)),
     ]
     http_client.modullari_paralel_islet(aktiv)
 
     bildir("bitdi")
     hesabat.sirala()
 
-    # Tapıntılar (3 dil + CVSS)
-    tapintilar = []
-    for t in hesabat.tapintilar:
-        tapintilar.append({
-            "ciddilik": t["ciddilik"],
-            "kod": t["kod"],
-            "yer": t["yer"],
-            "cvss": reporter.cvss(t["ciddilik"]),
-            "metn": diller.render_hamisi(t["kod"], t["deyishken"]),
-        })
+    tapintilar = [{
+        "ciddilik": t["ciddilik"], "kod": t["kod"], "yer": t["yer"],
+        "cvss": reporter.cvss(t["ciddilik"]),
+        "metn": diller.render_hamisi(t["kod"], t["deyishken"]),
+    } for t in hesabat.tapintilar]
 
-    # Yoxlama kateqoriyaları (hamısı görünür)
     yoxlamalar = []
     for kat in KATEQORIYALAR:
         aid = [t for t in hesabat.tapintilar if KATEQORIYA.get(t["kod"]) == kat]
@@ -113,14 +118,9 @@ def skan_et(hedef: str, test_rejimi=True, maks_sehife=30, ilerleme=None,
     return {
         "hedef": hedef, "domen": domen,
         "bal": bal, "qiymet": reporter.qiymet(bal),
-        "platforma_domeni": platforma,
-        "texnologiya": tech,
+        "platforma_domeni": platforma, "texnologiya": tech,
         "icmal": reporter.icmal(hesabat.tapintilar),
-        "statistika": {
-            "sehifeler": netice["sehifeler"],
-            "formalar": len(formalar),
-            "parametrli_url": len(purl),
-        },
-        "yoxlamalar": yoxlamalar,
-        "tapintilar": tapintilar,
+        "statistika": {"sehifeler": netice["sehifeler"],
+                       "formalar": len(formalar), "parametrli_url": len(purl)},
+        "yoxlamalar": yoxlamalar, "tapintilar": tapintilar,
     }
