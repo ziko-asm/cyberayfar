@@ -77,11 +77,12 @@
 
   /* ---- Terminal input ---- */
   .axtaris{display:flex;gap:10px;margin:18px 0;flex-wrap:wrap;align-items:stretch}
-  .input-sarma{flex:1;min-width:240px;display:flex;align-items:center;gap:10px;background:var(--panel);
-    border:1px solid var(--kenar);border-radius:8px;padding:0 14px;transition:.15s}
+  .input-sarma{flex:1 1 240px;min-width:0;display:flex;align-items:center;gap:10px;background:var(--panel);
+    border:1px solid var(--kenar);border-radius:8px;padding:0 14px;transition:.15s;overflow:hidden}
   .input-sarma:focus-within{border-color:var(--neon);box-shadow:0 0 0 2px rgba(0,255,156,.15),0 0 18px rgba(0,255,156,.12)}
-  .prompt{color:var(--neon);font-size:15px;white-space:nowrap;user-select:none;opacity:.9}
-  .axtaris input{flex:1;padding:15px 0;border:0;background:transparent;color:var(--neon);
+  .prompt{color:var(--neon);font-size:15px;white-space:nowrap;user-select:none;opacity:.9;flex-shrink:0}
+  .p-qisa{display:none}
+  .axtaris input{flex:1;min-width:0;padding:15px 0;border:0;background:transparent;color:var(--neon);
     font-family:inherit;font-size:16px;outline:none;letter-spacing:1px}
   .axtaris button{padding:15px 26px;border:1px solid var(--neon);border-radius:8px;background:transparent;
     color:var(--neon);font-family:'Orbitron',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;
@@ -170,7 +171,49 @@
     .tapinti h3,.xulase-metn h2,.bal-ici .reqem{color:#111}
     h1.glitch{color:#111;text-shadow:none}h1.glitch::before,h1.glitch::after{display:none}
   }
-  @media(max-width:560px){h1.glitch{font-size:30px}.logo svg{width:36px;height:36px}.stat .num{font-size:22px}}
+  /* ===== TABLET / böyük telefon ===== */
+  @media(max-width:768px){
+    h1.glitch{font-size:38px}
+    .stat{min-width:0;max-width:none}
+  }
+  /* ===== TELEFON (iPhone, Android) ===== */
+  @media(max-width:600px){
+    body{padding:14px}
+    .konteyner{max-width:100%}
+    h1.glitch{font-size:30px;letter-spacing:2px}
+    .logo{gap:10px}.logo svg{width:38px;height:38px}
+    .tagline{font-size:13px}
+    .stats{gap:8px}
+    .stat{flex:1 1 0;padding:11px 6px}
+    .stat .num{font-size:20px}.stat .lab{font-size:10px;letter-spacing:.5px}
+    .axtaris{flex-direction:column;gap:10px}
+    .input-sarma{flex:1 1 auto;width:100%}
+    .axtaris button{width:100%;padding:14px}
+    .p-uzun{display:none}.p-qisa{display:inline}
+    .prompt{font-size:14px}
+    .panel{padding:16px}
+    .bal-qutu,.bal-dairesi{width:94px;height:94px}
+    .bal-ici .reqem{font-size:26px}
+    .icmal-ust{gap:14px;justify-content:center}
+    #donut{width:100px;height:100px}
+    .tapinti{padding:13px 14px}
+    .cip-sira{justify-content:center}
+    #bootMetn{font-size:16px}
+  }
+  /* ===== KİÇİK / köhnə telefon (iPhone SE, ~320px) ===== */
+  @media(max-width:380px){
+    body{padding:11px}
+    h1.glitch{font-size:23px;letter-spacing:1px}
+    .logo{gap:8px}.logo svg{width:32px;height:32px}
+    .tagline{font-size:12px}
+    .stat{padding:9px 4px}
+    .stat .num{font-size:17px}.stat .lab{font-size:9px}
+    .diller button{padding:4px 8px;font-size:11px}
+    .prompt{font-size:13px}
+    .axtaris input{font-size:16px}
+    .xulase-metn h2{font-size:14px}
+    #bootMetn{font-size:14px}
+  }
 </style>
 </head>
 <body>
@@ -204,8 +247,8 @@
 
   <div class="axtaris">
     <div class="input-sarma">
-      <span class="prompt">root@cyberayfar:~#</span>
-      <input id="hedef" type="text" placeholder="domen.com" value="saytyoxla.vercel.app" autocomplete="off">
+      <span class="prompt"><span class="p-uzun">root@cyberayfar:~#</span><span class="p-qisa">~#</span></span>
+      <input id="hedef" type="text" inputmode="url" placeholder="domen.com" value="saytyoxla.vercel.app" autocomplete="off">
     </div>
     <button id="skanBtn" onclick="skanBasla()">⚡ SKAN ET</button>
   </div>
