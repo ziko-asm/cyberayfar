@@ -25,11 +25,27 @@ app = Flask(__name__, template_folder=os.path.join(BASE, "templates"))
 PROD = bool(os.environ.get("VERCEL"))
 TEST_REJIMI = not PROD                       # lokalda rahat, canlıda təhlükəsiz
 MAKS_SEHIFE = 15 if PROD else 30             # serverless timeout üçün az
-ALLOWLIST = tuple(
+# Operatorun öz domenləri (ayfar.dev-dəki layihələr) — həmişə icazəli.
+# Bunlar koda yazılıb; Vercel-dəki SAHIB_DOMENLER env dəyişəni əlavə domen üçündür.
+SAHIB_DEFOLT = (
+    "ayfar.dev", "www.ayfar.dev",
+    "saytyoxla.vercel.app",
+    "provguard.vercel.app",
+    "prompt-injection-detector-snowy.vercel.app",
+    "graphguard-iot.vercel.app",
+    "agent-audit-ten.vercel.app",
+    "bathshop-az-selling-site.vercel.app",
+    "mexaniki-emal.vercel.app",
+    "ai-nids-robustness.streamlit.app",
+    "mansia.az", "www.mansia.az",
+)
+_env_domenler = tuple(
     d.strip().lower()
-    for d in os.environ.get("SAHIB_DOMENLER", "saytyoxla.vercel.app").split(",")
+    for d in os.environ.get("SAHIB_DOMENLER", "").split(",")
     if d.strip()
 )
+# Defolt + env (təkrarsız)
+ALLOWLIST = tuple(dict.fromkeys(SAHIB_DEFOLT + _env_domenler))
 
 
 def _sse(data: dict) -> str:
