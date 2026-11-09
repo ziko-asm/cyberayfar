@@ -103,6 +103,23 @@
   @keyframes yan{50%{opacity:0}}
 
   .netice{display:none}
+  /* Terminal pəncərəsi + tablar */
+  .term-pencere{background:var(--panel);border:1px solid var(--kenar);border-radius:12px;overflow:hidden;box-shadow:0 0 30px rgba(0,255,156,.07)}
+  .term-bar{display:flex;align-items:center;gap:12px;padding:10px 15px;background:#070b11;border-bottom:1px solid var(--kenar)}
+  .term-dots{display:flex;gap:7px}
+  .term-dots i{width:11px;height:11px;border-radius:50%;display:inline-block}
+  .term-dots i:nth-child(1){background:#ff5f56}.term-dots i:nth-child(2){background:#ffbd2e}.term-dots i:nth-child(3){background:#27c93f}
+  .term-title{font-size:12px;color:var(--solgun);letter-spacing:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .term-title::before{content:"⬡ cyberayfar://";color:var(--neon);opacity:.85}
+  .tablar{display:flex;gap:2px;background:#070b11;border-bottom:1px solid var(--kenar);padding:0 8px;overflow-x:auto}
+  .tab{background:transparent;border:0;border-bottom:2px solid transparent;color:var(--solgun);padding:13px 18px;
+    font-family:'Orbitron',sans-serif;font-size:12px;letter-spacing:1px;cursor:pointer;white-space:nowrap;transition:.15s}
+  .tab:hover{color:var(--metn)}
+  .tab.aktiv{color:var(--neon);border-bottom-color:var(--neon);text-shadow:0 0 8px rgba(0,255,156,.5)}
+  .tab-pane{display:none;padding:22px;animation:fadeIn .3s ease}
+  .tab-pane.acik{display:block}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .bolme-ayri{margin-top:18px;padding-top:18px;border-top:1px dashed var(--kenar)}
   .panel{background:var(--panel);border:1px solid var(--kenar);border-radius:12px;padding:20px;margin-bottom:16px;position:relative}
   /* animasiyalı neon kənar */
   .panel.isiq::after{content:"";position:absolute;inset:-1px;border-radius:12px;padding:1px;pointer-events:none;
@@ -175,7 +192,9 @@
   footer{text-align:center;color:var(--solgun);font-size:12px;padding:30px 0;letter-spacing:1px}
 
   @media print{
-    #matrix,.crt,body::before,#boot,.diller,.axtaris,.stats,.tagline,.terminal,.eylemler,footer{display:none!important}
+    #matrix,.crt,body::before,#boot,.diller,.axtaris,.stats,.tagline,.terminal,.eylemler,footer,.tablar,.term-bar,.giris-qutu{display:none!important}
+    .term-pencere{border:0;box-shadow:none}
+    .tab-pane{display:block!important;padding:0;animation:none}
     body{background:#fff;color:#111;padding:0}
     .panel,.tapinti{background:#fff;border:1px solid #ccc;color:#111}
     .panel.isiq::after{display:none}
@@ -277,38 +296,52 @@
   <div class="terminal" id="terminal"></div>
 
   <div class="netice" id="netice">
-    <div class="panel isiq xulase">
-      <div class="bal-qutu">
-        <div class="bal-dairesi" id="balDairesi"></div>
-        <div class="bal-ici"><div class="reqem" id="balReqem">—</div><div class="qiymet" id="balQiymet"></div></div>
+    <div class="term-pencere">
+      <div class="term-bar">
+        <span class="term-dots"><i></i><i></i><i></i></span>
+        <span class="term-title" id="termTitle">scan_results</span>
       </div>
-      <div class="xulase-metn"><h2 id="xHedef"></h2><div class="stat-x" id="xStat"></div><div id="xTech"></div></div>
-    </div>
-
-    <div class="panel">
-      <div class="icmal-bash" id="icmalBash">İcmal</div>
-      <div class="icmal-ust">
-        <svg id="donut" width="116" height="116" viewBox="0 0 116 116"></svg>
-        <div class="icmal-sag"><div class="cip-sira" id="cipSira"></div><div class="bar" id="icmalBar"></div></div>
+      <div class="tablar">
+        <button class="tab aktiv" data-tab="xulase" onclick="tabKec('xulase')" id="tabXulase">Xülasə</button>
+        <button class="tab" data-tab="tapintilar" onclick="tabKec('tapintilar')" id="tabTapintilar">Tapıntılar</button>
+        <button class="tab" data-tab="yoxlamalar" onclick="tabKec('yoxlamalar')" id="tabYoxlamalar">Yoxlamalar</button>
       </div>
-      <div class="eylemler">
-        <button onclick="jsonYukle()" id="btnJson">⬇ JSON yüklə</button>
-        <button onclick="window.print()" id="btnPdf">🖨 PDF / Çap</button>
+
+      <div class="tab-pane acik" id="paneXulase">
+        <div class="xulase">
+          <div class="bal-qutu">
+            <div class="bal-dairesi" id="balDairesi"></div>
+            <div class="bal-ici"><div class="reqem" id="balReqem">—</div><div class="qiymet" id="balQiymet"></div></div>
+          </div>
+          <div class="xulase-metn"><h2 id="xHedef"></h2><div class="stat-x" id="xStat"></div><div id="xTech"></div></div>
+        </div>
+        <div class="bolme-ayri">
+          <div class="icmal-bash" id="icmalBash">İcmal</div>
+          <div class="icmal-ust">
+            <svg id="donut" width="116" height="116" viewBox="0 0 116 116"></svg>
+            <div class="icmal-sag"><div class="cip-sira" id="cipSira"></div><div class="bar" id="icmalBar"></div></div>
+          </div>
+        </div>
+        <div class="bolme-ayri" id="owaspPanel" style="display:none">
+          <div class="yox-bash">⚠ OWASP TOP 10 (2021)</div>
+          <div id="owaspListe"></div>
+        </div>
+        <div class="eylemler">
+          <button onclick="jsonYukle()" id="btnJson">⬇ JSON yüklə</button>
+          <button onclick="window.print()" id="btnPdf">🖨 PDF / Çap</button>
+        </div>
+      </div>
+
+      <div class="tab-pane" id="paneTapintilar">
+        <div class="filtr-info" id="filtrInfo" onclick="filterEt(null)"></div>
+        <div id="tapintilar"></div>
+      </div>
+
+      <div class="tab-pane" id="paneYoxlamalar">
+        <div class="yox-bash" id="yoxBash">Aparılan Yoxlamalar</div>
+        <div id="yoxListe"></div>
       </div>
     </div>
-
-    <div class="panel" id="owaspPanel" style="display:none">
-      <div class="yox-bash">⚠ OWASP TOP 10 (2021)</div>
-      <div id="owaspListe"></div>
-    </div>
-
-    <div class="panel">
-      <div class="yox-bash" id="yoxBash">Aparılan Yoxlamalar</div>
-      <div id="yoxListe"></div>
-    </div>
-
-    <div class="filtr-info" id="filtrInfo" onclick="filterEt(null)"></div>
-    <div id="tapintilar"></div>
   </div>
 
   <footer id="footer">⚖️ Yalnız öz saytlarını və ya icazəli saytları skan et.</footer>
@@ -320,7 +353,7 @@ const UI = {
     footer:"⚖️ Yalnız öz saytlarını və ya icazəli saytları skan et.",qiymet:"QİYMƏT",
     netice:"nəticə",sehife:"səhifə",forma:"forma",icmal:"İcmal",
     yoxlamalar:"Aparılan Yoxlamalar",temiz:"TƏMİZ",zeif:"ZƏİF",tapildi_yox:"✓ Heç bir açıq zəiflik tapılmadı!",
-    hell:"Həll",json:"⬇ JSON yüklə",pdf:"🖨 PDF / Çap",xeta_qosulma:"Serverə qoşulma xətası",filtr_temizle:"filtri təmizlə",authli:"Girişli skan",giris:"🔐 Giriş (ixtiyari — autentifikasiyalı skan)",
+    hell:"Həll",json:"⬇ JSON yüklə",pdf:"🖨 PDF / Çap",xeta_qosulma:"Serverə qoşulma xətası",filtr_temizle:"filtri təmizlə",authli:"Girişli skan",giris:"🔐 Giriş (ixtiyari — autentifikasiyalı skan)",tab_xulase:"Xülasə",tab_tapintilar:"Tapıntılar",tab_yoxlamalar:"Yoxlamalar",
     st:["Yoxlama növü","Dil","Pulsuz"],
     tag:["SQL Injection aşkarlanır...","XSS ovlanır...","15 hücum vektoru yoxlanılır...","Tap. Düzəlt. Qoru."],
     kat:{fayllar:"Həssas Fayllar",basliqlar:"Təhlükəsizlik Başlıqları",email:"Email / Spoofing",xss:"XSS",sqli:"SQL Injection",cmd:"Command Injection",lfi:"LFI / Path Traversal",redirect:"Open Redirect",cors:"CORS",kohne_js:"Köhnə JS Kitabxanalar",csrf:"CSRF",yollar:"Gizli Yollar",metodlar:"HTTP Metodları",mixed:"Mixed Content",subdomain:"Subdomenlər",sirr:"Sirr Sızması",tls:"TLS/SSL",clickjacking:"Clickjacking",graphql:"GraphQL",host:"Host Header",ssrf:"SSRF",xxe:"XXE",idor:"IDOR",waf:"WAF"},
@@ -330,7 +363,7 @@ const UI = {
     footer:"⚖️ Only scan sites you own or are authorized to test.",qiymet:"GRADE",
     netice:"findings",sehife:"pages",forma:"forms",icmal:"Summary",
     yoxlamalar:"Checks Performed",temiz:"CLEAN",zeif:"WEAK",tapildi_yox:"✓ No open vulnerabilities found!",
-    hell:"Fix",json:"⬇ Download JSON",pdf:"🖨 PDF / Print",xeta_qosulma:"Server connection error",filtr_temizle:"clear filter",authli:"Authenticated",giris:"🔐 Login (optional — authenticated scan)",
+    hell:"Fix",json:"⬇ Download JSON",pdf:"🖨 PDF / Print",xeta_qosulma:"Server connection error",filtr_temizle:"clear filter",authli:"Authenticated",giris:"🔐 Login (optional — authenticated scan)",tab_xulase:"Summary",tab_tapintilar:"Findings",tab_yoxlamalar:"Checks",
     st:["Scan types","Languages","Free"],
     tag:["Detecting SQL Injection...","Hunting XSS...","15 attack vectors scanned...","Find. Fix. Secure."],
     kat:{fayllar:"Sensitive Files",basliqlar:"Security Headers",email:"Email / Spoofing",xss:"XSS",sqli:"SQL Injection",cmd:"Command Injection",lfi:"LFI / Path Traversal",redirect:"Open Redirect",cors:"CORS",kohne_js:"Outdated JS Libraries",csrf:"CSRF",yollar:"Hidden Paths",metodlar:"HTTP Methods",mixed:"Mixed Content",subdomain:"Subdomains",sirr:"Secret Leaks",tls:"TLS/SSL",clickjacking:"Clickjacking",graphql:"GraphQL",host:"Host Header",ssrf:"SSRF",xxe:"XXE",idor:"IDOR",waf:"WAF"},
@@ -340,7 +373,7 @@ const UI = {
     footer:"⚖️ Сканируйте только свои или авторизованные сайты.",qiymet:"ОЦЕНКА",
     netice:"результатов",sehife:"страниц",forma:"форм",icmal:"Сводка",
     yoxlamalar:"Выполненные проверки",temiz:"ЧИСТО",zeif:"СЛАБО",tapildi_yox:"✓ Открытых уязвимостей не найдено!",
-    hell:"Решение",json:"⬇ Скачать JSON",pdf:"🖨 PDF / Печать",xeta_qosulma:"Ошибка подключения к серверу",filtr_temizle:"сбросить фильтр",authli:"С авторизацией",giris:"🔐 Вход (необязательно — скан с авторизацией)",
+    hell:"Решение",json:"⬇ Скачать JSON",pdf:"🖨 PDF / Печать",xeta_qosulma:"Ошибка подключения к серверу",filtr_temizle:"сбросить фильтр",authli:"С авторизацией",giris:"🔐 Вход (необязательно — скан с авторизацией)",tab_xulase:"Сводка",tab_tapintilar:"Результаты",tab_yoxlamalar:"Проверки",
     st:["Проверок","Языков","Бесплатно"],
     tag:["Обнаружение SQL-инъекций...","Охота на XSS...","15 векторов атак...","Найти. Исправить. Защитить."],
     kat:{fayllar:"Чувствительные файлы",basliqlar:"Заголовки безопасности",email:"Email / Spoofing",xss:"XSS",sqli:"SQL-инъекция",cmd:"Command Injection",lfi:"LFI / Path Traversal",redirect:"Open Redirect",cors:"CORS",kohne_js:"Устаревшие JS-библиотеки",csrf:"CSRF",yollar:"Скрытые пути",metodlar:"HTTP-методы",mixed:"Mixed Content",subdomain:"Поддомены",sirr:"Утечки секретов",tls:"TLS/SSL",clickjacking:"Clickjacking",graphql:"GraphQL",host:"Host Header",ssrf:"SSRF",xxe:"XXE",idor:"IDOR",waf:"WAF"},
@@ -448,7 +481,18 @@ function neticeGoster(d){
   } else owP.style.display='none';
 
   tapintilariGoster();
+  document.getElementById('termTitle').textContent='scan/'+(d.domen||'');
+  document.getElementById('tabXulase').textContent=t.tab_xulase;
+  document.getElementById('tabTapintilar').textContent=t.tab_tapintilar+' ('+d.tapintilar.length+')';
+  document.getElementById('tabYoxlamalar').textContent=t.tab_yoxlamalar;
+  tabKec('xulase');
   document.getElementById('netice').style.display='block';
+}
+
+function tabKec(t){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('aktiv', b.dataset.tab===t));
+  const hedef='pane'+t.charAt(0).toUpperCase()+t.slice(1);
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.toggle('acik', p.id===hedef));
 }
 
 function donutGoster(ic,sira){
