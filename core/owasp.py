@@ -14,7 +14,8 @@ XERITE = {
     "sirr_sizma": "A02",
     # A03 — Injection
     "xss_url": "A03", "xss_forma": "A03", "stored_xss": "A03", "sqli_url": "A03",
-    "sqli_forma": "A03", "sqli_blind": "A03", "cmd_injection": "A03",
+    "sqli_forma": "A03", "sqli_blind": "A03", "sqli_bool": "A03", "ssti": "A03",
+    "cmd_injection": "A03",
     "rce_oob": "A03", "lfi": "A03",
     # A05 — Security Misconfiguration
     "csp_yox": "A05", "xcto_yox": "A05", "refpol_yox": "A05",

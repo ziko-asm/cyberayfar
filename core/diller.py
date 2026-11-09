@@ -69,19 +69,19 @@ METINLER = {
     },
     # ---------- XSS ----------
     "xss_url": {
-        "az": {"ad": "Əks olunan XSS (URL parametri)", "izah": "'{param}' parametri inputu təmizləmədən səhifəyə qaytarır — zərərli JavaScript yeridilə bilər.",
+        "az": {"ad": "Əks olunan XSS (URL parametri)", "izah": "'{param}' parametri inputu '{kontekst}' kontekstində təmizləmədən qaytarır — zərərli JavaScript yeridilə bilər. İşləyən payload: {payload}",
                "hell": "Çıxışda escape et (htmlspecialchars), CSP başlığı əlavə et."},
-        "en": {"ad": "Reflected XSS (URL parameter)", "izah": "The '{param}' parameter reflects input without sanitizing — malicious JavaScript can be injected.",
+        "en": {"ad": "Reflected XSS (URL parameter)", "izah": "The '{param}' parameter reflects input in '{kontekst}' context without sanitizing — malicious JavaScript can be injected. Working payload: {payload}",
                "hell": "Escape output (htmlspecialchars), add a CSP header."},
-        "ru": {"ad": "Отражённый XSS (параметр URL)", "izah": "Параметр '{param}' возвращает ввод без очистки — можно внедрить вредоносный JavaScript.",
+        "ru": {"ad": "Отражённый XSS (параметр URL)", "izah": "Параметр '{param}' возвращает ввод в контексте '{kontekst}' без очистки — можно внедрить вредоносный JavaScript. Рабочий payload: {payload}",
                "hell": "Экранируйте вывод (htmlspecialchars), добавьте заголовок CSP."},
     },
     "xss_forma": {
-        "az": {"ad": "Əks olunan XSS (forma)", "izah": "Forma inputu təmizlənmədən qaytarılır (mənbə: {menbe}).",
+        "az": {"ad": "Əks olunan XSS (forma)", "izah": "Forma inputu '{kontekst}' kontekstində təmizlənmədən qaytarılır (mənbə: {menbe}). İşləyən payload: {payload}",
                "hell": "İnputu escape et, çıxışı kodla, CSP tətbiq et."},
-        "en": {"ad": "Reflected XSS (form)", "izah": "Form input is reflected without sanitizing (source: {menbe}).",
+        "en": {"ad": "Reflected XSS (form)", "izah": "Form input is reflected in '{kontekst}' context without sanitizing (source: {menbe}). Working payload: {payload}",
                "hell": "Escape input, encode output, apply CSP."},
-        "ru": {"ad": "Отражённый XSS (форма)", "izah": "Ввод формы возвращается без очистки (источник: {menbe}).",
+        "ru": {"ad": "Отражённый XSS (форма)", "izah": "Ввод формы возвращается в контексте '{kontekst}' без очистки (источник: {menbe}). Рабочий payload: {payload}",
                "hell": "Экранируйте ввод, кодируйте вывод, примените CSP."},
     },
     # ---------- SQL Injection ----------
@@ -382,6 +382,22 @@ METINLER.update({
                "hell": "HTML-escape all user content on output. Apply a CSP. Sanitize input server-side."},
         "ru": {"ad": "Stored XSS (хранимый)", "izah": "HTML-символы, отправленные в форму, были СОХРАНЕНЫ и показаны без экранирования на другой странице (из '{menbe}') — самый опасный XSS. Скрипт атакующего выполняется у ВСЕХ посетителей (кража сессии, захват аккаунта).",
                "hell": "Экранируйте весь пользовательский контент при выводе. Примените CSP. Очищайте ввод на сервере."},
+    },
+    "sqli_bool": {
+        "az": {"ad": "SQL Injection (boolean-blind)", "izah": "'{param}' parametrində AND 1=1 (doğru) və AND 1=2 (yalan) fərqli cavablar verdi — xəta görünməsə də sorğu idarə olunur. Bazadan məlumat çıxarıla bilər.",
+               "hell": "Prepared statements (parametrli sorğular) istifadə et; inputu heç vaxt SQL-ə birbaşa qoşma."},
+        "en": {"ad": "SQL Injection (boolean-blind)", "izah": "On '{param}', AND 1=1 (true) and AND 1=2 (false) returned different responses — the query is controllable even without errors. Data can be extracted.",
+               "hell": "Use prepared statements; never concatenate input into SQL."},
+        "ru": {"ad": "SQL-инъекция (boolean-blind)", "izah": "Для '{param}' запросы AND 1=1 (истина) и AND 1=2 (ложь) дали разные ответы — запрос управляем даже без ошибок. Возможна выгрузка данных.",
+               "hell": "Используйте подготовленные запросы; не вставляйте ввод в SQL напрямую."},
+    },
+    "ssti": {
+        "az": {"ad": "SSTI — Şablon Injection ({muherrik})", "izah": "'{param}' parametri şablon mühərrikində ({muherrik}) icra olundu — riyazi ifadə serverdə hesablandı. Bu adətən TAM RCE-yə (uzaqdan kod icrası) gedir. Payload: {payload}",
+               "hell": "İstifadəçi inputunu şablona birbaşa qoyma; sandbox-lu mühərrik və ciddi validasiya işlət."},
+        "en": {"ad": "SSTI — Template Injection ({muherrik})", "izah": "The '{param}' parameter was executed by the template engine ({muherrik}) — a math expression was evaluated server-side. This usually leads to full RCE (remote code execution). Payload: {payload}",
+               "hell": "Never put user input directly into templates; use a sandboxed engine and strict validation."},
+        "ru": {"ad": "SSTI — Внедрение в шаблон ({muherrik})", "izah": "Параметр '{param}' был выполнен движком шаблонов ({muherrik}) — математическое выражение вычислено на сервере. Обычно ведёт к полному RCE (удалённое выполнение кода). Payload: {payload}",
+               "hell": "Не вставляйте ввод прямо в шаблоны; используйте песочницу и строгую валидацию."},
     },
 })
 
