@@ -148,7 +148,7 @@ def gez(bas_url, maks_sehife=20, timeout=15000):
         browser.close()
 
     return {"sehifeler": len(gorulmus), "formalar": formalar,
-            "parametrli_url": list(parametrli),
+            "parametrli_url": list(parametrli), "sehife_list": list(gorulmus),
             "cookies": kukiler, "auth_ok": auth_ok}
 
 

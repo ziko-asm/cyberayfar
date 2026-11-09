@@ -13,7 +13,7 @@ from modullar import (sensitive_files, email_spoof, xss, sqli, headers, cors,
                       open_redirect, js_libs, command_injection, lfi,
                       csrf, subdomain, http_methods, mixed_content, hidden_paths,
                       secrets_leak, tls_analiz, ssrf, xxe, graphql,
-                      host_header, clickjacking, waf, idor, oob_checks)
+                      host_header, clickjacking, waf, idor, oob_checks, stored_xss)
 
 GIZLI_ACAR = "DEYISDIR-MENI-uzun-tesadufi-acar"
 
@@ -25,7 +25,7 @@ KATEQORIYA = {
     "hessas_fayl": "fayllar", "robots": "fayllar",
     "spf_yox": "email", "spf_zeif": "email", "dmarc_yox": "email",
     "dmarc_passiv": "email", "dkim_yox": "email", "platforma": "email",
-    "xss_url": "xss", "xss_forma": "xss",
+    "xss_url": "xss", "xss_forma": "xss", "stored_xss": "xss",
     "sqli_url": "sqli", "sqli_forma": "sqli", "sqli_blind": "sqli",
     "csp_yox": "basliqlar", "hsts_yox": "basliqlar",
     "xcto_yox": "basliqlar", "refpol_yox": "basliqlar", "permpol_yox": "basliqlar",
@@ -97,6 +97,7 @@ def skan_et(hedef: str, test_rejimi=True, maks_sehife=30, ilerleme=None,
     if not netice:
         netice = crawler_modulu.Crawler(hedef, maks_sehife=maks_sehife).gez()
     purl, formalar = netice["parametrli_url"], netice["formalar"]
+    sehifeler_list = netice.get("sehife_list", [])
 
     bildir("texnologiya")
     tech = tech_detect.askarla(hedef)
@@ -132,7 +133,7 @@ def skan_et(hedef: str, test_rejimi=True, maks_sehife=30, ilerleme=None,
 
     # 4) AKTİV modullar (paralel)
     bildir("xss"); bildir("sqli"); bildir("redirect")
-    bildir("cmd"); bildir("lfi"); bildir("csrf"); bildir("ssrf"); bildir("idor"); bildir("oob")
+    bildir("cmd"); bildir("lfi"); bildir("csrf"); bildir("ssrf"); bildir("idor"); bildir("oob"); bildir("stored")
     aktiv = [
         (xss.yoxla, (purl, formalar, hesabat)),
         (sqli.yoxla, (purl, formalar, hesabat)),
@@ -143,6 +144,7 @@ def skan_et(hedef: str, test_rejimi=True, maks_sehife=30, ilerleme=None,
         (ssrf.yoxla, (purl, hesabat)),
         (idor.yoxla, (purl, hesabat, auth_edildi)),
         (oob_checks.yoxla, (purl, hedef, oob_base, hesabat)),
+        (stored_xss.yoxla, (formalar, sehifeler_list, hesabat)),
     ]
     http_client.modullari_paralel_islet(aktiv)
 

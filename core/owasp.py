@@ -13,7 +13,7 @@ XERITE = {
     "mixed_content": "A02", "cookie_zeif": "A02", "hsts_yox": "A02",
     "sirr_sizma": "A02",
     # A03 — Injection
-    "xss_url": "A03", "xss_forma": "A03", "sqli_url": "A03",
+    "xss_url": "A03", "xss_forma": "A03", "stored_xss": "A03", "sqli_url": "A03",
     "sqli_forma": "A03", "sqli_blind": "A03", "cmd_injection": "A03",
     "rce_oob": "A03", "lfi": "A03",
     # A05 — Security Misconfiguration

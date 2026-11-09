@@ -375,6 +375,14 @@ METINLER.update({
         "ru": {"ad": "IDOR (нарушение контроля доступа)", "izah": "Изменение '{param}' с {id1} на {id2} открыло данные ДРУГОГО объекта — атакующий может читать/изменять данные других.",
                "hell": "Проверяйте владельца объекта на каждом запросе (серверная авторизация). Используйте случайные UUID."},
     },
+    "stored_xss": {
+        "az": {"ad": "Stored XSS (saxlanılan XSS)", "izah": "Formaya göndərilən HTML simvolları saytda SAXLANILIB və '{menbe}' səhifəsindən sonra başqa səhifədə təmizlənmədən göstərildi — ən təhlükəli XSS. Hücumçunun skripti BÜTÜN ziyarətçilərdə işləyir (sessiya oğurluğu, hesab ələ keçirmə).",
+               "hell": "Bütün istifadəçi məzmununu göstərəndə HTML-escape et (çıxışda). CSP tətbiq et. Girişi serverdə təmizlə."},
+        "en": {"ad": "Stored XSS (persistent)", "izah": "HTML characters sent to a form were STORED and later shown unescaped on another page (from '{menbe}') — the most dangerous XSS. The attacker's script runs for EVERY visitor (session theft, account takeover).",
+               "hell": "HTML-escape all user content on output. Apply a CSP. Sanitize input server-side."},
+        "ru": {"ad": "Stored XSS (хранимый)", "izah": "HTML-символы, отправленные в форму, были СОХРАНЕНЫ и показаны без экранирования на другой странице (из '{menbe}') — самый опасный XSS. Скрипт атакующего выполняется у ВСЕХ посетителей (кража сессии, захват аккаунта).",
+               "hell": "Экранируйте весь пользовательский контент при выводе. Примените CSP. Очищайте ввод на сервере."},
+    },
 })
 
 

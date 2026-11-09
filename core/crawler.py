@@ -68,6 +68,7 @@ class Crawler:
             "sehifeler": len(self.gorulmus),
             "formalar": self.formalar,
             "parametrli_url": self.parametrli_url,
+            "sehife_list": list(self.gorulmus),
         }
 
     def _form_cixar(self, form, sehife_url):
