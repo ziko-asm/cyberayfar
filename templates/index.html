@@ -92,11 +92,11 @@
 
   /* ---- Terminal (canlı irəliləmə) ---- */
   .terminal{display:none;position:relative;background:#030f0a;border:1px solid var(--kenar);border-radius:10px;
-    padding:18px;margin-bottom:18px;font-size:13px;max-height:240px;overflow:auto}
+    padding:18px;margin-bottom:18px;font-size:13px;max-height:240px;overflow-y:auto;overflow-x:hidden}
   .terminal::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;
     background:linear-gradient(90deg,transparent,var(--neon),transparent);animation:tscan 1.6s linear infinite}
   @keyframes tscan{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
-  .terminal .setir{padding:2px 0;color:var(--solgun);white-space:pre-wrap}
+  .terminal .setir{padding:2px 0;color:var(--solgun);white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere}
   .terminal .setir.isliyir{color:var(--cyan)} .terminal .setir.bitdi{color:var(--neon)}
   .terminal .yan{color:var(--neon)}
   .kursor{display:inline-block;width:9px;height:14px;background:var(--neon);animation:yan 1s steps(2) infinite;vertical-align:middle}
