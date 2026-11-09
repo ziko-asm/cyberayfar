@@ -399,6 +399,14 @@ METINLER.update({
         "ru": {"ad": "SSTI — Внедрение в шаблон ({muherrik})", "izah": "Параметр '{param}' был выполнен движком шаблонов ({muherrik}) — математическое выражение вычислено на сервере. Обычно ведёт к полному RCE (удалённое выполнение кода). Payload: {payload}",
                "hell": "Не вставляйте ввод прямо в шаблоны; используйте песочницу и строгую валидацию."},
     },
+    "crlf": {
+        "az": {"ad": "CRLF Injection (Header)", "izah": "'{param}' parametri cavab başlığına təmizlənmədən düşür — \\r\\n ilə yeni HTTP başlığı yeridilə bilir. Saxta Set-Cookie, cache poisoning və ya başlıq-XSS mümkündür.",
+               "hell": "İstifadəçi inputundan \\r \\n simvollarını sil; başlıqlara birbaşa input qoyma."},
+        "en": {"ad": "CRLF Injection (header)", "izah": "The '{param}' parameter is placed into a response header unsanitized — \\r\\n lets a new HTTP header be injected. Forged Set-Cookie, cache poisoning or header-XSS are possible.",
+               "hell": "Strip \\r and \\n from user input; never put input directly into headers."},
+        "ru": {"ad": "CRLF-инъекция (заголовок)", "izah": "Параметр '{param}' попадает в заголовок ответа без очистки — через \\r\\n можно внедрить новый HTTP-заголовок. Возможны поддельный Set-Cookie, отравление кеша, header-XSS.",
+               "hell": "Удаляйте \\r и \\n из ввода; не вставляйте ввод прямо в заголовки."},
+    },
 })
 
 
