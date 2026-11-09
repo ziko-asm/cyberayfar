@@ -399,6 +399,22 @@ METINLER.update({
         "ru": {"ad": "SSTI — Внедрение в шаблон ({muherrik})", "izah": "Параметр '{param}' был выполнен движком шаблонов ({muherrik}) — математическое выражение вычислено на сервере. Обычно ведёт к полному RCE (удалённое выполнение кода). Payload: {payload}",
                "hell": "Не вставляйте ввод прямо в шаблоны; используйте песочницу и строгую валидацию."},
     },
+    "nosql_bool": {
+        "az": {"ad": "NoSQL Injection (operator)", "izah": "'{param}' parametrində $ne/$gt/$regex operatorları şərh olundu — hücumçu şərti idarə edib auth bypass edə, bütün sənədləri çəkə bilər (MongoDB).",
+               "hell": "İnputu string kimi gözlə, obyekt/operator qəbul etmə; sxem validasiyası (məs: mongoose strict, express-mongo-sanitize)."},
+        "en": {"ad": "NoSQL Injection (operator)", "izah": "On '{param}', the $ne/$gt/$regex operators were interpreted — an attacker can control the condition, bypass auth and dump all documents (MongoDB).",
+               "hell": "Treat input as a string, reject objects/operators; validate schema (e.g. mongoose strict, express-mongo-sanitize)."},
+        "ru": {"ad": "NoSQL-инъекция (оператор)", "izah": "Для '{param}' операторы $ne/$gt/$regex были интерпретированы — атакующий управляет условием, обходит авторизацию и выгружает все документы (MongoDB).",
+               "hell": "Принимайте ввод как строку, отклоняйте объекты/операторы; валидация схемы (mongoose strict, express-mongo-sanitize)."},
+    },
+    "nosql_error": {
+        "az": {"ad": "NoSQL Injection (xəta əsaslı)", "izah": "'{param}' parametrinə xüsusi simvol göndərəndə NoSQL/Mongo xəta mesajı qaytarıldı — input birbaşa sorğuya düşür.",
+               "hell": "İnputu təmizlə/validasiya et; parametrli sorğular və sanitizasiya işlət."},
+        "en": {"ad": "NoSQL Injection (error-based)", "izah": "Sending special characters to '{param}' returned a NoSQL/Mongo error — input reaches the query directly.",
+               "hell": "Sanitize/validate input; use parameterized queries and sanitization."},
+        "ru": {"ad": "NoSQL-инъекция (на ошибках)", "izah": "Отправка спецсимволов в '{param}' вернула ошибку NoSQL/Mongo — ввод попадает прямо в запрос.",
+               "hell": "Очищайте/валидируйте ввод; используйте параметризованные запросы."},
+    },
     "crlf": {
         "az": {"ad": "CRLF Injection (Header)", "izah": "'{param}' parametri cavab başlığına təmizlənmədən düşür — \\r\\n ilə yeni HTTP başlığı yeridilə bilir. Saxta Set-Cookie, cache poisoning və ya başlıq-XSS mümkündür.",
                "hell": "İstifadəçi inputundan \\r \\n simvollarını sil; başlıqlara birbaşa input qoyma."},

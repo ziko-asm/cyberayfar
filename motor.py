@@ -14,7 +14,7 @@ from modullar import (sensitive_files, email_spoof, xss, sqli, headers, cors,
                       csrf, subdomain, http_methods, mixed_content, hidden_paths,
                       secrets_leak, tls_analiz, ssrf, xxe, graphql,
                       host_header, clickjacking, waf, idor, oob_checks, stored_xss,
-                      ssti, crlf)
+                      ssti, crlf, nosql)
 
 GIZLI_ACAR = "DEYISDIR-MENI-uzun-tesadufi-acar"
 
@@ -29,6 +29,7 @@ KATEQORIYA = {
     "xss_url": "xss", "xss_forma": "xss", "stored_xss": "xss",
     "sqli_url": "sqli", "sqli_forma": "sqli", "sqli_blind": "sqli",
     "sqli_bool": "sqli", "ssti": "ssti", "crlf": "crlf",
+    "nosql_bool": "nosql", "nosql_error": "nosql",
     "csp_yox": "basliqlar", "hsts_yox": "basliqlar",
     "xcto_yox": "basliqlar", "refpol_yox": "basliqlar", "permpol_yox": "basliqlar",
     "server_versiya": "basliqlar", "cookie_zeif": "basliqlar",
@@ -49,7 +50,8 @@ KATEQORIYA = {
 KATEQORIYALAR = ("fayllar", "basliqlar", "email", "xss", "sqli", "cmd", "lfi",
                  "redirect", "cors", "kohne_js", "csrf", "yollar", "metodlar",
                  "mixed", "subdomain", "sirr", "tls", "clickjacking",
-                 "graphql", "host", "ssrf", "xxe", "idor", "ssti", "crlf", "waf")
+                 "graphql", "host", "ssrf", "xxe", "idor", "ssti", "crlf",
+                 "nosql", "waf")
 
 
 def skan_et(hedef: str, test_rejimi=True, maks_sehife=30, ilerleme=None,
@@ -136,12 +138,13 @@ def skan_et(hedef: str, test_rejimi=True, maks_sehife=30, ilerleme=None,
     # 4) AKTİV modullar (paralel)
     bildir("xss"); bildir("sqli"); bildir("redirect")
     bildir("cmd"); bildir("lfi"); bildir("csrf"); bildir("ssrf"); bildir("idor")
-    bildir("oob"); bildir("stored"); bildir("ssti"); bildir("crlf")
+    bildir("oob"); bildir("stored"); bildir("ssti"); bildir("crlf"); bildir("nosql")
     aktiv = [
         (xss.yoxla, (purl, formalar, hesabat)),
         (sqli.yoxla, (purl, formalar, hesabat)),
         (ssti.yoxla, (purl, formalar, hesabat)),
         (crlf.yoxla, (purl, hesabat)),
+        (nosql.yoxla, (purl, hesabat)),
         (open_redirect.yoxla, (purl, hesabat)),
         (command_injection.yoxla, (purl, hesabat)),
         (lfi.yoxla, (purl, hesabat)),

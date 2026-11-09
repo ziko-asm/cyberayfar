@@ -37,13 +37,21 @@ def cookie_qur(kukiler):
 
 
 def al(url, metod="GET", timeout=8, **kw):
-    """Tək sorğu (rate-limit ilə). Xəta olsa None qaytarır."""
+    """Tək sorğu (rate-limit ilə). Bağlantı sıfırlanarsa 1 dəfə təkrar
+    cəhd edir (500/reset cavablarını itirməmək üçün). Yenə alınmasa None."""
+    redirect = kw.pop("redirect", True)
     with _semafor:
-        try:
-            return _sessiya.request(metod, url, timeout=timeout,
-                                    allow_redirects=kw.pop("redirect", True), **kw)
-        except requests.RequestException:
-            return None
+        for cehd in (1, 2):
+            try:
+                return _sessiya.request(metod, url, timeout=timeout,
+                                        allow_redirects=redirect, **kw)
+            except requests.RequestException:
+                # 1-ci cəhd sınıq keep-alive bağlantıya düşə bilər; urllib3 onu
+                # atır, 2-ci cəhd yeni bağlantı alır (sessiyanı bağlamırıq —
+                # paralel thread-ləri pozmasın).
+                if cehd == 2:
+                    return None
+    return None
 
 
 def paralel_al(url_siyahi, timeout=8):
