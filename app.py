@@ -12,6 +12,7 @@ Mühit dəyişənləri (Vercel-də Settings -> Environment Variables):
 
 import os
 import json
+import time
 import queue
 import secrets
 import threading
@@ -198,10 +199,50 @@ def _sorgunu_oxu():
     return hedef, auth
 
 
+# Sürət limiti: bir IP-dən dəqiqədə ən çox LIMIT_SAY skan. Yaddaşda saxlanılır
+# (hər server nüsxəsi üçün ayrıca) — serverless-də "ən yaxşı cəhd" qorumasıdır;
+# sərt limit üçün ortaq yaddaş (Redis/Upstash) lazımdır.
+LIMIT_SAY = int(os.environ.get("SKAN_LIMIT", "6"))
+LIMIT_PENCERE = 60.0
+_limit_kilid = threading.Lock()
+_limit_vaxtlar = {}
+
+
+def _musteri_ip() -> str:
+    if PROD:   # platforma proksisi əsl IP-ni X-Forwarded-For-un əvvəlinə yazır
+        xff = request.headers.get("X-Forwarded-For", "")
+        if xff:
+            return xff.split(",")[0].strip()
+    return request.remote_addr or "?"
+
+
+def _limit_asildi():
+    """Limit aşılıbsa gözləmə saniyəsini, yoxsa 0 qaytarır (və sorğunu sayır)."""
+    if not PROD:
+        return 0
+    indi, ip = time.time(), _musteri_ip()
+    with _limit_kilid:
+        if len(_limit_vaxtlar) > 5000:           # yaddaş şişməsin
+            _limit_vaxtlar.clear()
+        v = [t for t in _limit_vaxtlar.get(ip, []) if indi - t < LIMIT_PENCERE]
+        if len(v) >= LIMIT_SAY:
+            _limit_vaxtlar[ip] = v
+            return max(1, int(LIMIT_PENCERE - (indi - v[0])) + 1)
+        v.append(indi)
+        _limit_vaxtlar[ip] = v
+    return 0
+
+
 def _on_yoxlama(hedef):
-    """Skandan əvvəl: boş ünvan / icazə. Xəta varsa (cavab, status)."""
+    """Skandan əvvəl: boş ünvan / sürət limiti / icazə. Xəta varsa (cavab, status)."""
     if not hedef:
         return jsonify({"xeta": "Sayt ünvanı boşdur", "xeta_kod": "bos"}), 400
+    gozle = _limit_asildi()
+    if gozle:
+        cavab = jsonify({"xeta": "Çox tez-tez skan. Bir az sonra yenidən cəhd et.",
+                         "xeta_kod": "limit", "gozle": gozle})
+        cavab.headers["Retry-After"] = str(gozle)
+        return cavab, 429
     try:
         motor.icaze_yoxla(hedef, test_rejimi=TEST_REJIMI, allowlist=ALLOWLIST)
     except authorization.IcazeXetasi as e:

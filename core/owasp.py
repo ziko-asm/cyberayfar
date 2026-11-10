@@ -23,7 +23,7 @@ XERITE = {
     "cors_reflect": "A05", "tehlukeli_metod": "A05", "graphql_introspection": "A05",
     "hessas_fayl": "A05", "robots": "A05", "gizli_yol": "A05",
     "clickjacking": "A05", "xxe": "A05", "xxe_oob": "A05", "csrf_yox": "A05",
-    "subdomainler": "A05",
+    "subdomainler": "A05", "qovluq_siyahisi": "A05", "debug_sizma": "A05",
     # A06 — Vulnerable and Outdated Components
     "kohne_js": "A06",
     # A07 — Identification and Authentication Failures

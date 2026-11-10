@@ -68,6 +68,11 @@ def _bool_yoxla(parcalar, parametrler, param, timeout):
     if _ratio(base, wr) > 0.95:
         return None
 
+    # "Parametri tamam sil" bazası: server naməlum `param[$op]` açarını sadəcə
+    # NƏZƏRƏ ALMIRSA (məs. redirect/URL parametri), operator cavabı bu baza ilə
+    # eyni olur -> bu injection DEYİL, yalançı müsbətdir.
+    omitted, _ = _fetch(parcalar, {k: v for k, v in others.items() if k != param}, timeout)
+
     uygunlar = 0
     son_url = None
     for op, sabit in OPERATORLAR:
@@ -77,6 +82,9 @@ def _bool_yoxla(parcalar, parametrler, param, timeout):
         p["%s[%s]" % (param, op)] = deger
         ne, u = _fetch(parcalar, p, timeout)
         if ne is None:
+            continue
+        # Operator sadəcə "param yoxdur" halına bərabərdirsə -> şərh olunmayıb
+        if omitted is not None and _ratio(ne, omitted) > 0.95:
             continue
         # operator şərh olunubsa: nəticə "uyğunsuz" səhifədən fərqli,
         # "nəticə var" bazasına daha yaxın olmalıdır

@@ -15,7 +15,7 @@ from modullar import (sensitive_files, email_spoof, xss, sqli, headers, cors,
                       csrf, subdomain, http_methods, mixed_content, hidden_paths,
                       secrets_leak, tls_analiz, ssrf, xxe, graphql,
                       host_header, clickjacking, waf, idor, oob_checks, stored_xss,
-                      ssti, crlf, nosql)
+                      ssti, crlf, nosql, melumat_sizmasi)
 
 # Token açarı: canlıda SKANER_GIZLI_ACAR mühit dəyişəni ilə əvəz et
 # (dəyişəndə əvvəl verilmiş sahiblik tokenləri etibarsız olur).
@@ -49,12 +49,13 @@ KATEQORIYA = {
     "clickjacking": "clickjacking", "waf_askarlandi": "waf",
     "idor": "idor",
     "ssrf_oob": "ssrf", "rce_oob": "cmd", "xxe_oob": "xxe",
+    "qovluq_siyahisi": "melumat", "debug_sizma": "melumat",
 }
 KATEQORIYALAR = ("fayllar", "basliqlar", "email", "xss", "sqli", "cmd", "lfi",
                  "redirect", "cors", "kohne_js", "csrf", "yollar", "metodlar",
                  "mixed", "subdomain", "sirr", "tls", "clickjacking",
                  "graphql", "host", "ssrf", "xxe", "idor", "ssti", "crlf",
-                 "nosql", "waf")
+                 "nosql", "melumat", "waf")
 
 
 def hedefi_hazirla(hedef: str):
@@ -159,7 +160,7 @@ def _skan_et(hedef, test_rejimi, maks_sehife, ilerleme, allowlist, auth,
     # 3) PASSİV modullar (paralel)
     bildir("fayllar"); bildir("basliqlar"); bildir("cors"); bildir("kohne_js")
     bildir("metodlar"); bildir("mixed"); bildir("yollar"); bildir("sirr")
-    bildir("tls"); bildir("clickjacking"); bildir("graphql"); bildir("host"); bildir("waf")
+    bildir("tls"); bildir("clickjacking"); bildir("graphql"); bildir("host"); bildir("melumat"); bildir("waf")
     passiv = [
         (sensitive_files.yoxla, (hedef, hesabat)),
         (headers.yoxla, (hedef, hesabat)),
@@ -175,6 +176,7 @@ def _skan_et(hedef, test_rejimi, maks_sehife, ilerleme, allowlist, auth,
         (host_header.yoxla, (hedef, hesabat)),
         (waf.yoxla, (hedef, hesabat)),
         (xxe.yoxla, (hedef, hesabat)),
+        (melumat_sizmasi.yoxla, (sehifeler_list, hesabat)),
     ]
     bildir("spoofing")
     if platforma:
@@ -185,9 +187,15 @@ def _skan_et(hedef, test_rejimi, maks_sehife, ilerleme, allowlist, auth,
         passiv.append((subdomain.yoxla, (domen, hesabat)))
     http_client.modullari_paralel_islet(passiv)
 
+    # 3.5) IDOR — vaxt-əsaslı (sleep) testlərdən ƏVVƏL, ayrıca işləyir.
+    # Səbəb: SQLi/cmd time-based payloadları 5-6 san yatıb bağlantı hovuzunu
+    # tutur; IDOR eyni anda işləsə sorğuları timeout olub obyektləri itirir.
+    bildir("idor")
+    http_client.modullari_paralel_islet([(idor.yoxla, (purl, hesabat, auth_edildi))])
+
     # 4) AKTİV modullar (paralel)
     bildir("xss"); bildir("sqli"); bildir("redirect")
-    bildir("cmd"); bildir("lfi"); bildir("csrf"); bildir("ssrf"); bildir("idor")
+    bildir("cmd"); bildir("lfi"); bildir("csrf"); bildir("ssrf")
     bildir("oob"); bildir("stored"); bildir("ssti"); bildir("crlf"); bildir("nosql")
     aktiv = [
         (xss.yoxla, (purl, formalar, hesabat)),
@@ -200,7 +208,6 @@ def _skan_et(hedef, test_rejimi, maks_sehife, ilerleme, allowlist, auth,
         (lfi.yoxla, (purl, hesabat)),
         (csrf.yoxla, (formalar, hesabat)),
         (ssrf.yoxla, (purl, hesabat)),
-        (idor.yoxla, (purl, hesabat, auth_edildi)),
         (oob_checks.yoxla, (purl, hedef, oob_base, hesabat)),
         (stored_xss.yoxla, (formalar, sehifeler_list, hesabat)),
     ]
@@ -211,7 +218,8 @@ def _skan_et(hedef, test_rejimi, maks_sehife, ilerleme, allowlist, auth,
 
     tapintilar = [{
         "ciddilik": t["ciddilik"], "kod": t["kod"], "yer": t["yer"],
-        "cvss": reporter.cvss(t["ciddilik"]),
+        "cvss": reporter.cvss(t["ciddilik"], t["kod"]),
+        "cvss_vektor": reporter.cvss_vektor(t["kod"]),
         "owasp": owasp.kateqoriya(t["kod"]),
         "metn": diller.render_hamisi(t["kod"], t["deyishken"]),
     } for t in hesabat.tapintilar]

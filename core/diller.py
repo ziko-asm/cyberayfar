@@ -453,3 +453,30 @@ METINLER.update({
                "hell": "Полностью отключите внешние сущности (DTD) в XML-парсере."},
     },
 })
+
+
+# ---- Passiv məlumat sızması ----
+METINLER.update({
+    "qovluq_siyahisi": {
+        "az": {"ad": "Açıq qovluq siyahısı",
+               "izah": "Bu ünvanda server qovluğun içindəki bütün faylları siyahı kimi göstərir — fayl adları, ölçüləri və tarixləri hər kəsə açıqdır.",
+               "hell": "Serverdə qovluq siyahısını söndür (nginx: autoindex off; Apache: Options -Indexes)."},
+        "en": {"ad": "Directory listing enabled",
+               "izah": "The server lists every file in this folder — file names, sizes and dates are visible to anyone.",
+               "hell": "Disable directory listing (nginx: autoindex off; Apache: Options -Indexes)."},
+        "ru": {"ad": "Открыт листинг каталога",
+               "izah": "Сервер показывает список всех файлов в этой папке — имена, размеры и даты видны всем.",
+               "hell": "Отключите листинг каталогов (nginx: autoindex off; Apache: Options -Indexes)."},
+    },
+    "debug_sizma": {
+        "az": {"ad": "Debug / stack trace sızması ({texnologiya})",
+               "izah": "Səhifədə daxili xəta izi görünür: fayl yolları, kod sətirləri və kitabxana adları kənar şəxsə açılır.",
+               "hell": "Canlı mühitdə debug rejimini söndür və istifadəçiyə ümumi xəta səhifəsi göstər; təfərrüatı yalnız loqa yaz."},
+        "en": {"ad": "Debug / stack trace disclosure ({texnologiya})",
+               "izah": "The page shows an internal error trace: file paths, code lines and library names are exposed.",
+               "hell": "Turn off debug mode in production and show a generic error page; write details to logs only."},
+        "ru": {"ad": "Раскрытие debug / stack trace ({texnologiya})",
+               "izah": "На странице виден внутренний трейс ошибки: пути к файлам, строки кода и названия библиотек.",
+               "hell": "Отключите режим отладки в продакшене и показывайте общую страницу ошибки; детали пишите только в лог."},
+    },
+})

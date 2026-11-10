@@ -20,9 +20,10 @@ def yoxla(parametrli_url, hesabat, timeout=8):
     for url in parametrli_url:
         parcalar = urlparse(url)
         parametrler = parse_qs(parcalar.query)
-        for param in parametrler:
-            if param.lower() not in ƏLAMƏTLƏR:
-                continue
+        # Bütün parametrləri sına: təsdiq (Location bizim sentinel-ə yönəlir)
+        # qəti olduğu üçün qeyri-standart adlarda da yalançı müsbət yoxdur.
+        # Ad-uyğunları əvvəl sına (sürət).
+        for param in sorted(parametrler, key=lambda p: p.lower() not in ƏLAMƏTLƏR):
             yeni = {k: v[0] for k, v in parametrler.items()}
             yeni[param] = TEST_HEDEF
             test_url = urlunparse(parcalar._replace(query=urlencode(yeni)))

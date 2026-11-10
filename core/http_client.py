@@ -9,13 +9,22 @@ import time
 import threading
 import requests
 from concurrent.futures import ThreadPoolExecutor
+from urllib3.util.retry import Retry
 
 ISTIFADECI_AGENT = "CyberAyfar-Scanner/2.0 (+authorized-security-test)"
 
-# Böyük connection pool -> paralel sorğular üçün
+# Böyük connection pool -> paralel sorğular üçün.
+# Retry: hədəf server xəta/5xx-dən sonra bağlantını bağlayanda (çox olur,
+# xüsusən SQL xətası -> 500), köhnəlmiş pooled bağlantını atıb YENİSİ ilə
+# təkrar cəhd edir. Bu olmadan skaner məhz zəiflik göstərən cavabı (500)
+# "cavab yoxdur" kimi itirirdi -> error-based aşkarlama pozulurdu.
+_retry = Retry(total=3, connect=3, read=2, redirect=0, other=2,
+               backoff_factor=0.3, raise_on_status=False,
+               allowed_methods=None)   # bütün metodlar üçün (GET/POST/...)
 _sessiya = requests.Session()
 _sessiya.headers.update({"User-Agent": ISTIFADECI_AGENT})
-_adapter = requests.adapters.HTTPAdapter(pool_connections=20, pool_maxsize=20)
+_adapter = requests.adapters.HTTPAdapter(pool_connections=20, pool_maxsize=20,
+                                         max_retries=_retry)
 _sessiya.mount("http://", _adapter)
 _sessiya.mount("https://", _adapter)
 
@@ -42,19 +51,43 @@ def cookie_sil():
     _sessiya.cookies.clear()
 
 
+class Cavab:
+    """requests.Response üçün nazik örtük.
+
+    KRİTİK SƏBƏB: requests.Response.__bool__ -> response.ok, yəni 4xx/5xx
+    cavab `if cavab:` yoxlamasında YALAN sayılır. Bu, error-based aşkarlamanı
+    (SQLi/LFI və s. çox vaxt 500/404 ilə cavab verir) tamamilə pozurdu:
+    modullar `if cavab and ...` yazır və 500 cavabı səssizcə atılırdı.
+    Bu örtük cavab MÖVCUDDURSA həmişə doğrudur; bütün atributlar ötürülür.
+    """
+    __slots__ = ("_r",)
+
+    def __init__(self, r):
+        self._r = r
+
+    def __getattr__(self, ad):
+        return getattr(self._r, ad)
+
+    def __bool__(self):
+        return True
+
+    def __repr__(self):
+        return f"<Cavab {self._r.status_code} {self._r.url}>"
+
+
 def al(url, metod="GET", timeout=8, **kw):
-    """Tək sorğu (rate-limit ilə). Bağlantı sıfırlanarsa 1 dəfə təkrar
-    cəhd edir (500/reset cavablarını itirməmək üçün). Yenə alınmasa None."""
+    """Tək sorğu (rate-limit ilə). Cavab varsa Cavab örtüyü, yoxdursa None.
+    Qeyd: 4xx/5xx də MÖVCUD cavabdır (atılmır) — error-based aşkarlama üçün."""
     redirect = kw.pop("redirect", True)
     with _semafor:
         for cehd in (1, 2):
             try:
-                return _sessiya.request(metod, url, timeout=timeout,
-                                        allow_redirects=redirect, **kw)
+                r = _sessiya.request(metod, url, timeout=timeout,
+                                     allow_redirects=redirect, **kw)
+                return Cavab(r)
             except requests.RequestException:
-                # 1-ci cəhd sınıq keep-alive bağlantıya düşə bilər; urllib3 onu
-                # atır, 2-ci cəhd yeni bağlantı alır (sessiyanı bağlamırıq —
-                # paralel thread-ləri pozmasın).
+                # Köhnəlmiş keep-alive bağlantısı 1-ci cəhdi poza bilər;
+                # 2-ci cəhd yeni bağlantı alır.
                 if cehd == 2:
                     return None
     return None

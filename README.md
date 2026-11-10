@@ -1,56 +1,92 @@
-# SaytYoxla DAST Skaner 🔐
+# CYBERAYFAR SCANNER 🔐
 
 İcazəli **Veb Zəiflik Skaneri** (DAST — Dynamic Application Security Testing).
-Saytlara zərərsiz test sorğuları göndərib zəiflikləri tapır.
+Saytlara zərərsiz test sorğuları göndərib zəiflikləri tapır: XSS, SQL/NoSQL
+injection, SSTI, LFI, SSRF, CRLF, IDOR, təhlükəsizlik başlıqları, TLS, həssas
+fayllar, məlumat sızması və s. — OWASP Top 10 xəritəsi və CVSS 3.1 balı ilə.
+
+🌐 Canlı: https://cyberayfar.vercel.app · Dillər: AZ / EN / RU
 
 > ⚖️ **Qanuni istifadə:** Yalnız SAHİBİ olduğun və ya yazılı icazən olan
 > saytları skan et. Məhsulun içindəki "icazə qapısı" məhz bunu təmin edir.
+> Skaner əl ilə pentesti ƏVƏZ ETMİR — ilkin/avtomatik yoxlama vasitəsidir.
 
 ---
 
 ## 🚀 İşlətmə
 
+### Veb (tövsiyə)
 ```bash
-cd /home/user/kiber-lab/skaner
+py app.py        # http://127.0.0.1:5000  (lokalda test rejimi)
+```
 
+### CLI
+```bash
 # Öz saytında (test rejimi — icazə yoxlaması atlanır):
-python3 skan.py https://saytyoxla.vercel.app --oz-saytim
+python skan.py https://saytyoxla.vercel.app --oz-saytim
 
 # Real müştəridə (sahiblik təsdiqi tələb olunur):
-python3 skan.py https://musteri-sayti.com
+python skan.py https://musteri-sayti.com
 ```
+
+Canlı (PROD) rejimdə skan yalnız sahibliyi təsdiqlənmiş domenlərdə işləyir:
+hədəfin kökünə `/.well-known/skaner-verify.txt` faylı və ya `skaner-verify=...`
+DNS TXT qeydi qoyulmalıdır.
 
 ---
 
-## 📂 Fayllar və nə edirlər
+## 🔑 Mühit dəyişənləri (Vercel/Render)
+
+| Dəyişən | Təyinat |
+|---------|---------|
+| `SAHIB_DOMENLER` | Təsdiq tələb etməyən öz domenlərin (vergüllə) |
+| `SKANER_GIZLI_ACAR` | Sahiblik tokenlərinin açarı (uzun təsadüfi sətir) |
+| `SKAN_LIMIT` | Bir IP üçün dəqiqədə maksimum skan (defolt 6) |
+
+---
+
+## 📂 Quruluş
 
 | Fayl | Vəzifəsi |
 |------|----------|
-| `skan.py` | Əsas fayl — hər şeyi birləşdirir, CLI |
-| `core/authorization.py` | 🔐 İcazə qapısı (sahiblik təsdiqi: fayl və ya DNS) |
-| `core/crawler.py` | 🕷️ Saytı gəzir, səhifə/forma/parametr tapır |
-| `core/reporter.py` | 📊 Hesabat + 0–100 bal |
-| `modullar/sensitive_files.py` | 📂 Açıq həssas fayllar (.git, .env, backup) |
-| `modullar/email_spoof.py` | 📧 Domain spoofing (SPF/DMARC/DKIM) |
-| `modullar/xss.py` | 🎯 Əks olunan XSS |
-| `modullar/sqli.py` | 💉 SQL Injection (xəta-əsaslı) |
+| `app.py` | Flask veb server (CSP və digər təhlükəsizlik başlıqları, sürət limiti, SSE) |
+| `motor.py` | Mühərrik — crawl + bütün modulları paralel işlədir |
+| `core/authorization.py` | 🔐 İcazə qapısı + SSRF qoruması (daxili/IP ünvanları rədd) |
+| `core/crawler.py` | 🕷️ Saytı gəzir (sitemap/robots), səhifə/forma/parametr tapır |
+| `core/http_client.py` | 🌐 Paralel HTTP + retry (4xx/5xx cavabları itirmir) |
+| `core/reporter.py` | 📊 CVSS 3.1 vektorları + 0–100 bal |
+| `core/owasp.py` | 🗺️ OWASP Top 10 (2021) xəritəsi |
+| `core/diller.py` | 🌍 AZ/EN/RU tərcümələr |
+| `modullar/*.py` | 🧩 27 yoxlama modulu (injection, başlıqlar, TLS, IDOR, sızma…) |
+| `tests/` | ✅ Unit testlər + zəif-sayt benchmarkı |
+
+---
+
+## 📊 Dəqiqlik (benchmark)
+
+`tests/lab/zeif_sayt.py` — bilərəkdən zəif lokal sayt (hər zəifliyin zəif
+`/v/…` və təhlükəsiz `/s/…` nüsxəsi). `tests/benchmark.py` skan nəticəsini
+həqiqət cədvəli ilə tutuşdurur. Cari nəticə: **aşkarlama 39/40 (98%),
+yalançı müsbət 0**. Detallar: [`BENCHMARK.md`](BENCHMARK.md).
+
+```bash
+python tests/benchmark.py      # cədvəl + BENCHMARK.md
+pytest -q                      # unit testlər + benchmark həddi
+```
+
+> Laboratoriya bu skanerlə yazıldığı üçün 98% **yuxarı sərhəddir**; real
+> saytlarda aşkarlama daha aşağı olar. Müstəqil ölçü üçün DVWA / OWASP Juice
+> Shop kimi kənar hədəflərdə də sınayın.
+> **Məlum məhdudiyyət:** forma üzərindən *kor* (auth-bypass) SQLi hələ
+> aşkarlanmır; JS-render (SPA) səhifələr yalnız Playwright olan mühitdə
+> (Render/Docker) tam gəzilir, Vercel-də statik crawl işləyir.
 
 ---
 
 ## 🧠 Necə işləyir (addım-addım)
 
-1. **İcazə** — hədəfin sahibi olduğun təsdiqlənir (yoxsa dayanır)
-2. **Crawl** — saytdakı bütün səhifə, forma və parametrlər toplanır
-3. **Passiv yoxlama** — həssas fayllar + DNS (spoofing)
-4. **Aktiv yoxlama** — XSS və SQLi üçün zərərsiz test inputları
-5. **Hesabat** — tapılanlar ciddiliyə görə sıralanır, bal verilir
-
----
-
-## 🛠️ Növbəti addımlar (satılabilən məhsula doğru)
-
-- [ ] Async ilə sürəti 10x artır
-- [ ] Yeni modullar: CORS, open redirect, təhlükəsizlik başlıqları, köhnə JS (CVE)
-- [ ] JSON/PDF hesabat
-- [ ] SaytYoxla-ya "Dərin Skan" kimi birləşdir
-- [ ] Abunə / sahiblik təsdiqi sistemi
+1. **İcazə** — hədəfin sahibi olduğun təsdiqlənir (yoxsa dayanır); daxili/IP ünvanlar rədd edilir
+2. **Crawl** — səhifə, forma və parametrlər toplanır
+3. **Passiv yoxlama** — başlıqlar, həssas fayllar, TLS, sızma, DNS/spoofing…
+4. **Aktiv yoxlama** — XSS/SQLi/NoSQL/SSTI/LFI/SSRF/CRLF/IDOR üçün zərərsiz, təsdiqlənmiş testlər
+5. **Hesabat** — tapıntılar CVSS/OWASP ilə, ciddiliyə görə sıralanır; sayt cavab vermirsə "natamam" deyilir (yalan "100/A" yox)

@@ -27,9 +27,30 @@ ID_ADLAR = ("id", "uid", "user", "userid", "user_id", "account", "acc", "pid",
 PRIVAT = ("user", "userid", "user_id", "account", "acc", "order", "orderid",
           "order_id", "invoice", "profile", "member", "customer", "doc", "file")
 
+# Yalnız səhifənin MƏQSƏDİNİ bildirən qəti siqnallar — "Giriş"/"Login" kimi
+# naviqasiyada hər səhifədə olan sözlər DEYİL (yoxsa hər obyekt "login səhifəsi"
+# sayılıb IDOR gizlədilir). Not-found halı ayrıca "inv" bazası ilə tutulur.
+# IDOR yalnız ŞƏXSİ/HƏSSAS obyektlər üçün ciddidir. Açıq kataloq (məhsul,
+# xəbər, məqalə) id-si ilə "qonşu" səhifə açmaq zəiflik deyil. Ona görə sızan
+# obyektdə ən azı bir həssas əlamət (PII/maliyyə) tələb edirik -> yalançı
+# müsbətləri (public kataloq) kəsirik.
+# QEYD: sadə email/telefon ƏLAVƏ ETMİRİK — onlar footer/əlaqə blokunda hər
+# səhifədə olur (public kataloqda belə) və yalançı müsbət verir. Bunun yerinə
+# qeyd-sahəsi etiketləri + maliyyə nümunələrinə baxırıq: bunlar şəxsi obyektdə
+# olur, açıq məhsul/xəbər səhifəsində yox.
+HESSAS = re.compile(
+    r"\d{4}[ \-]\d{4}[ \-]\d{4}|\*{3,}[ \d]|"        # kart nömrəsi
+    r"\biban\b|\bfin\b|passport|паспорт|"            # şəxsiyyət/maliyyə
+    r"ünvan|address|адрес|kart\b|card\b|карт|"
+    r"müştəri|customer|клиент|"
+    r"parol|password|пароль|"
+    r"email\s*[:：]|e-?mail\s*[:：]|"                 # yalnız ETİKET kimi
+    r"telefon\s*[:：]|phone\s*[:：]|тел\.?\s*[:：]", re.IGNORECASE)
+
 LOGIN_XETA = re.compile(
-    r"type=[\"']password|sign ?in|log ?in|giriş|войти|unauthorized|forbidden|"
-    r"access denied|not found|does not exist|404|403|401|error", re.IGNORECASE)
+    r"type=[\"']password|please (?:log|sign) ?in|sign in to (?:continue|your)|"
+    r"you (?:must|need to) (?:log|sign) ?in|unauthorized|access denied|"
+    r"icazəniz yoxdur|доступ запрещ|войдите в", re.IGNORECASE)
 
 
 def _url_ile(parcalar, params, param, deyer):
@@ -84,6 +105,9 @@ def yoxla(parametrli_url, hesabat, auth_edildi=False):
                     continue
                 # "tapılmadı" bazası ilə eyni ölçü -> real obyekt deyil
                 if inv_uz > 0 and abs(uz - inv_uz) <= max(40, inv_uz * 0.05):
+                    continue
+                # Açıq kataloq deyil, həssas obyekt olmalıdır (PII/maliyyə)
+                if not (HESSAS.search(metn[:4000]) or HESSAS.search(orig[2][:4000])):
                     continue
                 # orijinalla oxşar struktur, fərqli məzmun -> BAŞQA obyekt açıldı
                 if _oxsar(uz, orig[1]) and metn[:2500] != orig[2][:2500]:

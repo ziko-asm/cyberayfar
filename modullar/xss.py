@@ -45,7 +45,18 @@ def _analiz(text, marker):
     acik = low.rfind("<script", 0, i)
     bagli = low.rfind("</script", 0, i)
     if acik > bagli:
-        kontekst = "JavaScript"
+        # JS daxilində hansı sətir dırnağının içindəyik? (delimiter)
+        delim = _js_delimiter(text, text.find(">", acik) + 1, i)
+        kontekst = "JavaScript" + (":" + delim if delim else "")
+        # JS sətrində yalnız DELIMITER dırnağı (escape olunmadan) sağ qalsa
+        # breakout olur: "-sətirdə ' zərərsizdir, əksinə də. Escape olunmuş
+        # (\" \') dırnaq da breakout deyil -> yalançı müsbəti kəsirik.
+        if m:
+            seg = m.group(1)
+            for c in ('"', "'"):
+                qacilmis = not re.search(r"(?<!\\)(?:\\\\)*" + c, seg)
+                if c in survivors and (qacilmis or (delim and c != delim)):
+                    survivors.discard(c)
     else:
         lt = text.rfind("<", 0, i)
         gt = text.rfind(">", 0, i)
@@ -62,13 +73,32 @@ def _analiz(text, marker):
     return survivors, kontekst
 
 
+def _js_delimiter(text, bas, i):
+    """`bas`..`i` aralığındakı JS kodunu gəzib `i` nöqtəsindəki açıq sətir
+    dırnağını qaytarır (' " və ya `), sətir içində deyiliksə None."""
+    delim = None
+    j = bas
+    while j < i:
+        c = text[j]
+        if delim:
+            if c == "\\":
+                j += 2
+                continue
+            if c == delim:
+                delim = None
+        elif c in "\"'`":
+            delim = c
+        j += 1
+    return delim
+
+
 def _qerar(survivors, kontekst):
     """(ciddilik, işləyən_payload) və ya (None, None)."""
     lt = "<" in survivors
     gt = ">" in survivors
     dq = '"' in survivors
     sq = "'" in survivors
-    if kontekst == "JavaScript":
+    if kontekst.startswith("JavaScript"):
         if lt and gt:
             return "yuksek", "</script><svg onload=alert(1)>"
         if dq:

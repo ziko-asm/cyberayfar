@@ -37,9 +37,9 @@ def yoxla(parametrli_url, hesabat, timeout=8):
     for url in parametrli_url:
         parcalar = urlparse(url)
         parametrler = parse_qs(parcalar.query)
-        for param in parametrler:
-            if param.lower() not in ƏLAMƏTLƏR:
-                continue
+        # Təsdiq (cavabda /etc/passwd və ya win.ini imzası) qəti olduğu üçün
+        # bütün parametrləri sınamaq yalançı müsbət vermir; ad-uyğunlar əvvəl.
+        for param in sorted(parametrler, key=lambda p: p.lower() not in ƏLAMƏTLƏR):
             for p in PAYLOADLAR:
                 yeni = {k: v[0] for k, v in parametrler.items()}
                 yeni[param] = p
