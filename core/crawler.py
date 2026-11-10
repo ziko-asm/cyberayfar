@@ -18,6 +18,7 @@ class Crawler:
         self.maks_sehife = maks_sehife
         self.timeout = timeout
         self.gorulmus = set()
+        self.ugurlu = 0          # həqiqətən HTML qaytaran səhifələr
         self.formalar = []
         self.parametrli_url = []
 
@@ -50,8 +51,10 @@ class Crawler:
             cavablar = http_client.paralel_al(dalga, timeout=self.timeout)
             for url, cavab in cavablar.items():
                 self.gorulmus.add(url)
-                if not cavab or "text/html" not in cavab.headers.get("Content-Type", ""):
+                if cavab is None or cavab.status_code >= 400 or \
+                        "text/html" not in cavab.headers.get("Content-Type", ""):
                     continue
+                self.ugurlu += 1
                 corba = BeautifulSoup(cavab.text, "html.parser")
 
                 for form in corba.find_all("form"):
@@ -65,7 +68,7 @@ class Crawler:
                             self.parametrli_url.append(tam)
 
         return {
-            "sehifeler": len(self.gorulmus),
+            "sehifeler": self.ugurlu,
             "formalar": self.formalar,
             "parametrli_url": self.parametrli_url,
             "sehife_list": list(self.gorulmus),

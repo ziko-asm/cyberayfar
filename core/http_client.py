@@ -36,6 +36,12 @@ def cookie_qur(kukiler):
             pass
 
 
+def cookie_sil():
+    """Skan bitəndə giriş cookie-lərini sil — növbəti skana (başqa
+    istifadəçiyə) keçməsin."""
+    _sessiya.cookies.clear()
+
+
 def al(url, metod="GET", timeout=8, **kw):
     """Tək sorğu (rate-limit ilə). Bağlantı sıfırlanarsa 1 dəfə təkrar
     cəhd edir (500/reset cavablarını itirməmək üçün). Yenə alınmasa None."""

@@ -15,14 +15,58 @@ Müştəri bu tokeni yerləşdirə bilirsə, deməli saytın sahibidir.
 Bu, sənin SaytYoxla saytındakı "sahib təsdiqindən sonra" məntiqidir.
 """
 
+import re
+import socket
 import hashlib
+import ipaddress
 import requests
 import dns.resolver
 
 
 class IcazeXetasi(Exception):
-    """Sahiblik təsdiqlənmədikdə atılan xəta."""
-    pass
+    """Skan başlamazdan əvvəl atılan xəta.
+
+    kod:  "sahiblik"  — sahiblik təsdiqlənmədi (domen + token doludur)
+          "etibarsiz" — ünvan yanlışdır və ya daxili/qorunan ünvandır
+          "tapilmadi" — domen DNS-də tapılmadı
+    Mətn (str) CLI üçündür; veb interfeys `kod`-a görə öz dilində göstərir.
+    """
+
+    def __init__(self, mesaj, kod="sahiblik", domen="", token=""):
+        super().__init__(mesaj)
+        self.kod = kod
+        self.domen = domen
+        self.token = token
+
+
+_HOST_RE = re.compile(
+    r"^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z][a-z0-9-]{1,62}$")
+_QADAGAN_SONLUQ = (".localhost", ".local", ".internal", ".lan", ".home", ".corp")
+
+
+def hedefi_yoxla(domen: str) -> None:
+    """Sahiblik sorğusundan ƏVVƏL ünvanı yoxlayır (SSRF qoruması).
+
+    Yalnız açıq internetdəki adi domen adlarına icazə verir: IP ünvanı,
+    localhost, daxili şəbəkə adları və daxili IP-yə açılan domenlər rədd
+    edilir — skaner serverin öz daxili şəbəkəsinə sorğu göndərməsin.
+    """
+    host, _, port = domen.partition(":")
+    host = host.strip().lower().rstrip(".")
+    if port and not (port.isdigit() and 0 < int(port) < 65536):
+        raise IcazeXetasi(f"Yanlış ünvan: {domen}", kod="etibarsiz", domen=domen)
+    if not _HOST_RE.match(host) or host.endswith(_QADAGAN_SONLUQ):
+        raise IcazeXetasi(f"Yanlış və ya daxili ünvan: {domen}",
+                          kod="etibarsiz", domen=domen)
+    try:
+        unvanlar = {i[4][0] for i in socket.getaddrinfo(host, None)}
+    except (socket.gaierror, UnicodeError):
+        raise IcazeXetasi(f"Domen tapılmadı: {domen}", kod="tapilmadi", domen=domen)
+    for u in unvanlar:
+        ip = ipaddress.ip_address(u.split("%")[0])
+        if not ip.is_global:
+            raise IcazeXetasi(f"Daxili ünvana skan qadağandır: {domen}",
+                              kod="etibarsiz", domen=domen)
 
 
 def token_yarat(domen: str, gizli_acar: str) -> str:
@@ -81,6 +125,9 @@ def icazeni_tesdiqle(domen: str, gizli_acar: str, test_rejimi=False,
     if domen in allowlist:
         return token
 
+    # Kənar sorğudan əvvəl: yalnız açıq internetdəki adi domenlər
+    hedefi_yoxla(domen)
+
     if fayl_ile_yoxla(domen, token):
         print(f"  [✓] Sahiblik FAYL ilə təsdiqləndi: {domen}")
         return token
@@ -93,5 +140,6 @@ def icazeni_tesdiqle(domen: str, gizli_acar: str, test_rejimi=False,
         f"  Skan etmək üçün müştəri bunlardan birini etməlidir:\n"
         f"    • Fayl: https://{domen}/.well-known/skaner-verify.txt\n"
         f"      içinə yaz: {token}\n"
-        f"    • Və ya DNS TXT qeydi: skaner-verify={token}\n"
+        f"    • Və ya DNS TXT qeydi: skaner-verify={token}\n",
+        kod="sahiblik", domen=domen, token=token,
     )

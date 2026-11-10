@@ -5,6 +5,7 @@ MOTOR (Engine) v3 — 15 kateqoriya, paralel
 
 import os
 import sys
+import importlib.util
 from urllib.parse import urlparse
 
 from core import (authorization, crawler as crawler_modulu, reporter, diller,
@@ -16,7 +17,9 @@ from modullar import (sensitive_files, email_spoof, xss, sqli, headers, cors,
                       host_header, clickjacking, waf, idor, oob_checks, stored_xss,
                       ssti, crlf, nosql)
 
-GIZLI_ACAR = "DEYISDIR-MENI-uzun-tesadufi-acar"
+# Token açarı: canlıda SKANER_GIZLI_ACAR mühit dəyişəni ilə əvəz et
+# (dəyişəndə əvvəl verilmiş sahiblik tokenləri etibarsız olur).
+GIZLI_ACAR = os.environ.get("SKANER_GIZLI_ACAR") or "DEYISDIR-MENI-uzun-tesadufi-acar"
 
 PLATFORMA_DOMENLERI = (".vercel.app", ".netlify.app", ".github.io",
                        ".pages.dev", ".herokuapp.com", ".web.app",
@@ -54,54 +57,101 @@ KATEQORIYALAR = ("fayllar", "basliqlar", "email", "xss", "sqli", "cmd", "lfi",
                  "nosql", "waf")
 
 
+def hedefi_hazirla(hedef: str):
+    """Ünvanı normallaşdırır -> (tam_url, domen). Yalnız http/https."""
+    hedef = (hedef or "").strip()
+    hedef = hedef if "://" in hedef else "https://" + hedef
+    p = urlparse(hedef)
+    if p.scheme not in ("http", "https") or not p.hostname or "@" in p.netloc:
+        raise authorization.IcazeXetasi(f"Yanlış ünvan: {hedef}",
+                                        kod="etibarsiz", domen=p.netloc)
+    return hedef, p.netloc.lower()
+
+
+def icaze_yoxla(hedef: str, test_rejimi=True, allowlist=()):
+    """Skandan əvvəl ayrıca çağırıla bilən icazə yoxlaması (veb üçün:
+    xəta axın başlamazdan əvvəl düzgün HTTP statusu ilə qayıtsın)."""
+    hedef, domen = hedefi_hazirla(hedef)
+    authorization.icazeni_tesdiqle(domen, GIZLI_ACAR, test_rejimi=test_rejimi,
+                                   allowlist=allowlist)
+
+
 def skan_et(hedef: str, test_rejimi=True, maks_sehife=30, ilerleme=None,
-            allowlist=(), auth=None, oob_base=None):
+            allowlist=(), auth=None, oob_base=None, icaze_verilib=False):
+    try:
+        return _skan_et(hedef, test_rejimi, maks_sehife, ilerleme, allowlist,
+                        auth, oob_base, icaze_verilib)
+    finally:
+        # Giriş cookie-ləri növbəti skana (başqa istifadəçiyə) keçməsin
+        http_client.cookie_sil()
+
+
+def _skan_et(hedef, test_rejimi, maks_sehife, ilerleme, allowlist, auth,
+             oob_base, icaze_verilib):
     def bildir(addim):
         if ilerleme:
             ilerleme(addim)
 
-    hedef = hedef if "://" in hedef else "https://" + hedef
-    domen = urlparse(hedef).netloc
+    hedef, domen = hedefi_hazirla(hedef)
     platforma = domen.endswith(PLATFORMA_DOMENLERI)
     hesabat = reporter.Hesabat(hedef)
 
     # 1) İcazə
     bildir("icaze")
-    authorization.icazeni_tesdiqle(domen, GIZLI_ACAR, test_rejimi=test_rejimi,
-                                   allowlist=allowlist)
+    if not icaze_verilib:
+        authorization.icazeni_tesdiqle(domen, GIZLI_ACAR, test_rejimi=test_rejimi,
+                                       allowlist=allowlist)
 
     # 2) Crawl + texnologiya
+    girisli = bool(auth and auth.get("user") and auth.get("parol"))
+    if girisli:
+        bildir("login")
     bildir("crawl")
     # HEADLESS (əsl Chrome) ayrıca prosesdə — Playwright-in thread problemini
-    # həll edir. Alınmasa köhnə (requests) crawler-ə avtomatik keçir.
+    # həll edir. Playwright olmayan mühitdə (məs: Vercel) cəhd edilmir və
+    # köhnə (requests) crawler işləyir. Xətanın təfərrüatı yalnız server
+    # loquna yazılır — cavabda daxili yol/traceback GETMİR.
     netice, headless, headless_xeta, auth_edildi = None, False, None, False
-    try:
-        import subprocess
-        kok = os.path.dirname(os.path.abspath(__file__))
-        skript = os.path.join(kok, "core", "crawler_js.py")
-        env = dict(os.environ)
-        if auth and auth.get("user") and auth.get("parol"):
-            env["CYB_USER"] = str(auth["user"])
-            env["CYB_PASS"] = str(auth["parol"])
-            env["CYB_LOGIN_URL"] = str(auth.get("login_url") or hedef)
-        cp = subprocess.run(
-            [sys.executable, skript, hedef, str(min(maks_sehife, 15))],
-            capture_output=True, text=True, timeout=140, env=env)
-        if cp.returncode == 0 and cp.stdout.strip():
-            import json as _json
-            netice = _json.loads(cp.stdout)
-            headless = True
-            auth_edildi = bool(netice.get("auth_ok"))
-            if netice.get("cookies"):   # giriş sessiyasını bütün modullara ver
-                http_client.cookie_qur(netice["cookies"])
-        else:
-            headless_xeta = (cp.stderr or cp.stdout or f"rc={cp.returncode}").strip()[-400:]
-    except Exception as e:
-        headless_xeta = f"{type(e).__name__}: {e}"[-400:]
+    if importlib.util.find_spec("playwright") is None:
+        headless_xeta = "playwright_yoxdur"
+    else:
+        try:
+            import subprocess
+            kok = os.path.dirname(os.path.abspath(__file__))
+            skript = os.path.join(kok, "core", "crawler_js.py")
+            env = dict(os.environ)
+            if girisli:
+                env["CYB_USER"] = str(auth["user"])
+                env["CYB_PASS"] = str(auth["parol"])
+                env["CYB_LOGIN_URL"] = str(auth.get("login_url") or hedef)
+            cp = subprocess.run(
+                [sys.executable, skript, hedef, str(min(maks_sehife, 15))],
+                capture_output=True, text=True, timeout=140, env=env)
+            if cp.returncode == 0 and cp.stdout.strip():
+                import json as _json
+                netice = _json.loads(cp.stdout)
+                headless = True
+                auth_edildi = bool(netice.get("auth_ok"))
+                if netice.get("cookies"):   # giriş sessiyasını bütün modullara ver
+                    http_client.cookie_qur(netice["cookies"])
+            else:
+                headless_xeta = "headless_xetasi"
+                print("[headless] " + (cp.stderr or cp.stdout
+                                       or f"rc={cp.returncode}").strip()[-400:],
+                      file=sys.stderr)
+        except Exception as e:
+            headless_xeta = "headless_xetasi"
+            print(f"[headless] {type(e).__name__}: {e}"[-400:], file=sys.stderr)
     if not netice:
         netice = crawler_modulu.Crawler(hedef, maks_sehife=maks_sehife).gez()
     purl, formalar = netice["parametrli_url"], netice["formalar"]
     sehifeler_list = netice.get("sehife_list", [])
+
+    # Sayt həqiqətən oxuna bildimi? Ana səhifə cavab vermirsə və ya bizi
+    # bloklayırsa (403/429/5xx), "təmiz" demək YALAN olar -> natamam skan.
+    ana = http_client.al(hedef, timeout=10)
+    ana_status = ana.status_code if ana is not None else None
+    natamam = (ana is None or ana_status >= 400 or netice["sehifeler"] == 0)
 
     bildir("texnologiya")
     tech = tech_detect.askarla(hedef)
@@ -177,7 +227,10 @@ def skan_et(hedef: str, test_rejimi=True, maks_sehife=30, ilerleme=None,
     bal = reporter.xal_hesabla(hesabat.tapintilar)
     return {
         "hedef": hedef, "domen": domen,
-        "bal": bal, "qiymet": reporter.qiymet(bal),
+        # Natamam skanda bal/qiymət verilmir ("100/A" yanlış təəssürat yaradar)
+        "bal": None if natamam else bal,
+        "qiymet": "?" if natamam else reporter.qiymet(bal),
+        "natamam": natamam, "natamam_status": ana_status,
         "platforma_domeni": platforma, "texnologiya": tech,
         "headless": headless, "headless_xeta": headless_xeta,
         "auth_edildi": auth_edildi,

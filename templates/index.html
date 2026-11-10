@@ -3,14 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CYBERAYFAR SCANER</title>
+<title>CYBERAYFAR SCANNER — İcazəli veb zəiflik skaneri</title>
+<meta name="description" content="CYBERAYFAR — pulsuz, icazəli veb zəiflik skaneri (DAST). {{ yoxlama_sayi }} yoxlama növü: XSS, SQL Injection, təhlükəsizlik başlıqları, TLS və s. AZ / EN / RU.">
+<meta name="theme-color" content="#03050a">
+<link rel="canonical" href="{{ kok_url }}">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="CYBERAYFAR">
+<meta property="og:title" content="CYBERAYFAR SCANNER — İcazəli veb zəiflik skaneri">
+<meta property="og:description" content="Öz saytını {{ yoxlama_sayi }} yoxlama növü ilə pulsuz skan et: XSS, SQLi, başlıqlar, TLS və s.">
+<meta property="og:url" content="{{ kok_url }}">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="CYBERAYFAR SCANNER">
+<meta name="twitter:description" content="Pulsuz, icazəli veb zəiflik skaneri — {{ yoxlama_sayi }} yoxlama növü, 3 dil.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Share+Tech+Mono&family=VT323&display=swap" rel="stylesheet">
 <style>
   :root{
     --qara:#03050a; --panel:#0a0f17; --panel2:#0e141c; --kenar:#182534;
-    --neon:#00ff9c; --cyan:#00e5ff; --metn:#c8e6d8; --solgun:#5f7385;
+    --neon:#00ff9c; --cyan:#00e5ff; --metn:#c8e6d8; --solgun:#8fa3b5;
     --kritik:#ff2bd6; --yuksek:#ff3b5c; --orta:#ffb020; --asagi:#2f9bff; --info:#5f7385;
   }
   *{box-sizing:border-box;margin:0;padding:0}
@@ -144,7 +156,10 @@
 
   .icmal-bash,.yox-bash{font-family:'Orbitron',sans-serif;font-size:12px;letter-spacing:2px;color:var(--cyan);margin-bottom:14px;text-transform:uppercase}
   .giris-qutu{margin:-6px 0 14px}
-  .giris-ac{color:var(--cyan);font-size:13px;cursor:pointer;user-select:none;padding:6px 2px;letter-spacing:.5px}
+  .giris-ac{display:flex;align-items:flex-start;gap:8px;width:100%;background:none;border:0;text-align:left;font-family:inherit;
+    color:var(--cyan);font-size:13px;cursor:pointer;user-select:none;padding:10px 2px;letter-spacing:.5px;border-radius:6px}
+  .giris-ac #girisOx{flex-shrink:0}
+  .giris-qeyd{font-size:12px;color:var(--solgun);line-height:1.5;padding:2px 2px 0}
   .giris-ac:hover{color:var(--neon)}
   .giris-sahe{display:none;flex-direction:column;gap:8px;margin-top:8px}
   .giris-sahe.acik{display:flex}
@@ -159,7 +174,7 @@
   @keyframes donutGel{from{opacity:0;transform:scale(.7) rotate(-20deg)}to{opacity:1;transform:none}}
   .donut-merkez{font-family:'Orbitron',sans-serif;font-weight:800}
   .cip-sira{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-  .cip{font-size:12px;padding:5px 11px;border-radius:7px;color:#fff;font-weight:bold;letter-spacing:.5px;cursor:pointer;transition:.15s;user-select:none}
+  .cip{border:0;font-family:inherit;font-size:12px;padding:5px 11px;border-radius:7px;color:#fff;font-weight:bold;letter-spacing:.5px;cursor:pointer;transition:.15s;user-select:none}
   .cip:hover{transform:translateY(-2px);filter:brightness(1.1)}
   .cip.sol{opacity:.28}
   .bar{display:flex;height:14px;border-radius:7px;overflow:hidden;border:1px solid var(--kenar)}
@@ -174,9 +189,10 @@
   .yox-ad{flex:1}
   .yox-status{font-size:11px;letter-spacing:1px;padding:2px 10px;border-radius:999px}
   .yox-temiz .yox-ikon{color:var(--neon)} .yox-temiz .yox-status{color:var(--neon);border:1px solid var(--neon)}
+  .yox-namelum .yox-ikon{color:var(--orta)} .yox-namelum .yox-status{color:var(--orta);border:1px solid var(--orta)}
   .yox-zeif .yox-ikon{color:var(--yuksek)} .yox-zeif .yox-status{color:var(--yuksek);border:1px solid var(--yuksek)}
 
-  .filtr-info{font-size:12px;color:var(--cyan);margin-bottom:10px;display:none;cursor:pointer}
+  .filtr-info{background:none;border:0;padding:4px 0;font-family:inherit;text-align:left;font-size:12px;color:var(--cyan);margin-bottom:10px;display:none;cursor:pointer}
   .tapinti{background:var(--panel);border:1px solid var(--kenar);border-left-width:4px;border-radius:10px;padding:15px 17px;margin-bottom:11px;animation:ac .45s ease both;transition:transform .15s,box-shadow .15s}
   .tapinti:hover{transform:translateX(3px)}
   .tapinti.kritik:hover{box-shadow:-4px 0 18px rgba(255,43,214,.3)}
@@ -197,8 +213,19 @@
   .info{border-left-color:var(--info)} .info .nisan{background:var(--info);color:#fff}
   .temiz-msg{text-align:center;padding:30px;color:var(--neon);font-size:16px;text-shadow:0 0 12px rgba(0,255,156,.4)}
   .xeta{display:none;background:rgba(255,59,92,.08);border:1px solid var(--yuksek);border-radius:10px;padding:15px;color:#ff8ea0;white-space:pre-wrap;margin-bottom:16px}
+  .xeberdarliq{display:none;margin-top:16px;background:rgba(255,176,32,.08);border:1px solid var(--orta);border-radius:10px;
+    padding:13px 15px;color:#ffd08a;font-size:13px;line-height:1.55}
+  .qeyd-chip{color:var(--solgun);border-style:dashed;cursor:help}
+  /* Klaviatura fokusu həmişə görünsün */
+  button:focus-visible,a:focus-visible,.giris-sahe input:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
   footer{text-align:center;color:var(--solgun);font-size:12px;padding:30px 0;letter-spacing:1px}
 
+  /* Hərəkəti azalt seçimi: animasiyalar və fon effektləri sönür */
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation:none!important;transition:none!important}
+    html{scroll-behavior:auto}
+    #matrix,.crt{display:none}
+  }
   @media print{
     #matrix,.crt,body::before,#boot,.diller,.axtaris,.stats,.tagline,.terminal,.eylemler,footer,.tablar,.term-bar,.giris-qutu{display:none!important}
     .term-pencere{border:0;box-shadow:none}
@@ -237,6 +264,7 @@
     .tapinti{padding:13px 14px}
     .cip-sira{justify-content:center}
     #bootMetn{font-size:16px}
+    .diller button{min-width:44px;min-height:44px}
   }
   /* ===== KİÇİK / köhnə telefon (iPhone SE, ~320px) ===== */
   @media(max-width:380px){
@@ -246,7 +274,6 @@
     .tagline{font-size:12px}
     .stat{padding:9px 4px}
     .stat .num{font-size:17px}.stat .lab{font-size:9px}
-    .diller button{padding:4px 8px;font-size:11px}
     .prompt{font-size:13px}
     .axtaris input{font-size:16px}
     .xulase-metn h2{font-size:14px}
@@ -260,15 +287,15 @@
 <canvas id="matrix"></canvas>
 
 <div class="konteyner">
-  <div class="diller">
-    <button data-dil="az" class="aktiv" onclick="dilDeyis('az')">AZ</button>
-    <button data-dil="en" onclick="dilDeyis('en')">EN</button>
-    <button data-dil="ru" onclick="dilDeyis('ru')">RU</button>
+  <div class="diller" role="group" aria-label="Dil seçimi">
+    <button type="button" data-dil="az" class="aktiv" aria-pressed="true" lang="az" title="Azərbaycanca">AZ</button>
+    <button type="button" data-dil="en" aria-pressed="false" lang="en" title="English">EN</button>
+    <button type="button" data-dil="ru" aria-pressed="false" lang="ru" title="Русский">RU</button>
   </div>
 
   <header>
     <div class="logo">
-      <svg width="54" height="54" viewBox="0 0 48 48" fill="none">
+      <svg width="54" height="54" viewBox="0 0 48 48" fill="none" aria-hidden="true">
         <path d="M24 3L6 10v12c0 11 7.6 18.9 18 23 10.4-4.1 18-12 18-23V10L24 3z" stroke="#00ff9c" stroke-width="2.5" fill="rgba(0,255,156,.06)"/>
         <path d="M16 24l6 6 10-12" stroke="#00ff9c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
@@ -278,7 +305,7 @@
   </header>
 
   <div class="stats">
-    <div class="stat"><div class="num" data-hedef="24" id="st1">0</div><div class="lab" id="stLab1">Yoxlama növü</div></div>
+    <div class="stat"><div class="num" data-hedef="{{ yoxlama_sayi }}" id="st1">0</div><div class="lab" id="stLab1">Yoxlama növü</div></div>
     <div class="stat"><div class="num" data-hedef="3" id="st2">0</div><div class="lab" id="stLab2">Dil</div></div>
     <div class="stat"><div class="num" data-hedef="100" data-son="%" id="st3">0</div><div class="lab" id="stLab3">Pulsuz</div></div>
   </div>
@@ -286,22 +313,23 @@
   <div class="axtaris">
     <div class="input-sarma">
       <span class="prompt"><span class="p-uzun">root@cyberayfar:~#</span><span class="p-qisa">~#</span></span>
-      <input id="hedef" type="text" inputmode="url" placeholder="domen.com" value="saytyoxla.vercel.app" autocomplete="off">
+      <input id="hedef" type="text" inputmode="url" placeholder="domen.com" value="saytyoxla.vercel.app" autocomplete="off" autocapitalize="none" spellcheck="false" aria-label="Skan ediləcək sayt ünvanı">
     </div>
-    <button id="skanBtn" onclick="skanBasla()">⚡ SKAN ET</button>
+    <button type="button" id="skanBtn">⚡ SKAN ET</button>
   </div>
 
   <div class="giris-qutu">
-    <div class="giris-ac" onclick="girisToggle()"><span id="girisBash">🔐 Giriş (ixtiyari — autentifikasiyalı skan)</span> <span id="girisOx">▾</span></div>
+    <button type="button" class="giris-ac" id="girisAc" aria-expanded="false" aria-controls="girisSahe"><span id="girisBash">🔐 Giriş (ixtiyari — autentifikasiyalı skan)</span><span id="girisOx" aria-hidden="true">▾</span></button>
     <div class="giris-sahe" id="girisSahe">
-      <input id="loginUrl" type="text" placeholder="Giriş səhifəsi URL (ixtiyari)" autocomplete="off">
-      <input id="istifadeci" type="text" placeholder="İstifadəçi / Email" autocomplete="off">
-      <input id="parol" type="password" placeholder="Parol" autocomplete="off">
+      <input id="loginUrl" type="text" inputmode="url" placeholder="Giriş səhifəsi URL (ixtiyari)" aria-label="Giriş səhifəsi URL (ixtiyari)" autocomplete="off" autocapitalize="none" spellcheck="false">
+      <input id="istifadeci" type="text" placeholder="İstifadəçi / Email" aria-label="İstifadəçi / Email" autocomplete="off" autocapitalize="none" spellcheck="false">
+      <input id="parol" type="password" placeholder="Parol" aria-label="Parol" autocomplete="off">
+      <p class="giris-qeyd" id="girisQeyd"></p>
     </div>
   </div>
 
-  <div class="xeta" id="xeta"></div>
-  <div class="terminal" id="terminal"></div>
+  <div class="xeta" id="xeta" role="alert"></div>
+  <div class="terminal" id="terminal" role="log" aria-live="polite"></div>
 
   <div class="netice" id="netice">
     <div class="term-pencere">
@@ -309,16 +337,16 @@
         <span class="term-dots"><i></i><i></i><i></i></span>
         <span class="term-title" id="termTitle">scan_results</span>
       </div>
-      <div class="tablar">
-        <button class="tab aktiv" data-tab="xulase" onclick="tabKec('xulase')" id="tabXulase">Xülasə</button>
-        <button class="tab" data-tab="tapintilar" onclick="tabKec('tapintilar')" id="tabTapintilar">Tapıntılar</button>
-        <button class="tab" data-tab="yoxlamalar" onclick="tabKec('yoxlamalar')" id="tabYoxlamalar">Yoxlamalar</button>
+      <div class="tablar" role="tablist">
+        <button type="button" role="tab" aria-selected="true" class="tab aktiv" data-tab="xulase" id="tabXulase">Xülasə</button>
+        <button type="button" role="tab" aria-selected="false" class="tab" data-tab="tapintilar" id="tabTapintilar">Tapıntılar</button>
+        <button type="button" role="tab" aria-selected="false" class="tab" data-tab="yoxlamalar" id="tabYoxlamalar">Yoxlamalar</button>
       </div>
 
       <div class="tab-pane acik" id="paneXulase">
         <div class="xulase">
           <div class="bal-qutu">
-            <svg class="bal-ring" width="108" height="108" viewBox="0 0 108 108">
+            <svg class="bal-ring" aria-hidden="true" width="108" height="108" viewBox="0 0 108 108">
               <circle cx="54" cy="54" r="48" fill="none" stroke="#182534" stroke-width="7"/>
               <circle id="balArc" cx="54" cy="54" r="48" fill="none" stroke="#00ff9c" stroke-width="7"
                       stroke-linecap="round" transform="rotate(-90 54 54)"
@@ -328,6 +356,7 @@
           </div>
           <div class="xulase-metn"><h2 id="xHedef"></h2><div class="stat-x" id="xStat"></div><div id="xTech"></div></div>
         </div>
+        <div class="xeberdarliq" id="xeberdarliq" role="status"></div>
         <div class="bolme-ayri">
           <div class="icmal-bash" id="icmalBash">İcmal</div>
           <div class="icmal-ust">
@@ -340,13 +369,13 @@
           <div id="owaspListe"></div>
         </div>
         <div class="eylemler">
-          <button onclick="jsonYukle()" id="btnJson">⬇ JSON yüklə</button>
-          <button onclick="window.print()" id="btnPdf">🖨 PDF / Çap</button>
+          <button type="button" id="btnJson">⬇ JSON yüklə</button>
+          <button type="button" id="btnPdf">🖨 PDF / Çap</button>
         </div>
       </div>
 
       <div class="tab-pane" id="paneTapintilar">
-        <div class="filtr-info" id="filtrInfo" onclick="filterEt(null)"></div>
+        <button type="button" class="filtr-info" id="filtrInfo"></button>
         <div id="tapintilar"></div>
       </div>
 
@@ -360,15 +389,29 @@
   <footer id="footer">⚖️ Yalnız öz saytlarını və ya icazəli saytları skan et.</footer>
 </div>
 
-<script>
+<script nonce="{{ nonce }}">
+const SAY={{ yoxlama_sayi }};   // yoxlama növlərinin sayı — serverdən (tək mənbə)
 const UI = {
   az:{altbashlik:"İcazəli Veb Zəiflik Skaneri",skan:"⚡ SKAN ET",skan_edilir:"SKAN EDİLİR...",
     footer:"⚖️ Yalnız öz saytlarını və ya icazəli saytları skan et.",qiymet:"QİYMƏT",
     netice:"nəticə",sehife:"səhifə",forma:"forma",icmal:"İcmal",
     yoxlamalar:"Aparılan Yoxlamalar",temiz:"TƏMİZ",zeif:"ZƏİF",tapildi_yox:"✓ Heç bir açıq zəiflik tapılmadı!",
     hell:"Həll",json:"⬇ JSON yüklə",pdf:"🖨 PDF / Çap",xeta_qosulma:"Serverə qoşulma xətası",filtr_temizle:"filtri təmizlə",authli:"Girişli skan",giris:"🔐 Giriş (ixtiyari — autentifikasiyalı skan)",tab_xulase:"Xülasə",tab_tapintilar:"Tapıntılar",tab_yoxlamalar:"Yoxlamalar",
+    ph_login:"Giriş səhifəsi URL (ixtiyari)",ph_user:"İstifadəçi / Email",ph_parol:"Parol",
+    giris_qeyd:"🔒 Giriş məlumatı yalnız bu skan üçün istifadə olunur — serverdə saxlanılmır.",
+    lbl_hedef:"Skan ediləcək sayt ünvanı",lbl_dil:"Dil seçimi",
+    xeta_bos:"Sayt ünvanı boşdur.",
+    xeta_etibarsiz:"Ünvan yanlışdır və ya daxili şəbəkə ünvanıdır. Açıq internetdəki domen yaz (məs: sayt.az).",
+    xeta_tapilmadi:"Bu domen tapılmadı (DNS). Ünvanı yoxla.",
+    xeta_skan:"Skan zamanı xəta baş verdi. Bir az sonra yenidən cəhd et.",
+    xeta_sorgu:"Yanlış sorğu.",
+    xeta_sahiblik:"✗ «{domen}» üçün sahiblik təsdiqlənmədi — skan başlamadı.\n\nBu saytı skan etmək üçün sahibi olduğunu təsdiqlə (ikisindən biri):\n\n1) Fayl: https://{domen}/.well-known/skaner-verify.txt\n   içinə yaz: {token}\n\n2) DNS TXT qeydi: skaner-verify={token}",
+    natamam:"⚠ Skan natamamdır: sayt skanerə cavab vermədi və ya onu blokladı ({status}). Yoxlamaların çoxu aparıla bilmədi, ona görə bal verilmir. Bir neçə dəqiqə sonra yenidən cəhd et və ya WAF-da skanerə icazə ver.",
+    natamam_qisa:"⚠ Skan natamamdır — nəticə etibarlı deyil.",
+    cavab_yox:"cavab yoxdur",namelum:"NAMƏLUM",
+    statik:"Statik crawl",statik_izah:"JavaScript render edilmədi: yalnız serverdən gələn HTML gəzildi. JS ilə qurulan səhifələr (React/Vue) tam görünməyə bilər.",
     st:["Yoxlama növü","Dil","Pulsuz"],
-    tag:["SQL Injection aşkarlanır...","XSS ovlanır...","15 hücum vektoru yoxlanılır...","Tap. Düzəlt. Qoru."],
+    tag:["SQL Injection aşkarlanır...","XSS ovlanır...",SAY+" yoxlama növü işə salınır...","Tap. Düzəlt. Qoru."],
     kat:{fayllar:"Həssas Fayllar",basliqlar:"Təhlükəsizlik Başlıqları",email:"Email / Spoofing",xss:"XSS",sqli:"SQL Injection",cmd:"Command Injection",lfi:"LFI / Path Traversal",redirect:"Open Redirect",cors:"CORS",kohne_js:"Köhnə JS Kitabxanalar",csrf:"CSRF",yollar:"Gizli Yollar",metodlar:"HTTP Metodları",mixed:"Mixed Content",subdomain:"Subdomenlər",sirr:"Sirr Sızması",tls:"TLS/SSL",clickjacking:"Clickjacking",graphql:"GraphQL",host:"Host Header",ssrf:"SSRF",xxe:"XXE",idor:"IDOR",ssti:"SSTI (Şablon)",crlf:"CRLF Injection",nosql:"NoSQL Injection",waf:"WAF"},
     addim:{icaze:"İcazə yoxlanılır",login:"Giriş edilir (login)",crawl:"Sayt gəzilir (crawl)",texnologiya:"Texnologiya aşkarlanır",fayllar:"Həssas fayllar yoxlanılır",basliqlar:"Təhlükəsizlik başlıqları yoxlanılır",cors:"CORS yoxlanılır",kohne_js:"Köhnə JS kitabxanalar yoxlanılır",spoofing:"Domain spoofing yoxlanılır",xss:"XSS sınanılır",sqli:"SQL Injection sınanılır",redirect:"Open Redirect sınanılır",cmd:"Command Injection sınanılır",lfi:"LFI sınanılır",csrf:"CSRF yoxlanılır",metodlar:"HTTP metodları yoxlanılır",mixed:"Mixed content yoxlanılır",yollar:"Gizli yollar yoxlanılır",subdomain:"Subdomenlər axtarılır",sirr:"Sirr/API-açar sızması yoxlanılır",tls:"TLS/SSL analiz edilir",clickjacking:"Clickjacking yoxlanılır",graphql:"GraphQL introspection yoxlanılır",host:"Host Header yoxlanılır",ssrf:"SSRF sınanılır",xxe:"XXE sınanılır",idor:"IDOR yoxlanılır",oob:"Blind/OOB zəifliklər (callback)",stored:"Stored XSS yoxlanılır",ssti:"SSTI (şablon injection) sınanılır",crlf:"CRLF injection yoxlanılır",nosql:"NoSQL injection sınanılır",waf:"WAF aşkarlanır",bitdi:"Skan tamamlandı"},
     nisan:{kritik:"KRİTİK",yuksek:"YÜKSEK",orta:"ORTA",asagi:"AŞAĞI",info:"MƏLUMAT"}},
@@ -377,8 +420,21 @@ const UI = {
     netice:"findings",sehife:"pages",forma:"forms",icmal:"Summary",
     yoxlamalar:"Checks Performed",temiz:"CLEAN",zeif:"WEAK",tapildi_yox:"✓ No open vulnerabilities found!",
     hell:"Fix",json:"⬇ Download JSON",pdf:"🖨 PDF / Print",xeta_qosulma:"Server connection error",filtr_temizle:"clear filter",authli:"Authenticated",giris:"🔐 Login (optional — authenticated scan)",tab_xulase:"Summary",tab_tapintilar:"Findings",tab_yoxlamalar:"Checks",
+    ph_login:"Login page URL (optional)",ph_user:"Username / Email",ph_parol:"Password",
+    giris_qeyd:"🔒 Credentials are used for this scan only — they are not stored on the server.",
+    lbl_hedef:"Site address to scan",lbl_dil:"Language",
+    xeta_bos:"The site address is empty.",
+    xeta_etibarsiz:"The address is invalid or points to an internal network. Enter a public domain (e.g. example.com).",
+    xeta_tapilmadi:"This domain was not found (DNS). Check the address.",
+    xeta_skan:"The scan failed. Please try again in a moment.",
+    xeta_sorgu:"Bad request.",
+    xeta_sahiblik:"✗ Ownership of “{domen}” is not verified — the scan did not start.\n\nTo scan this site, prove you own it (either one):\n\n1) File: https://{domen}/.well-known/skaner-verify.txt\n   containing: {token}\n\n2) DNS TXT record: skaner-verify={token}",
+    natamam:"⚠ Scan incomplete: the site did not respond to the scanner or blocked it ({status}). Most checks could not run, so no score is given. Try again in a few minutes or allow the scanner in your WAF.",
+    natamam_qisa:"⚠ Scan incomplete — the result is not reliable.",
+    cavab_yox:"no response",namelum:"UNKNOWN",
+    statik:"Static crawl",statik_izah:"JavaScript was not rendered: only server-sent HTML was crawled. Pages built with JS (React/Vue) may be only partly covered.",
     st:["Scan types","Languages","Free"],
-    tag:["Detecting SQL Injection...","Hunting XSS...","15 attack vectors scanned...","Find. Fix. Secure."],
+    tag:["Detecting SQL Injection...","Hunting XSS...",SAY+" scan types, one click...","Find. Fix. Secure."],
     kat:{fayllar:"Sensitive Files",basliqlar:"Security Headers",email:"Email / Spoofing",xss:"XSS",sqli:"SQL Injection",cmd:"Command Injection",lfi:"LFI / Path Traversal",redirect:"Open Redirect",cors:"CORS",kohne_js:"Outdated JS Libraries",csrf:"CSRF",yollar:"Hidden Paths",metodlar:"HTTP Methods",mixed:"Mixed Content",subdomain:"Subdomains",sirr:"Secret Leaks",tls:"TLS/SSL",clickjacking:"Clickjacking",graphql:"GraphQL",host:"Host Header",ssrf:"SSRF",xxe:"XXE",idor:"IDOR",ssti:"SSTI (Template)",crlf:"CRLF Injection",nosql:"NoSQL Injection",waf:"WAF"},
     addim:{icaze:"Checking authorization",login:"Logging in",crawl:"Crawling site",texnologiya:"Detecting technology",fayllar:"Checking sensitive files",basliqlar:"Checking security headers",cors:"Checking CORS",kohne_js:"Checking outdated JS",spoofing:"Checking domain spoofing",xss:"Testing XSS",sqli:"Testing SQL Injection",redirect:"Testing Open Redirect",cmd:"Testing Command Injection",lfi:"Testing LFI",csrf:"Checking CSRF",metodlar:"Checking HTTP methods",mixed:"Checking mixed content",yollar:"Checking hidden paths",subdomain:"Enumerating subdomains",sirr:"Checking secret leaks",tls:"Analyzing TLS/SSL",clickjacking:"Checking clickjacking",graphql:"Checking GraphQL introspection",host:"Testing Host Header Injection",ssrf:"Testing SSRF",xxe:"Testing XXE",idor:"Testing IDOR",oob:"Blind/OOB vulns (callback)",stored:"Testing Stored XSS",ssti:"Testing SSTI (template injection)",crlf:"Testing CRLF injection",nosql:"Testing NoSQL injection",waf:"Detecting WAF",bitdi:"Scan complete"},
     nisan:{kritik:"CRITICAL",yuksek:"HIGH",orta:"MEDIUM",asagi:"LOW",info:"INFO"}},
@@ -387,159 +443,229 @@ const UI = {
     netice:"результатов",sehife:"страниц",forma:"форм",icmal:"Сводка",
     yoxlamalar:"Выполненные проверки",temiz:"ЧИСТО",zeif:"СЛАБО",tapildi_yox:"✓ Открытых уязвимостей не найдено!",
     hell:"Решение",json:"⬇ Скачать JSON",pdf:"🖨 PDF / Печать",xeta_qosulma:"Ошибка подключения к серверу",filtr_temizle:"сбросить фильтр",authli:"С авторизацией",giris:"🔐 Вход (необязательно — скан с авторизацией)",tab_xulase:"Сводка",tab_tapintilar:"Результаты",tab_yoxlamalar:"Проверки",
+    ph_login:"URL страницы входа (необязательно)",ph_user:"Логин / Email",ph_parol:"Пароль",
+    giris_qeyd:"🔒 Данные для входа используются только для этого скана — на сервере не сохраняются.",
+    lbl_hedef:"Адрес сайта для сканирования",lbl_dil:"Выбор языка",
+    xeta_bos:"Адрес сайта пуст.",
+    xeta_etibarsiz:"Адрес неверный или ведёт во внутреннюю сеть. Укажите публичный домен (напр. example.com).",
+    xeta_tapilmadi:"Домен не найден (DNS). Проверьте адрес.",
+    xeta_skan:"Ошибка сканирования. Попробуйте ещё раз чуть позже.",
+    xeta_sorgu:"Неверный запрос.",
+    xeta_sahiblik:"✗ Право владения «{domen}» не подтверждено — сканирование не начато.\n\nЧтобы сканировать этот сайт, подтвердите владение (любым способом):\n\n1) Файл: https://{domen}/.well-known/skaner-verify.txt\n   с содержимым: {token}\n\n2) DNS TXT-запись: skaner-verify={token}",
+    natamam:"⚠ Сканирование неполное: сайт не ответил сканеру или заблокировал его ({status}). Большинство проверок не выполнено, поэтому оценка не выставляется. Повторите через несколько минут или разрешите сканер в WAF.",
+    natamam_qisa:"⚠ Сканирование неполное — результат ненадёжен.",
+    cavab_yox:"нет ответа",namelum:"НЕИЗВЕСТНО",
+    statik:"Статический обход",statik_izah:"JavaScript не выполнялся: обойдён только HTML с сервера. Страницы на JS (React/Vue) могут быть охвачены не полностью.",
     st:["Проверок","Языков","Бесплатно"],
-    tag:["Обнаружение SQL-инъекций...","Охота на XSS...","15 векторов атак...","Найти. Исправить. Защитить."],
+    tag:["Обнаружение SQL-инъекций...","Охота на XSS...",SAY+" видов проверок...","Найти. Исправить. Защитить."],
     kat:{fayllar:"Чувствительные файлы",basliqlar:"Заголовки безопасности",email:"Email / Spoofing",xss:"XSS",sqli:"SQL-инъекция",cmd:"Command Injection",lfi:"LFI / Path Traversal",redirect:"Open Redirect",cors:"CORS",kohne_js:"Устаревшие JS-библиотеки",csrf:"CSRF",yollar:"Скрытые пути",metodlar:"HTTP-методы",mixed:"Mixed Content",subdomain:"Поддомены",sirr:"Утечки секретов",tls:"TLS/SSL",clickjacking:"Clickjacking",graphql:"GraphQL",host:"Host Header",ssrf:"SSRF",xxe:"XXE",idor:"IDOR",ssti:"SSTI (Шаблон)",crlf:"CRLF Injection",nosql:"NoSQL Injection",waf:"WAF"},
     addim:{icaze:"Проверка авторизации",login:"Вход в систему",crawl:"Обход сайта",texnologiya:"Определение технологий",fayllar:"Проверка файлов",basliqlar:"Проверка заголовков",cors:"Проверка CORS",kohne_js:"Проверка устаревших JS",spoofing:"Проверка domain spoofing",xss:"Проверка XSS",sqli:"Проверка SQL-инъекций",redirect:"Проверка Open Redirect",cmd:"Проверка Command Injection",lfi:"Проверка LFI",csrf:"Проверка CSRF",metodlar:"Проверка HTTP-методов",mixed:"Проверка mixed content",yollar:"Проверка скрытых путей",subdomain:"Поиск поддоменов",sirr:"Проверка утечек секретов",tls:"Анализ TLS/SSL",clickjacking:"Проверка clickjacking",graphql:"Проверка GraphQL introspection",host:"Проверка Host Header Injection",ssrf:"Проверка SSRF",xxe:"Проверка XXE",idor:"Проверка IDOR",oob:"Blind/OOB (callback)",stored:"Проверка Stored XSS",ssti:"Проверка SSTI (внедрение в шаблон)",crlf:"Проверка CRLF-инъекции",nosql:"Проверка NoSQL-инъекции",waf:"Обнаружение WAF",bitdi:"Сканирование завершено"},
     nisan:{kritik:"КРИТИЧНО",yuksek:"ВЫСОКО",orta:"СРЕДНЕ",asagi:"НИЗКО",info:"ИНФО"}}
 };
 const RENG={kritik:'#ff2bd6',yuksek:'#ff3b5c',orta:'#ffb020',asagi:'#2f9bff',info:'#5f7385'};
-let dil='az', sonNetice=null, simTimer=null, aktivFiltr=null, twTimer=null;
+const DILLER=['az','en','ru'];
+let dil='az', sonNetice=null, sonXeta=null, aktivFiltr=null, twTimer=null, skanGedir=false;
+const $=id=>document.getElementById(id);
+const AZ_HEREKET=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Serverdən/hədəf saytdan gələn HƏR mətn HTML-ə yazılmazdan əvvəl buradan keçir
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+function xetaMetni(x){
+  const t=UI[dil];
+  if(x.kod==='sahiblik'&&x.token) return t.xeta_sahiblik.replace(/\{domen\}/g,x.domen||'').replace(/\{token\}/g,x.token);
+  if(x.kod==='qosulma') return t.xeta_qosulma+(x.elave?': '+x.elave:'');
+  return t['xeta_'+x.kod]||t.xeta_skan;
+}
+function xetaRender(){
+  const el=$('xeta');
+  if(!sonXeta){el.style.display='none';el.textContent='';return;}
+  el.textContent=xetaMetni(sonXeta); el.style.display='block';
+}
 
 function dilDeyis(y){
+  if(!UI[y])y='az';
   dil=y;
-  document.querySelectorAll('.diller button').forEach(b=>b.classList.toggle('aktiv',b.dataset.dil===y));
+  try{localStorage.setItem('cyb_dil',y);}catch(e){}
+  document.querySelectorAll('.diller button').forEach(b=>{const a=b.dataset.dil===y;b.classList.toggle('aktiv',a);b.setAttribute('aria-pressed',a);});
   document.documentElement.lang=y;
   const t=UI[y];
-  document.getElementById('skanBtn').textContent=t.skan;
-  document.getElementById('footer').textContent=t.footer;
-  document.getElementById('yoxBash').textContent=t.yoxlamalar;
-  document.getElementById('icmalBash').textContent=t.icmal;
-  document.getElementById('btnJson').textContent=t.json;
-  document.getElementById('btnPdf').textContent=t.pdf;
-  document.getElementById('stLab1').textContent=t.st[0];
-  document.getElementById('stLab2').textContent=t.st[1];
-  document.getElementById('stLab3').textContent=t.st[2];
-  document.getElementById('girisBash').textContent=t.giris;
+  if(!skanGedir)$('skanBtn').textContent=t.skan;
+  $('footer').textContent=t.footer;
+  $('yoxBash').textContent=t.yoxlamalar;
+  $('icmalBash').textContent=t.icmal;
+  $('btnJson').textContent=t.json;
+  $('btnPdf').textContent=t.pdf;
+  $('stLab1').textContent=t.st[0];
+  $('stLab2').textContent=t.st[1];
+  $('stLab3').textContent=t.st[2];
+  $('girisBash').textContent=t.giris;
+  $('girisQeyd').textContent=t.giris_qeyd;
+  $('hedef').setAttribute('aria-label',t.lbl_hedef);
+  [['loginUrl',t.ph_login],['istifadeci',t.ph_user],['parol',t.ph_parol]].forEach(([id,m])=>{$(id).placeholder=m;$(id).setAttribute('aria-label',m);});
+  document.querySelector('.diller').setAttribute('aria-label',t.lbl_dil);
   typewriterBasla();
+  xetaRender();
   if(sonNetice) neticeGoster(sonNetice);
 }
 
-// ============ SKAN (SSE + POST ehtiyat) ============
-function skanBasla(){
-  const hedef=document.getElementById('hedef').value.trim(); if(!hedef) return;
-  const btn=document.getElementById('skanBtn'),term=document.getElementById('terminal'),
-    netice=document.getElementById('netice'),xeta=document.getElementById('xeta');
-  sonNetice=null; xeta.style.display='none'; netice.style.display='none';
+// ============ SKAN (POST + axın: real irəliləmə, parol URL-də getmir) ============
+async function skanBasla(){
+  const hedef=$('hedef').value.trim();
+  if(!hedef){$('hedef').focus();return;}
+  if(skanGedir)return;
+  const btn=$('skanBtn'),term=$('terminal');
+  skanGedir=true; sonNetice=null; sonXeta=null; xetaRender(); $('netice').style.display='none';
   term.style.display='block'; term.innerHTML=''; btn.disabled=true; btn.textContent=UI[dil].skan_edilir;
-  if(simTimer){clearInterval(simTimer);simTimer=null;}
-  let addimlar=[], tamamlandi=false;
+  let addimlar=[], bitdi=false;
   function termRender(){
     term.innerHTML=addimlar.map((a,i)=>{const son=i===addimlar.length-1;
       const cls=a.bitdi?'bitdi':(son?'isliyir':'bitdi'); const ikon=a.bitdi?'✓':(son?'▶':'✓');
       const k=(son&&!a.bitdi)?'<span class="kursor"></span>':'';
-      return `<div class="setir ${cls}"><span class="yan">[${ikon}]</span> ${UI[dil].addim[a.kod]||a.kod} ${k}</div>`;}).join('');
+      return `<div class="setir ${cls}"><span class="yan">[${ikon}]</span> ${esc(UI[dil].addim[a.kod]||a.kod)} ${k}</div>`;}).join('');
     term.scrollTop=term.scrollHeight;
   }
-  function bitir(){btn.disabled=false;btn.textContent=UI[dil].skan;if(simTimer){clearInterval(simTimer);simTimer=null;}}
-  function xetaGoster(m){tamamlandi=true;bitir();term.style.display='none';xeta.textContent=m;xeta.style.display='block';}
-  function neticeHazir(d){tamamlandi=true;bitir();addimlar.forEach(a=>a.bitdi=true);termRender();sonNetice=d;neticeGoster(d);}
-  const auser=(document.getElementById('istifadeci').value||'').trim();
-  const apass=document.getElementById('parol').value||'';
-  const aurl=(document.getElementById('loginUrl').value||'').trim();
-  const authData=(auser&&apass)?{istifadeci:auser,parol:apass,login_url:aurl}:null;
-
-  function postFallback(){
-    const sim=authData?['icaze','crawl','login','xss','sqli','cmd','lfi','sirr']:['icaze','crawl','texnologiya','fayllar','basliqlar','spoofing','xss','sqli','cmd','lfi'];
-    let i=0;addimlar=[];
-    simTimer=setInterval(()=>{if(i<sim.length){if(addimlar.length)addimlar[addimlar.length-1].bitdi=true;addimlar.push({kod:sim[i],bitdi:false});termRender();i++;}},700);
-    fetch('/api/skan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({hedef},authData||{}))})
-      .then(r=>r.json()).then(d=>{if(d.xeta)xetaGoster(d.xeta);else neticeHazir(d);})
-      .catch(e=>xetaGoster(UI[dil].xeta_qosulma+': '+e.message));
+  function bitir(){bitdi=true;skanGedir=false;btn.disabled=false;btn.textContent=UI[dil].skan;term.style.display='none';}
+  function xetaGoster(x){bitir();sonXeta=x;xetaRender();$('xeta').scrollIntoView({block:'nearest'});}
+  function neticeHazir(d){bitir();sonNetice=d;neticeGoster(d);$('netice').scrollIntoView({block:'start'});}
+  const xetaObyekti=d=>({kod:d.xeta_kod||'skan',domen:d.domen,token:d.token});
+  function hadise(d){
+    if(d.tip==='ilerleme'){
+      if(d.addim==='bitdi')return;
+      if(addimlar.length)addimlar[addimlar.length-1].bitdi=true;
+      addimlar.push({kod:d.addim,bitdi:false});termRender();
+    }
+    else if(d.tip==='netice')neticeHazir(d.data);
+    else if(d.tip==='xeta')xetaGoster(xetaObyekti(d));
   }
 
-  // Autentifikasiyalı skan: parol GET-də getməsin -> birbaşa POST
-  if(authData){ postFallback(); return; }
+  const govde={hedef};
+  const auser=$('istifadeci').value.trim(), apass=$('parol').value;
+  if(auser&&apass)Object.assign(govde,{istifadeci:auser,parol:apass,login_url:$('loginUrl').value.trim()});
 
-  const es=new EventSource('/api/skan-stream?hedef='+encodeURIComponent(hedef));
-  es.onmessage=(ev)=>{const d=JSON.parse(ev.data);
-    if(d.tip==='ilerleme'){if(d.addim==='bitdi')return;if(addimlar.length)addimlar[addimlar.length-1].bitdi=true;addimlar.push({kod:d.addim,bitdi:false});termRender();}
-    else if(d.tip==='netice'){es.close();neticeHazir(d.data);}
-    else if(d.tip==='xeta'){es.close();xetaGoster(d.mesaj);}};
-  es.onerror=()=>{es.close();if(tamamlandi)return;addimlar=[];termRender();postFallback();};
+  try{
+    const r=await fetch('/api/skan-stream',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(govde)});
+    if(!r.ok||!(r.headers.get('content-type')||'').includes('text/event-stream')){
+      let d={}; try{d=await r.json();}catch(e){}
+      xetaGoster(xetaObyekti(d)); return;
+    }
+    const oxucu=r.body.getReader(), dec=new TextDecoder(); let buf='';
+    while(!bitdi){
+      const {done,value}=await oxucu.read(); if(done)break;
+      buf+=dec.decode(value,{stream:true});
+      let i;
+      while(!bitdi&&(i=buf.indexOf('\n\n'))>=0){
+        const blok=buf.slice(0,i); buf=buf.slice(i+2);
+        const setir=blok.split('\n').filter(s=>s.startsWith('data:')).map(s=>s.slice(5).trim()).join('');
+        if(!setir)continue;
+        let d; try{d=JSON.parse(setir);}catch(e){continue;}
+        hadise(d);
+      }
+    }
+    if(!bitdi)xetaGoster({kod:'qosulma'});   // axın nəticəsiz kəsildi
+  }catch(e){
+    if(!bitdi)xetaGoster({kod:'qosulma',elave:e.message});
+  }
 }
 
-function balRengi(b){return b>=75?getComputedStyle(document.documentElement).getPropertyValue('--neon'):b>=40?getComputedStyle(document.documentElement).getPropertyValue('--orta'):getComputedStyle(document.documentElement).getPropertyValue('--yuksek');}
+function cssReng(ad){return getComputedStyle(document.documentElement).getPropertyValue(ad).trim();}
+function balRengi(b){return cssReng(b>=75?'--neon':b>=40?'--orta':'--yuksek');}
 
 function neticeGoster(d){
-  const t=UI[dil], reng=balRengi(d.bal).trim();
-  document.getElementById('balQiymet').textContent=t.qiymet+' '+d.qiymet;
-  document.getElementById('balQiymet').style.color=reng;
+  const t=UI[dil], nat=!!d.natamam||d.bal==null, bal=nat?0:d.bal;
+  const reng=nat?cssReng('--orta'):balRengi(bal);
+  $('balQiymet').textContent=t.qiymet+' '+(nat?'?':d.qiymet);
+  $('balQiymet').style.color=reng;
   // Animasiyalı halqa (dolur) + rəqəm count-up
-  const arc=document.getElementById('balArc'), C=301.6;
+  const arc=$('balArc'), C=301.6;
   arc.style.stroke=reng; arc.style.strokeDashoffset=C;
-  requestAnimationFrame(()=>{arc.style.strokeDashoffset=C*(1-Math.max(0,Math.min(100,d.bal))/100);});
-  document.querySelector('.bal-qutu').classList.add('doldu');
-  const rq=document.getElementById('balReqem'); let n=0;
+  requestAnimationFrame(()=>{arc.style.strokeDashoffset=C*(1-Math.max(0,Math.min(100,bal))/100);});
+  document.querySelector('.bal-qutu').classList.toggle('doldu',!nat);
+  const rq=$('balReqem'); let n=0;
   if(window._balT)clearInterval(window._balT);
-  window._balT=setInterval(()=>{n+=Math.max(1,Math.ceil(d.bal/28));if(n>=d.bal){n=d.bal;clearInterval(window._balT);}rq.textContent=n;},34);
-  document.getElementById('xHedef').textContent=d.hedef;
-  document.getElementById('xStat').textContent=`${d.statistika.sehifeler} ${t.sehife} · ${d.statistika.formalar} ${t.forma} · ${d.tapintilar.length} ${t.netice}`;
-  const tex=d.texnologiya||{}; let texHtml='';
-  if(tex.server&&tex.server!=='?') texHtml+=`<span class="tech-chip">⚙ ${tex.server}</span>`;
-  (tex.texnologiyalar||[]).forEach(x=>texHtml+=`<span class="tech-chip">${x}</span>`);
-  if(d.auth_edildi) texHtml=`<span class="auth-chip">🔓 ${UI[dil].authli}</span>`+texHtml;
-  document.getElementById('xTech').innerHTML=texHtml;
+  if(nat)rq.textContent='?';
+  else if(AZ_HEREKET)rq.textContent=bal;
+  else window._balT=setInterval(()=>{n+=Math.max(1,Math.ceil(bal/28));if(n>=bal){n=bal;clearInterval(window._balT);}rq.textContent=n;},34);
+
+  // Natamam skan: "təmiz" demirik, səbəbini açıq yazırıq
+  const xb=$('xeberdarliq');
+  if(nat){xb.textContent=t.natamam.replace('{status}',d.natamam_status==null?t.cavab_yox:('HTTP '+d.natamam_status));xb.style.display='block';}
+  else xb.style.display='none';
+
+  $('xHedef').textContent=d.hedef;
+  $('xStat').textContent=`${d.statistika.sehifeler} ${t.sehife} · ${d.statistika.formalar} ${t.forma} · ${d.tapintilar.length} ${t.netice}`;
+  const tex=d.texnologiya||{}, texler=(tex.texnologiyalar||[]).map(String); let texHtml='';
+  // Server adı artıq texnologiya siyahısındadırsa, iki dəfə göstərmə
+  const srv=String(tex.server||'');
+  if(srv&&srv!=='?'&&!texler.some(x=>srv.toLowerCase().includes(x.toLowerCase()))) texHtml+=`<span class="tech-chip">⚙ ${esc(srv)}</span>`;
+  texler.forEach(x=>texHtml+=`<span class="tech-chip">${esc(x)}</span>`);
+  if(d.auth_edildi) texHtml=`<span class="auth-chip">🔓 ${esc(t.authli)}</span>`+texHtml;
+  if(d.headless===false) texHtml+=`<span class="tech-chip qeyd-chip" title="${esc(t.statik_izah)}">${esc(t.statik)}</span>`;
+  $('xTech').innerHTML=texHtml;
 
   aktivFiltr=null;
   const ic=d.icmal||{}; const sira=['kritik','yuksek','orta','asagi','info'];
-  document.getElementById('cipSira').innerHTML=sira.map(s=>ic[s]?`<span class="cip" data-sev="${s}" onclick="filterEt('${s}')" style="background:${RENG[s]};color:${s==='info'?'#fff':'#03050a'}">${t.nisan[s]}: ${ic[s]}</span>`:'').join('');
+  $('cipSira').innerHTML=sira.map(s=>ic[s]?`<button type="button" class="cip" data-sev="${s}" aria-pressed="false" style="background:${RENG[s]};color:${s==='info'?'#fff':'#03050a'}">${esc(t.nisan[s])}: ${Number(ic[s])}</button>`:'').join('');
   const cem=sira.reduce((a,s)=>a+(ic[s]||0),0)||1;
-  document.getElementById('icmalBar').innerHTML=sira.map(s=>ic[s]?`<span style="background:${RENG[s]};width:${ic[s]/cem*100}%"></span>`:'').join('')||`<span style="background:var(--neon);width:100%"></span>`;
-  donutGoster(ic,sira);
+  $('icmalBar').innerHTML=sira.map(s=>ic[s]?`<span style="background:${RENG[s]};width:${ic[s]/cem*100}%"></span>`:'').join('')||`<span style="background:var(${nat?'--orta':'--neon'});width:100%"></span>`;
+  donutGoster(ic,sira,nat);
 
-  document.getElementById('yoxListe').innerHTML=d.yoxlamalar.map(y=>{const tm=y.status==='temiz';
-    return `<div class="yox-setir ${tm?'yox-temiz':'yox-zeif'}"><span class="yox-ikon">${tm?'✓':'⚠'}</span><span class="yox-ad">${t.kat[y.kat]||y.kat}</span><span class="yox-status">${tm?t.temiz:t.zeif}${y.say>0?' ('+y.say+')':''}</span></div>`;}).join('');
+  $('yoxListe').innerHTML=d.yoxlamalar.map(y=>{const tm=y.status==='temiz';
+    const cls=tm?(nat?'yox-namelum':'yox-temiz'):'yox-zeif', ikon=tm?(nat?'?':'✓'):'⚠';
+    const st=tm?(nat?t.namelum:t.temiz):t.zeif;
+    return `<div class="yox-setir ${cls}"><span class="yox-ikon">${ikon}</span><span class="yox-ad">${esc(t.kat[y.kat]||y.kat)}</span><span class="yox-status">${esc(st)}${y.say>0?' ('+Number(y.say)+')':''}</span></div>`;}).join('');
 
   // OWASP Top 10
   const ow=d.owasp_icmal||{}, owAd=d.owasp_adlar||{}, owK=Object.keys(ow).sort();
-  const owP=document.getElementById('owaspPanel');
+  const owP=$('owaspPanel');
   if(owK.length){
-    document.getElementById('owaspListe').innerHTML=owK.map(k=>`<div class="yox-setir yox-zeif"><span class="yox-ikon">⚠</span><span class="yox-ad"><b>${k}</b> — ${(owAd[k]&&owAd[k][dil])||''}</span><span class="yox-status">${ow[k]}</span></div>`).join('');
+    $('owaspListe').innerHTML=owK.map(k=>`<div class="yox-setir yox-zeif"><span class="yox-ikon">⚠</span><span class="yox-ad"><b>${esc(k)}</b> — ${esc((owAd[k]&&owAd[k][dil])||'')}</span><span class="yox-status">${Number(ow[k])}</span></div>`).join('');
     owP.style.display='block';
   } else owP.style.display='none';
 
   tapintilariGoster();
-  document.getElementById('termTitle').textContent='scan/'+(d.domen||'');
-  document.getElementById('tabXulase').textContent=t.tab_xulase;
-  document.getElementById('tabTapintilar').textContent=t.tab_tapintilar+' ('+d.tapintilar.length+')';
-  document.getElementById('tabYoxlamalar').textContent=t.tab_yoxlamalar;
+  $('termTitle').textContent='scan/'+(d.domen||'');
+  $('tabXulase').textContent=t.tab_xulase;
+  $('tabTapintilar').textContent=t.tab_tapintilar+' ('+d.tapintilar.length+')';
+  $('tabYoxlamalar').textContent=t.tab_yoxlamalar;
   tabKec('xulase');
-  document.getElementById('netice').style.display='block';
+  $('netice').style.display='block';
 }
 
 function tabKec(t){
-  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('aktiv', b.dataset.tab===t));
+  document.querySelectorAll('.tab').forEach(b=>{const a=b.dataset.tab===t;b.classList.toggle('aktiv',a);b.setAttribute('aria-selected',a);});
   const hedef='pane'+t.charAt(0).toUpperCase()+t.slice(1);
   document.querySelectorAll('.tab-pane').forEach(p=>p.classList.toggle('acik', p.id===hedef));
 }
 
-function donutGoster(ic,sira){
+function donutGoster(ic,sira,nat){
   const cem=sira.reduce((a,s)=>a+(ic[s]||0),0);
   const R=46,C=2*Math.PI*R; let off=0,halq='';
-  if(cem===0){halq=`<circle cx="58" cy="58" r="${R}" fill="none" stroke="#00ff9c" stroke-width="12"/>`;}
+  if(cem===0){halq=`<circle cx="58" cy="58" r="${R}" fill="none" stroke="${nat?'#ffb020':'#00ff9c'}" stroke-width="12"/>`;}
   else sira.forEach(s=>{if(!ic[s])return;const f=ic[s]/cem;
     halq+=`<circle cx="58" cy="58" r="${R}" fill="none" stroke="${RENG[s]}" stroke-width="12" stroke-dasharray="${f*C} ${C}" stroke-dashoffset="${-off*C}" transform="rotate(-90 58 58)"/>`;off+=f;});
-  document.getElementById('donut').innerHTML=halq+
+  $('donut').innerHTML=halq+
     `<text x="58" y="55" text-anchor="middle" class="donut-merkez" fill="#fff" font-size="24">${cem}</text>`+
-    `<text x="58" y="73" text-anchor="middle" fill="#5f7385" font-size="10">${UI[dil].netice}</text>`;
+    `<text x="58" y="73" text-anchor="middle" fill="#8fa3b5" font-size="10">${esc(UI[dil].netice)}</text>`;
 }
 
 function filterEt(sev){
   aktivFiltr=(aktivFiltr===sev)?null:sev;
-  document.querySelectorAll('.cip').forEach(c=>c.classList.toggle('sol',aktivFiltr&&c.dataset.sev!==aktivFiltr));
+  document.querySelectorAll('.cip').forEach(c=>{c.classList.toggle('sol',!!aktivFiltr&&c.dataset.sev!==aktivFiltr);c.setAttribute('aria-pressed',c.dataset.sev===aktivFiltr);});
   tapintilariGoster();
+  if(aktivFiltr)tabKec('tapintilar');
 }
 
 function tapintilariGoster(){
   if(!sonNetice)return;
-  const t=UI[dil],qab=document.getElementById('tapintilar'),finfo=document.getElementById('filtrInfo');
-  if(!sonNetice.tapintilar.length){qab.innerHTML=`<div class="temiz-msg">${t.tapildi_yox}</div>`;finfo.style.display='none';return;}
+  const t=UI[dil],qab=$('tapintilar'),finfo=$('filtrInfo');
+  if(!sonNetice.tapintilar.length){qab.innerHTML=`<div class="temiz-msg">${esc(sonNetice.natamam?t.natamam_qisa:t.tapildi_yox)}</div>`;finfo.style.display='none';return;}
   let list=aktivFiltr?sonNetice.tapintilar.filter(x=>x.ciddilik===aktivFiltr):sonNetice.tapintilar;
   if(aktivFiltr){finfo.style.display='block';finfo.textContent=`⊗ ${t.nisan[aktivFiltr]} (${list.length}) — ${t.filtr_temizle}`;}
   else finfo.style.display='none';
-  qab.innerHTML=list.map((tp,i)=>{const m=tp.metn[dil];
-    return `<div class="tapinti ${tp.ciddilik}" style="animation-delay:${Math.min(i*35,350)}ms"><div class="bash"><span class="nisan">${t.nisan[tp.ciddilik]}</span>${tp.cvss?`<span class="cvss-rozet">CVSS ${tp.cvss.toFixed(1)}</span>`:''}${tp.owasp?`<span class="owasp-chip">${tp.owasp}</span>`:''}<h3>${m.ad}</h3></div><div class="s2">📍 ${tp.yer}</div><div class="izah">${m.izah}</div><div class="hell">💡 ${t.hell}: ${m.hell}</div></div>`;}).join('');
+  qab.innerHTML=list.map((tp,i)=>{const m=(tp.metn&&(tp.metn[dil]||tp.metn.az))||{};
+    const sev=RENG[tp.ciddilik]?tp.ciddilik:'info', cv=Number(tp.cvss)||0;
+    return `<div class="tapinti ${sev}" style="animation-delay:${Math.min(i*35,350)}ms"><div class="bash"><span class="nisan">${esc(t.nisan[sev])}</span>${cv?`<span class="cvss-rozet">CVSS ${cv.toFixed(1)}</span>`:''}${tp.owasp?`<span class="owasp-chip">${esc(tp.owasp)}</span>`:''}<h3>${esc(m.ad)}</h3></div><div class="s2">📍 ${esc(tp.yer)}</div><div class="izah">${esc(m.izah)}</div><div class="hell">💡 ${esc(t.hell)}: ${esc(m.hell)}</div></div>`;}).join('');
 }
 
 function jsonYukle(){
@@ -547,12 +673,24 @@ function jsonYukle(){
   const blob=new Blob([JSON.stringify(sonNetice,null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);
   a.download='cyberayfar-'+(sonNetice.domen||'report').replace(/[^a-z0-9]/gi,'_')+'.json';a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
 }
 function girisToggle(){
-  const s=document.getElementById('girisSahe'), o=document.getElementById('girisOx');
-  s.classList.toggle('acik'); o.textContent=s.classList.contains('acik')?'▴':'▾';
+  const s=$('girisSahe'), acik=s.classList.toggle('acik');
+  $('girisOx').textContent=acik?'▴':'▾';
+  $('girisAc').setAttribute('aria-expanded',acik);
 }
-document.getElementById('hedef').addEventListener('keydown',e=>{if(e.key==='Enter')skanBasla();});
+
+// ============ Hadisələr (inline onclick YOXDUR — CSP nonce ilə uyğun) ============
+document.querySelectorAll('.diller button').forEach(b=>b.addEventListener('click',()=>dilDeyis(b.dataset.dil)));
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>tabKec(b.dataset.tab)));
+$('skanBtn').addEventListener('click',skanBasla);
+$('girisAc').addEventListener('click',girisToggle);
+$('btnJson').addEventListener('click',jsonYukle);
+$('btnPdf').addEventListener('click',()=>window.print());
+$('filtrInfo').addEventListener('click',()=>filterEt(null));
+$('cipSira').addEventListener('click',e=>{const c=e.target.closest('.cip');if(c)filterEt(c.dataset.sev);});
+['hedef','loginUrl','istifadeci','parol'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter')skanBasla();}));
 
 // ============ TYPEWRITER tagline ============
 function typewriterBasla(){
@@ -574,6 +712,7 @@ function typewriterBasla(){
 function countUp(){
   document.querySelectorAll('.stat .num').forEach(el=>{
     const hedef=+el.dataset.hedef, son=el.dataset.son||''; let n=0;
+    if(AZ_HEREKET){el.textContent=hedef+son;return;}
     const addim=Math.max(1,Math.round(hedef/40));
     const t=setInterval(()=>{n+=addim;if(n>=hedef){n=hedef;clearInterval(t);}el.textContent=n+son;},30);
   });
@@ -584,10 +723,10 @@ function bootBasla(){
   const boot=document.getElementById('boot'), el=document.getElementById('bootMetn');
   let gorundu=false;
   try{gorundu=sessionStorage.getItem('cyb_boot')==='1';}catch(e){}
-  if(gorundu){boot.classList.add('gizle');countUp();typewriterBasla();return;}
+  if(gorundu||AZ_HEREKET){boot.classList.add('gizle');countUp();typewriterBasla();return;}
   const setirler=[
     "> INITIALIZING CYBERAYFAR CORE",
-    "> LOADING 24 ATTACK MODULES ... <span class='ok'>[OK]</span>",
+    "> LOADING "+SAY+" SCAN MODULES ... <span class='ok'>[OK]</span>",
     "> ESTABLISHING SECURE CHANNEL ... <span class='ok'>[OK]</span>",
     "> AUTHORIZATION GATE ... <span class='ok'>[ARMED]</span>",
     "> <span class='ok'>ACCESS GRANTED</span>",
@@ -611,14 +750,25 @@ function bootBasla(){
   const c=document.getElementById('matrix'),x=c.getContext('2d');
   let w,h,sutun,damla;
   function olcu(){w=c.width=innerWidth;h=c.height=innerHeight;sutun=Math.floor(w/14);damla=Array(sutun).fill(1);}
+  if(AZ_HEREKET){c.style.display='none';return;}
   olcu();addEventListener('resize',olcu);
   const herf="01</>{}#$аяＣＹＢＥＲ01ｱｲｳｴ10アイウエオカ".split('');
-  setInterval(()=>{x.fillStyle='rgba(3,5,10,.07)';x.fillRect(0,0,w,h);
+  function cek(){x.fillStyle='rgba(3,5,10,.07)';x.fillRect(0,0,w,h);
     x.fillStyle='#00ff9c';x.font='14px monospace';
     for(let i=0;i<damla.length;i++){const t=herf[Math.floor(Math.random()*herf.length)];
-      x.fillText(t,i*14,damla[i]*14);if(damla[i]*14>h&&Math.random()>.975)damla[i]=0;damla[i]++;}},55);
+      x.fillText(t,i*14,damla[i]*14);if(damla[i]*14>h&&Math.random()>.975)damla[i]=0;damla[i]++;}}
+  // Tab gizli olanda çəkmə (batareya/CPU)
+  let tm=null;
+  const basla=()=>{if(!tm)tm=setInterval(cek,55);}, dayan=()=>{clearInterval(tm);tm=null;};
+  document.addEventListener('visibilitychange',()=>document.hidden?dayan():basla());
+  if(!document.hidden)basla();
 })();
 
+// Seçilmiş dil yadda qalır (yoxdursa brauzer dilinə bax)
+let basDil='az';
+try{basDil=localStorage.getItem('cyb_dil')||'';}catch(e){}
+if(!UI[basDil]){const b=(navigator.language||'az').slice(0,2).toLowerCase();basDil=UI[b]?b:'az';}
+dilDeyis(basDil);
 bootBasla();
 </script>
 </body>
