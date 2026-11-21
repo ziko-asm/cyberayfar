@@ -14,8 +14,11 @@ import os
 import json
 import time
 import queue
+import hashlib
 import secrets
 import threading
+
+import requests
 
 from flask import Flask, request, jsonify, render_template, Response, g
 import motor
@@ -209,11 +212,49 @@ _limit_vaxtlar = {}
 
 
 def _musteri_ip() -> str:
-    if PROD:   # platforma proksisi əsl IP-ni X-Forwarded-For-un əvvəlinə yazır
+    """Ziyarətçinin IP-si — ziyarətçinin özünün dəyişə bilmədiyi başlıqdan.
+    Vercel x-vercel-forwarded-for / x-real-ip başlıqlarını özü yazır (ziyarətçinin
+    göndərdiyini silir). X-Forwarded-For-un BİRİNCİ elementini isə ziyarətçi özü
+    yaza bilər — ona görə Vercel-də ona güvənmirik."""
+    if os.environ.get("VERCEL"):
+        for ad in ("x-vercel-forwarded-for", "x-real-ip"):
+            v = (request.headers.get(ad) or "").split(",")[0].strip()
+            if v:
+                return v
+    if PROD:   # Render: platforma proksisi əsl IP-ni X-Forwarded-For-un əvvəlinə yazır
         xff = request.headers.get("X-Forwarded-For", "")
         if xff:
             return xff.split(",")[0].strip()
     return request.remote_addr or "?"
+
+
+# Ortaq sayğac (istəyə bağlı): Vercel-də hər server nüsxəsinin öz yaddaşı var,
+# ona görə yaddaşdakı limit faktiki işləmir. Upstash Redis qoşulubsa (Vercel →
+# Storage → Upstash, və ya env: UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN)
+# limit bütün nüsxələr üçün birdir. Redis cavab verməsə yaddaşdakı limitə düşür.
+_REDIS_URL = (os.environ.get("UPSTASH_REDIS_REST_URL")
+              or os.environ.get("KV_REST_API_URL") or "").rstrip("/")
+_REDIS_TOKEN = (os.environ.get("UPSTASH_REDIS_REST_TOKEN")
+                or os.environ.get("KV_REST_API_TOKEN") or "")
+
+
+def _redis_limit(ip: str, indi: float):
+    """Gözləmə saniyəsi (0 = icazə), Redis yoxdursa/işləmirsə None."""
+    if not (_REDIS_URL and _REDIS_TOKEN):
+        return None
+    pencere = int(indi // LIMIT_PENCERE)
+    acar = "cyberayfar:limit:" + hashlib.sha256(ip.encode()).hexdigest()[:32] + f":{pencere}"
+    try:
+        r = requests.post(f"{_REDIS_URL}/pipeline", timeout=2,
+                          headers={"Authorization": f"Bearer {_REDIS_TOKEN}"},
+                          json=[["INCR", acar], ["EXPIRE", acar, str(int(LIMIT_PENCERE) + 5)]])
+        r.raise_for_status()
+        say = int(r.json()[0]["result"])
+    except Exception:
+        return None
+    if say > LIMIT_SAY:
+        return max(1, int(LIMIT_PENCERE - indi % LIMIT_PENCERE) + 1)
+    return 0
 
 
 def _limit_asildi():
@@ -221,6 +262,9 @@ def _limit_asildi():
     if not PROD:
         return 0
     indi, ip = time.time(), _musteri_ip()
+    ortaq = _redis_limit(ip, indi)
+    if ortaq is not None:
+        return ortaq
     with _limit_kilid:
         if len(_limit_vaxtlar) > 5000:           # yaddaş şişməsin
             _limit_vaxtlar.clear()
