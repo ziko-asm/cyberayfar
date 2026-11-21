@@ -21,6 +21,9 @@ import hashlib
 import ipaddress
 import requests
 import dns.resolver
+from urllib.parse import urljoin, urlparse
+
+from core import http_client   # bağlantı qoruması (daxili IP-yə qoşulmur) aktiv olsun
 
 
 class IcazeXetasi(Exception):
@@ -79,15 +82,30 @@ def token_yarat(domen: str, gizli_acar: str) -> str:
     return "skaner-" + hashlib.sha256(xam).hexdigest()[:32]
 
 
+def _eyni_sayt(url: str, domen: str) -> bool:
+    """Redirect yalnız eyni host və ya onun www-variantı daxilində izlənir."""
+    host = (urlparse(url).hostname or "").lower()
+    esas = (urlparse("//" + domen).hostname or "").lower()
+    esas = esas[4:] if esas.startswith("www.") else esas
+    return host in (esas, "www." + esas)
+
+
 def fayl_ile_yoxla(domen: str, gozlenilen_token: str, timeout=10) -> bool:
-    """Üsul 1: /.well-known/skaner-verify.txt faylını yoxlayır."""
+    """Üsul 1: /.well-known/skaner-verify.txt faylını yoxlayır.
+    Fayl SAHİBİN öz saytında olmalıdır: başqa hosta redirect izlənmir
+    (əks halda token başqa saytdan "götürülə" bilərdi)."""
     for sxem in ("https", "http"):
         url = f"{sxem}://{domen}/.well-known/skaner-verify.txt"
         try:
-            cavab = requests.get(url, timeout=timeout)
+            for _ in range(5):
+                cavab = requests.get(url, timeout=timeout, allow_redirects=False)
+                novbeti = urljoin(url, cavab.headers.get("location", ""))
+                if not cavab.is_redirect or not _eyni_sayt(novbeti, domen):
+                    break
+                url = novbeti
             if cavab.status_code == 200 and gozlenilen_token in cavab.text:
                 return True
-        except requests.RequestException:
+        except (requests.RequestException, http_client.HedefXaricindedir):
             continue
     return False
 

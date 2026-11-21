@@ -79,10 +79,14 @@ def icaze_yoxla(hedef: str, test_rejimi=True, allowlist=()):
 
 def skan_et(hedef: str, test_rejimi=True, maks_sehife=30, ilerleme=None,
             allowlist=(), auth=None, oob_base=None, icaze_verilib=False):
+    _, domen = hedefi_hazirla(hedef)
+    # Bütün sorğular (redirect-lər daxil) yalnız bu hosta getsin
+    http_client.hedef_qur(domen, daxiliye_icaze=test_rejimi)
     try:
         return _skan_et(hedef, test_rejimi, maks_sehife, ilerleme, allowlist,
                         auth, oob_base, icaze_verilib)
     finally:
+        http_client.hedef_sil(domen)
         # Giriş cookie-ləri növbəti skana (başqa istifadəçiyə) keçməsin
         http_client.cookie_sil()
 
